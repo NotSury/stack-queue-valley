@@ -1,12 +1,6 @@
 package game;
 
-/**
- * Stores formatted messages displayed by the game.
- */
 public class FancyMessage {
-    /**
-     * Title displayed when the game starts.
-     */
     public static String GAME_TITLE = "   ,-,--.  ,--.--------.   ,---.       _,.----.  ,--.-.,-.                \n" +
             " ,-.'-  _\\/==/,  -   , -\\.--.'  \\    .' .' -   \\/==/- |\\  \\               \n" +
             "/==/_ ,_.'\\==\\.-.  - ,-./\\==\\-/\\ \\  /==/  ,  ,-'|==|_ `/_ /,--.--------.  \n" +

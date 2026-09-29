@@ -1,82 +1,76 @@
 package game.grounds;
 
-import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.positions.Ground;
+import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actions.HarvestAction;
-import game.capabilities.Harvestable;
 import game.items.Parsnip;
 
 import java.util.List;
-import java.util.Random;
 
 /**
- * Represents a mature Parsnip crop that can be harvested.
+ * ParsnipCrop represents a mature Parsnip crop that can be harvested.
+ *
+ * <p>Harvesting the crop costs 1 stamina point and adds one Parsnip
+ * to the actor's inventory. The crop is then replaced with Dirt.
+ * There is also a 50 percent chance that an additional Parsnip is
+ * placed on a randomly selected adjacent location.</p>
+ *
+ * @author Lee Le Si 34599223
+ * @version 1.0.0
  */
-public class ParsnipCrop extends Ground implements Harvestable {
-
-    private static final int HARVEST_STAMINA_COST = 1;
-    private static final double BONUS_PARSNIP_CHANCE = 0.5;
-
-    private final Random random = new Random();
+public class ParsnipCrop extends Crop {
 
     /**
-     * Constructs a mature Parsnip crop.
+     * Constructor for the ParsnipCrop class.
+     *
+     * <p>Creates a mature Parsnip crop represented by the 'P'
+     * display character.</p>
      */
-    public ParsnipCrop(){
+    public ParsnipCrop() {
         super('P', "Parsnip Crop");
     }
 
     /**
-     * Applies the specific effects of harvesting this Parsnip crop.
-     * One portable Parsnip is added to the actor's inventory and the harvested
-     * crop is replaced with Dirt. There is also a 50% chance that another
-     * Parsnip is placed on a randomly selected adjacent location.
+     * Returns the stamina required to harvest this crop.
      *
-     * @param actor the actor performing the harvest
-     * @param location the location of this Parsnip crop
+     * @return the harvest cost of 1 stamina point
+     */
+    @Override
+    public int getHarvestCost() {
+        return 1;
+    }
+
+    /**
+     * Harvests this Parsnip crop.
+     *
+     * <p>One Parsnip is added to the actor's inventory and the crop is
+     * replaced with Dirt. There is a 50 percent chance that another
+     * Parsnip is placed on a randomly selected adjacent location.</p>
+     *
+     * @param actor the actor harvesting the crop
+     * @param location the location containing the crop
      * @return a description of the harvesting result
      */
     @Override
-    public String harvestedBy(Actor actor, Location location) {
+    public String harvest(Actor actor, Location location) {
+
         actor.getInventory().add(new Parsnip());
+
         location.setGround(new Dirt());
 
-        if (random.nextDouble() < BONUS_PARSNIP_CHANCE) {
-            placeBonusParsnip(location);
+        if (Math.random() < 0.5) {
+            List<Exit> exits = location.getExits();
+
+            if (!exits.isEmpty()) {
+                int randomIndex = (int) (Math.random() * exits.size());
+
+                Location adjacentLocation =
+                        exits.get(randomIndex).getDestination();
+
+                adjacentLocation.addItem(new Parsnip());
+            }
         }
 
-        return actor + " harvests the Parsnip crop.";
-    }
-
-    /**
-     * Places a bonus Parsnip on a randomly selected adjacent location.
-     *
-     * @param location the location of the harvested Parsnip crop
-     */
-    private void placeBonusParsnip(Location location) {
-        List<Location> adjacentLocations = location.getNearbyLocations(1);
-
-        if (!adjacentLocations.isEmpty()) {
-            int randomIndex = random.nextInt(adjacentLocations.size());
-            Location selectedLocation = adjacentLocations.get(randomIndex);
-            selectedLocation.addItem(new Parsnip());
-        }
-    }
-
-    /**
-     * Returns the actions that can be performed on this Parsnip crop.
-     *
-     * @param actor the actor interacting with the crop
-     * @param location the location of this crop
-     * @param direction the direction of this crop relative to the actor
-     * @return the actions available for this crop
-     */
-    @Override
-    public ActionList allowableActions(Actor actor, Location location, String direction) {
-        ActionList actions = new ActionList();
-        actions.add(new HarvestAction(this, location, HARVEST_STAMINA_COST));
-        return actions;
+        return actor + " harvest the Parsnip crop";
     }
 }

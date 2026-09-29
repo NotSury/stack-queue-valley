@@ -6,68 +6,77 @@ import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
-import game.capabilities.Harvestable;
-
+import game.interfaces.Harvestable;
 /**
- * Represents an action that allows an actor to harvest a harvestable object.
+ * HarvestAction represents an action that allows an actor to harvest
+ * a Harvestable target.
+ *
+ * <p>The stamina cost is determined by the Harvestable target. If the
+ * actor has enough stamina, the required amount is deducted before the
+ * target's specific harvesting behaviour is performed.</p>
+ *
+ * @author Lee Le Si 34599223
+ * @version 1.0.0
  */
 public class HarvestAction extends Action {
-
-    private final Harvestable harvestable;
-    private final Location location;
-    private final int staminaCost;
-
     /**
-     * Constructs a new harvest action.
-     *
-     * @param harvestable the object to be harvested
-     * @param location the location of the object to be harvested
-     * @param staminaCost the stamina required to perform the harvest
+     * The harvestable target of this action.
      */
-    public HarvestAction(
-            Harvestable harvestable,
-            Location location,
-            int staminaCost
-    ) {
-        this.harvestable = harvestable;
+    private final Harvestable target;
+    /**
+     * The location of the harvestable target.
+     */
+    private final Location location;
+    /**
+     * Constructor for the HarvestAction class.
+     *
+     * @param target the harvestable target
+     * @param location the location of the harvestable target
+     */
+    public HarvestAction(Harvestable target, Location location) {
+        this.target = target;
         this.location = location;
-        this.staminaCost = staminaCost;
     }
 
     /**
      * Executes the harvesting action.
      *
-     * The harvest fails if the actor does not have enough stamina. On a
-     * successful attempt, the required stamina is consumed before delegating
-     * the crop-specific harvesting behavior to the harvestable object.
+     * <p>The required stamina cost is obtained from the Harvestable target.
+     * If the actor has sufficient stamina, the cost is deducted and the
+     * target's harvesting behaviour is performed.</p>
+     *
+     * <p>If the actor does not have enough stamina, the target is not
+     * harvested and no stamina is deducted.</p>
      *
      * @param actor the actor performing the harvest
-     * @param map the game map containing the actor
+     * @param map the game map where the action is performed
      * @return a description of the harvesting result
      */
     @Override
-    public String execute(Actor actor, GameMap map) {
-        if (actor.getStatistic(ActorStatistics.STAMINA) < staminaCost) {
-            return "You are too tired to harvest this crop.";
+    public String execute(Actor actor, GameMap map){
+        int cost = target.getHarvestCost();
+
+        if (actor.getStatistic(ActorStatistics.STAMINA) < cost) {
+            return actor + " is too tired to harvest";
         }
 
         actor.modifyStatistic(
                 ActorStatistics.STAMINA,
                 StatisticOperations.DECREASE,
-                staminaCost
+                cost
         );
 
-        return harvestable.harvestedBy(actor, location);
+        return target.harvest(actor, location);
     }
 
     /**
-     * Returns the description of this action for the action menu.
+     * Returns the description of this action for display in the action menu.
      *
      * @param actor the actor performing the action
-     * @return the menu description
+     * @return the menu description of the harvesting action
      */
     @Override
-    public String menuDescription(Actor actor) {
-        return actor + " harvests " + harvestable;
+    public String menuDescription(Actor actor){
+        return actor + " harvest " + target;
     }
 }

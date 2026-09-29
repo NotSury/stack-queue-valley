@@ -1,46 +1,45 @@
 package game.actors;
 
-import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Location;
 import game.items.Egg;
 
-import java.util.Random;
-
 /**
- * Represents a Chicken that wanders around the farm and can be fed.
- * When fed, the Chicken restores health and produces Eggs.
+ * Chicken represents a farm animal that can wander and be fed by the Farmer.
+ *
+ * <p>When fed successfully, the Chicken restores up to 3 health points
+ * and produces one Egg. There is also a 50 percent chance that a second
+ * Egg is produced.</p>
+ *
+ * @author Lee Le Si 34599223
+ * @version 1.0.0
  */
 public class Chicken extends FarmAnimal {
 
-    private static final int HEALTH_RESTORED_WHEN_FED = 3;
-    private static final double BONUS_EGG_CHANCE = 0.5;
-
-    private final Random random = new Random();
-
     /**
-     * Constructs a Chicken with its initial health and display character.
+     * Constructor for the Chicken class.
+     *
+     * <p>Creates a Chicken represented by the 'c' display character with
+     * 10 health points and a feeding health restoration of 3.</p>
      */
     public Chicken() {
-        super("Chicken", 'c', 10);
+        super("Chicken", 'c', 10, 3);
     }
 
     /**
-     * Applies the Chicken specific effect of being fed.
-     * Feeding restores health of the Chicken and produces one Egg on a
-     * randomly selected location adjacent to the feeding actor. There is also
-     * a 50 percent chance that another Egg is produced.
+     * Produces the Chicken-specific result after feeding.
      *
-     * @param actor the actor feeding this chicken
-     * @param actorLocation the location of the actor performing the feeding
+     * <p>One Egg is always produced, with a 50 percent chance of
+     * producing one additional Egg.</p>
+     *
+     * @param location the current location of the Chicken
      */
     @Override
-    public void fedBy(Actor actor, Location actorLocation) {
-        this.heal(HEALTH_RESTORED_WHEN_FED);
+    protected void produceAfterFeeding(Location location) {
 
-        dropItemNearby(actorLocation, new Egg());
+        location.addItem(new Egg());
 
-        if (random.nextDouble() < BONUS_EGG_CHANCE) {
-            dropItemNearby(actorLocation, new Egg());
+        if (Math.random() < 0.5) {
+            location.addItem(new Egg());
         }
     }
 }

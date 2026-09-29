@@ -1,34 +1,38 @@
 package game.actors;
 
-import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Location;
 import game.items.Milk;
 
 /**
- * Represents a Cow that can wander around the farm and be fed.
+ * Cow represents a farm animal that can wander and be fed by the Farmer.
+ *
+ * <p>When fed successfully, the Cow restores up to 5 health points
+ * and produces a Milk item at its current location.</p>
+ *
+ * @author Lee Le Si 34599223
+ * @version 1.0.0
  */
 public class Cow extends FarmAnimal {
 
-    private static final int HEALTH_RESTORED_WHEN_FED = 5;
-
     /**
-     * Constructs a Cow with 20 health points.
+     * Constructor for the Cow class.
+     *
+     * <p>Creates a Cow represented by the 'C' display character with
+     * 20 health points and a feeding health restoration of 5.</p>
      */
     public Cow() {
-        super("Cow", 'C', 20);
+        super("Cow", 'C', 20, 5);
     }
 
     /**
-     * Applies the Cow specific effect of being fed.
-     * Feeding restores health to the Cow and produces one bottle of Milk on
-     * a randomly selected location adjacent to the feeding actor.
+     * Produces the Cow-specific result after feeding.
      *
-     * @param actor the actor performing the feeding
-     * @param actorLocation the location of the actor performing the feeding
+     * <p>A Milk item is placed at the Cow's current location.</p>
+     *
+     * @param location the current location of the Cow
      */
     @Override
-    public void fedBy(Actor actor, Location actorLocation) {
-        this.heal(HEALTH_RESTORED_WHEN_FED);
-        dropItemNearby(actorLocation, new Milk());
+    protected void produceAfterFeeding(Location location) {
+        location.addItem(new Milk());
     }
 }
