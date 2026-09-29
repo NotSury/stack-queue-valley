@@ -1,6 +1,7 @@
 package game.behaviours;
 
 import edu.monash.fit2099.engine.actions.Action;
+import edu.monash.fit2099.engine.actions.MoveActorAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.Exit;
@@ -9,38 +10,57 @@ import edu.monash.fit2099.engine.positions.Location;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 /**
- * Represents a behavior that moves an actor to a randomly selected
- * neighboring location when movement is possible.
+ * WanderBehaviour represents a behaviour that allows an actor to move
+ * randomly to one of its accessible neighbouring locations.
+ *
+ * <p>The behaviour examines all exits from the actor's current location
+ * and creates movement actions for destinations that the actor can enter.
+ * One of the available movement actions is then selected randomly.</p>
+ *
+ * <p>If there are no accessible neighbouring locations, the behaviour
+ * returns null and no movement action is performed.</p>
+ *
+ * @author Lee Le Si 34599223
+ * @version 1.0.0
  */
-public class WanderBehaviour implements Behaviour<Actor, Action> {
-
+public class WanderBehaviour implements Behaviour<Actor,Action> {
+    /**
+     * Random number generator used to select one of the available
+     * movement actions.
+     */
     private final Random random = new Random();
 
     /**
-     * Selects a random valid movement action for the actor.
+     * Determines a random movement action for the actor.
      *
-     * @param actor the actor performing the behavior
+     * <p>All exits from the current location are checked and only destinations
+     * that the actor can enter are considered. A movement action is created
+     * for each valid destination and one is selected randomly.</p>
+     *
+     * @param actor the actor performing the wandering behaviour
      * @param location the actor's current location
-     * @return a movement action, or null if no movement is possible
+     * @return a randomly selected movement action, or null if no valid
+     *         movement is available
      */
     @Override
     public Action operate(Actor actor, Location location) {
-        List<Action> actions = new ArrayList<>();
+
+    List<Action> actions = new ArrayList<>();
 
         for (Exit exit : location.getExits()) {
-            Location destination = exit.getDestination();
+         if (exit.getDestination().canActorEnter(actor)) {
+             actions.add(new MoveActorAction(
+                     exit.getDestination(),
+                     exit.getName()
+             ));
+         }
+     }
 
-            if (destination.canActorEnter(actor)) {
-                actions.add(destination.getMoveAction(actor, "around", exit.getHotKey()));
-            }
-        }
+     if (!actions.isEmpty()){
+         return actions.get(random.nextInt(actions.size()));
+     }
 
-        if (actions.isEmpty()) {
-            return null;
-        }
-
-        return actions.get(random.nextInt(actions.size()));
+     return null;
     }
 }

@@ -4,61 +4,74 @@ import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.World;
-import game.actors.Chicken;
-import game.actors.Cow;
 import game.actors.Farmer;
 import game.grounds.*;
+import game.actors.Cow;
+import game.actors.Chicken;
 
 import java.util.Arrays;
 import java.util.List;
-
 /**
- * Represents the game world for Stack-Queue Valley.
+ * StackQueueValleyWorld represents the game world for Stack-Queue Valley.
+ *
+ * <p>The world initialises the farm map, places the Farmer, crops,
+ * farm animals, and processing facilities, and prepares the game
+ * environment before the game begins.</p>
+ *
+ * @author Lee Le Si 34599223
+ * @version 1.0.0
  */
 public class StackQueueValleyWorld extends World {
 
     /**
-     * Constructs the Stack-Queue Valley world.
+     * Constructor.
      *
      * @param display the Display that will display this World.
      */
     public StackQueueValleyWorld(Display display) {
         super(display);
     }
-
     /**
-     * Initializes the game world, including the farm map and Farmer.
+     * Initialises the game world.
      *
-     * @throws Exception if the world cannot be initialized
+     * <p>This method creates the farm map, places the Farmer and farm animals,
+     * adds mature crops, and places the available processing facilities.</p>
+     *
+     * @throws Exception if an error occurs while initialising the game world
      */
     public void initialise() throws Exception {
         DefaultGroundCreator groundCreator = new DefaultGroundCreator();
         groundCreator.registerGround('.', Dirt::new);
-        groundCreator.registerGround('P', ParsnipCrop::new);
-        groundCreator.registerGround('T', TomatoCrop::new);
-        groundCreator.registerGround('J', PreservesJar::new);
-        groundCreator.registerGround('R', DryingRack::new);
 
         List<String> inheritedFarm = Arrays.asList(
-                "..P....T..",
                 "..........",
-                "......P...",
-                "...T......",
-                "....J.R...",
-                ".P........",
-                ".......T.."
+                "..........",
+                "..........",
+                "..........",
+                "..........",
+                "..........",
+                ".........."
         );
 
         GameMap inheritedFarmMap = new GameMap("Inherited Farm", groundCreator, inheritedFarm);
         this.addGameMap(inheritedFarmMap);
 
+        inheritedFarmMap.at(4, 3).setGround(new ParsnipCrop());
+        inheritedFarmMap.at(6, 3).setGround(new TomatoCrop());
+        inheritedFarmMap.at(3,2).setGround(new ParsnipCrop());
+        inheritedFarmMap.at(8, 2).setGround(new TomatoCrop());
+
         Farmer farmer = new Farmer("Bob");
         this.addPlayer(farmer, inheritedFarmMap.at(5, 3));
 
         Cow cow = new Cow();
-        inheritedFarmMap.addActor(cow, inheritedFarmMap.at(0, 1));
-
         Chicken chicken = new Chicken();
-        inheritedFarmMap.addActor(chicken, inheritedFarmMap.at(7, 4));
+
+        inheritedFarmMap.at(1,1).addActor(cow);
+        inheritedFarmMap.at(4,5).addActor(chicken);
+
+        inheritedFarmMap.at(6,5).setGround(new PreservesJar());
+        inheritedFarmMap.at(5,6).setGround(new DryingRack());
+
     }
 }

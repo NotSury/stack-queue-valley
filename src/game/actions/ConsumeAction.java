@@ -3,45 +3,53 @@ package game.actions;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
-import game.capabilities.Consumable;
-
+import game.interfaces.Consumable;
 /**
- * Represents an action that allows an actor to consume a consumable object.
+ * ConsumeAction represents an action that allows an actor to consume
+ * an object that implements the Consumable interface.
+ *
+ * <p>The action delegates the actual consumption behaviour to the
+ * Consumable target so that different consumable objects can define
+ * their own effects.</p>
+ *
+ * @author Lee Le Si 34599223
+ * @version 1.0.0
  */
 public class ConsumeAction extends Action {
-
-    private final Consumable consumable;
-
     /**
-     * Constructs a new consume action.
-     *
-     * @param consumable the object to be consumed
+     * The consumable object targeted by this action.
      */
-    public ConsumeAction(Consumable consumable) {
-        this.consumable = consumable;
-    }
-
+    private final Consumable target;
     /**
-     * Executes the consume action by delegating the consumption behavior
-     * to the consumable object.
+     * Constructor for the ConsumeAction class.
      *
-     * @param actor the actor performing the action
-     * @param map the map the actor is on
-     * @return a description of the consumption result
+     * @param target the consumable object to be consumed
+     */
+    public ConsumeAction(Consumable target) {
+        this.target = target;
+    }
+    /**
+     * Executes the consumption action.
+     *
+     * <p>The consumption behaviour is delegated to the target Consumable,
+     * allowing the target to apply its own effects to the actor.</p>
+     *
+     * @param actor the actor consuming the target
+     * @param map the game map where the action is performed
+     * @return a description of the result of consumption
      */
     @Override
-    public String execute(Actor actor, GameMap map) {
-        return consumable.consumedBy(actor);
+    public String execute(Actor actor, GameMap map){
+        return target.consume(actor);
     }
-
     /**
-     * Returns the description of this action for the action menu.
+     * Returns the description of this action for display in the action menu.
      *
      * @param actor the actor performing the action
-     * @return the menu description
+     * @return the menu description of the consumption action
      */
     @Override
     public String menuDescription(Actor actor) {
-        return actor + " consumes " + consumable;
+        return actor + " consumes " + target;
     }
 }

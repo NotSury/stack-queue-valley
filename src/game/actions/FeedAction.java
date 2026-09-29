@@ -6,64 +6,91 @@ import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
-import game.capabilities.FeedItem;
-import game.capabilities.Feedable;
-
+import game.interfaces.FeedItem;
+import game.interfaces.Feedable;
 /**
- * Represents an action that allows an actor to feed a feedable target
- * using a selected feeding item.
+ * FeedAction represents an action that allows an actor to feed a
+ * Feedable target using a FeedItem.
+ *
+ * <p>The action requires 2 stamina points. When successful, the target's
+ * feeding effect and the food item's feeding effect are both applied.
+ * The food item is then removed from the actor's inventory.</p>
+ *
+ * @author Lee Le Si 34599223
+ * @version 1.0.0
  */
 public class FeedAction extends Action {
-
-    private static final int FEED_STAMINA_COST = 2;
-
-    private final Feedable feedable;
-    private final FeedItem feedItem;
+    /**
+     * The feedable actor targeted by this action.
+     */
+    private final Feedable target;
+    /**
+     * The food item used to feed the target.
+     */
+    private final FeedItem food;
+    /**
+     * The location of the feedable target.
+     */
+    private final Location targetLocation;
 
     /**
-     * Constructs a feeding action.
+     * Constructor for the FeedAction class.
      *
-     * @param feedable the target being fed
-     * @param feedItem the item used for feeding
+     * @param target the feedable actor being fed
+     * @param food the item used to feed the target
+     * @param targetLocation the location of the feedable target
      */
-    public FeedAction(Feedable feedable, FeedItem feedItem) {
-        this.feedable = feedable;
-        this.feedItem = feedItem;
+    public FeedAction(Feedable target, FeedItem food, Location targetLocation) {
+        this.target = target;
+        this.food = food;
+        this.targetLocation = targetLocation;
     }
 
     /**
      * Executes the feeding action.
-     * The actor must have sufficient stamina before the target and food
-     * effects are applied.
      *
-     * @param actor the actor performing the feeding
-     * @param map the map containing the actor
-     * @return a description of the feeding result
+     * <p>If the actor has at least 2 stamina points, the required stamina
+     * is deducted before applying both the animal-specific feeding effect
+     * and the food-specific feeding effect. The food item is removed after
+     * the feeding process is completed.</p>
+     *
+     * <p>If the actor does not have enough stamina, no feeding effects are
+     * applied and the food remains in the actor's inventory.</p>
+     *
+     * @param actor the actor performing the feeding action
+     * @param map the game map where the action is performed
+     * @return a description of the result of the feeding action
      */
     @Override
-    public String execute(Actor actor, GameMap map) {
-        if (actor.getStatistic(ActorStatistics.STAMINA) < FEED_STAMINA_COST) {
-            return "You are too tired to feed this animal.";
+    public String execute(Actor actor, GameMap map){
+
+        if (actor.getStatistic(ActorStatistics.STAMINA)<2){
+            return actor + " is too tired to feed the animal.";
         }
 
-        actor.modifyStatistic(ActorStatistics.STAMINA, StatisticOperations.DECREASE, FEED_STAMINA_COST);
+        actor.modifyStatistic(
+                ActorStatistics.STAMINA,
+                StatisticOperations.DECREASE,
+                2
+        );
 
-        Location actorLocation = map.locationOf(actor);
+        String animalResult = target.feed(actor, targetLocation);
+        String foodResult = food.feedEffect(actor);
 
-        feedable.fedBy(actor, actorLocation);
-        feedItem.usedForFeedingBy(actor);
+        food.removeAfterFeeding(actor);
 
-        return actor + " feeds " + feedable + " with " + feedItem + ".";
+        return animalResult + " " + foodResult;
     }
 
     /**
-     * Describes the feeding action in the action menu.
+     * Returns the description of this action for display in the action menu.
      *
-     * @param actor the actor performing the feeding
-     * @return the menu description
+     * @param actor the actor performing the action
+     * @return the menu description of the feeding action
      */
     @Override
     public String menuDescription(Actor actor){
-        return actor + " feeds " + feedable + " with " + feedItem;
+        return actor + " feeds " + target + " with " + food;
     }
 }
+

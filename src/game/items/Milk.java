@@ -1,17 +1,23 @@
 package game.items;
 
 import edu.monash.fit2099.engine.items.Item;
-
 /**
- * Represents a bottle of Milk produced by a Cow.
+ * Milk represents an item that is produced when a Cow is fed.
+ *
+ * <p>Milk is portable and can therefore be carried in an actor's
+ * inventory or dropped onto the game map.</p>
+ *
+ * @author Lee Le Si 34599223
+ * @version 1.0.0
  */
 public class Milk extends Item {
-
     /**
-     * Constructs a portable bottle of Milk.
+     * Constructor for the Milk class.
+     *
+     * <p>Creates a portable Milk item with the display character 'M'.</p>
      */
     public Milk() {
-        super("Milk", 'M');
+        super("Milk",'M');
         this.makePortable();
     }
 }

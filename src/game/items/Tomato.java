@@ -3,66 +3,128 @@ package game.items;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
+import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.actions.ConsumeAction;
 import game.actions.FeedAction;
-import game.capabilities.Ability;
-import game.capabilities.FeedItem;
-import game.capabilities.Feedable;
-
+import game.interfaces.FeedItem;
+import game.interfaces.Feedable;
 /**
- * Represents a harvested Tomato that can be carried, consumed,
- * used for feeding, and processed by artisan facilities.
+ * Tomato represents a harvested product that can be consumed,
+ * fed to farm animals, and processed by processing facilities.
+ *
+ * <p>When consumed, a Tomato increases the actor's maximum health
+ * by 2. When used as animal feed, it increases the Farmer's maximum
+ * health by 2. As a ProcessableItem, it can also be repeatedly
+ * processed into different processed products.</p>
+ *
+ * @author Lee Le Si 34599223
+ * @version 1.0.0
  */
-public class Tomato extends ProcessableProduct implements FeedItem {
-
-    private static final int MAX_HEALTH_INCREASE = 2;
-    private static final int MAX_HEALTH_INCREASE_WHEN_FEEDING = 2;
-
+public class Tomato extends ProcessableItem implements FeedItem {
     /**
-     * Constructs a portable Tomato.
+     * Constructor for the Tomato class.
+     *
+     * <p>Creates a Tomato with the display character 'o'.</p>
      */
-    public Tomato() {
-        super("Tomato", 'o');
+    public Tomato(){
+        super("Tomato",'o');
     }
 
     /**
-     * Applies the raw Tomato consumption effect.
-     * Consuming a Tomato increases the actor's maximum health.
+     * Applies the consumption effect of a Tomato.
      *
-     * @param actor the actor consuming this Tomato
-     */
-    @Override
-    protected void applyConsumptionEffects(Actor actor) {
-        actor.modifyStatisticMaximum(ActorStatistics.HEALTH, StatisticOperations.INCREASE, MAX_HEALTH_INCREASE);
-    }
-
-    /**
-     * Applies the Tomato specific effect when used for feeding.
+     * <p>Consuming a Tomato increases the actor's maximum health by 2.
+     * The actor's current health is updated according to the statistic
+     * modification performed by the engine.</p>
      *
-     * @param actor the actor using this Tomato for feeding
+     * @param actor the actor consuming the Tomato
+     * @return a description of the consumption result
      */
     @Override
-    public void usedForFeedingBy(Actor actor) {
-        actor.modifyStatisticMaximum(ActorStatistics.HEALTH, StatisticOperations.INCREASE, MAX_HEALTH_INCREASE_WHEN_FEEDING);
-        actor.getInventory().remove(this);
+    public String applyConsumptionEffect(Actor actor){
+        actor.modifyStatisticMaximum(
+                ActorStatistics.HEALTH,
+                StatisticOperations.INCREASE,
+                2
+        );
+        return actor + " consumes the Tomato.";
     }
 
     /**
-     * Returns actions this Tomato allows its owner to perform on another actor
+     * Returns the actions that can be performed with this Tomato while
+     * it is in an actor's inventory.
      *
-     * @param otherActor the other actor that may be fed
+     * @param owner the actor carrying the Tomato
+     * @param map the current game map
+     * @return a list containing the allowable actions for this Tomato
+     */
+    @Override
+    public ActionList allowableActions(Actor owner, GameMap map){
+        ActionList actions = new ActionList();
+        actions.add(new ConsumeAction(this));
+        return actions;
+    }
+
+    /**
+     * Applies the Farmer-related effect of using this Tomato as feed.
+     *
+     * <p>Feeding an animal with a Tomato increases the Farmer's
+     * maximum health by 2.</p>
+     *
+     * @param farmer the Farmer using the Tomato as feed
+     * @return a description of the feeding effect
+     */
+    @Override
+    public String feedEffect(Actor farmer){
+        farmer.modifyStatisticMaximum(
+                ActorStatistics.HEALTH,
+                StatisticOperations.INCREASE,
+                2
+        );
+        return farmer + "'s maximum health increases by 2.";
+    }
+
+    /**
+     * Removes this Tomato from the Farmer's inventory after it has
+     * successfully been used to feed an animal.
+     *
+     * @param farmer the Farmer carrying the Tomato
+     */
+    @Override
+    public void removeAfterFeeding(Actor farmer){
+        farmer.getInventory().remove(this);
+    }
+
+    /**
+     * Returns feeding actions available when this Tomato is carried
+     * near another actor.
+     *
+     * <p>If the other actor supports the Feedable capability, a
+     * FeedAction using this Tomato is added to the available actions.</p>
+     *
+     * @param otherActor the actor that may be fed
      * @param location the location of the other actor
-     * @return the available actions
+     * @return the available actions involving this Tomato and the other actor
      */
     @Override
-    public ActionList allowableActions(Actor otherActor, Location location) {
+    public ActionList allowableActions(Actor otherActor, Location location){
         ActionList actions = new ActionList();
 
-        if (otherActor.hasAbility(Ability.FEEDABLE)) {
-            actions.add(new FeedAction((Feedable) otherActor, this));
-        }
-
+        otherActor.asCapability(Feedable.class).ifPresent(
+                feedable -> actions.add(new FeedAction(feedable,this, location))
+        );
         return actions;
+    }
+
+    /**
+     * Returns the product name of this Tomato.
+     *
+     * @return the name "Tomato"
+     */
+    @Override
+    public String getProductName() {
+        return "Tomato";
     }
 }

@@ -2,9 +2,6 @@ package game;
 
 import edu.monash.fit2099.engine.displays.Display;
 
-/**
- * Entry point for the Stack-Queue Valley application.
- */
 public class Application {
     public static void main(String[] args) {
         Display display = new Display();
