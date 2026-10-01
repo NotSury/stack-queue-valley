@@ -18,7 +18,8 @@ import java.util.List;
  * farm animals, and processing facilities, and prepares the game
  * environment before the game begins.</p>
  *
- * @author Lee Le Si 34599223
+ * @author <Lee Le Si> <34599223>
+ * @author <Chin Kai Xuan> <35730374>
  * @version 1.0.0
  */
 public class StackQueueValleyWorld extends World {
@@ -60,6 +61,10 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.at(6, 3).setGround(new TomatoCrop());
         inheritedFarmMap.at(3,2).setGround(new ParsnipCrop());
         inheritedFarmMap.at(8, 2).setGround(new TomatoCrop());
+
+        inheritedFarmMap.at(2, 3).setGround(new StrawberryCrop());
+        inheritedFarmMap.at(7, 3).setGround(new CauliflowerCrop());
+        inheritedFarmMap.at(5, 1).setGround(new MelonCrop());
 
         Farmer farmer = new Farmer("Bob");
         this.addPlayer(farmer, inheritedFarmMap.at(5, 3));
