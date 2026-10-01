@@ -10,6 +10,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.capabilities.ActorRole;
 import game.items.Hoe;
 import game.items.WateringCan;
 /**
@@ -36,6 +37,7 @@ public class Farmer extends Actor {
      */
     public Farmer(String name) {
         super("Farmer " + name, '@', 100);
+        this.enableAbility(ActorRole.FARMER);
         this.addNewStatistic(ActorStatistics.STAMINA, new BaseStatistic(20));
         this.getInventory().add(new Hoe());
         this.getInventory().add(new WateringCan());
