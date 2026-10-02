@@ -17,6 +17,11 @@ import java.util.List;
 public class CaveMimic extends StatefulCreature {
 
     private static final int ADJACENT_RADIUS = 1;
+    /**
+     * Maximum distance used for Farmer detection and ordinary item seeking.
+     */
+    public static final int DETECTION_RADIUS = 3;
+    private char appearance;
 
     /**
      * Creates a Cave Mimic with health and starting bait.
@@ -28,6 +33,7 @@ public class CaveMimic extends StatefulCreature {
      */
     public CaveMimic(int hitPoints, List<Item> startingBait) {
         super("Cave Mimic", 'M', hitPoints, CreatureStateType.DISGUISED);
+        appearance = super.getDisplayChar();
 
         for (Item item : startingBait) {
             getInventory().add(item);
@@ -91,6 +97,33 @@ public class CaveMimic extends StatefulCreature {
         }
 
         return reclaimedItems;
+    }
+
+    /**
+     * Changes the Mimic's displayed appearance to its disguise.
+     * The Mimic remains an actor with its existing health and inventory.
+     *
+     * @param displayChar the character used to represent the disguise
+     */
+    public void disguise(char displayChar) {
+        appearance = displayChar;
+    }
+
+    /**
+     * Restores the Mimic's normal displayed appearance.
+     */
+    public void reveal() {
+        appearance = super.getDisplayChar();
+    }
+
+    /**
+     * Returns the character representing the Mimic's current appearance.
+     *
+     * @return the disguised or revealed display character
+     */
+    @Override
+    public char getDisplayChar() {
+        return appearance;
     }
 
     private List<Item> getPortableItems(List<Item> items) {
