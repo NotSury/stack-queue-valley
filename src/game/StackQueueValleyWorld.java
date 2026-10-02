@@ -1,13 +1,22 @@
 package game;
 
+import edu.monash.fit2099.engine.actions.Action;
+import edu.monash.fit2099.engine.actions.DoNothingAction;
+import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
+import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.World;
-import game.actors.Farmer;
+import game.actors.*;
 import game.grounds.*;
-import game.actors.Cow;
-import game.actors.Chicken;
+import game.items.Parsnip;
+import game.items.Tomato;
+import game.navigation.MapMovementPlanner;
+import game.navigation.MovementPlanner;
+import game.perception.EnvironmentScanner;
+import game.perception.MapEnvironmentScanner;
 
 import java.util.Arrays;
 import java.util.List;
@@ -72,6 +81,36 @@ public class StackQueueValleyWorld extends World {
 
         inheritedFarmMap.at(6,5).setGround(new PreservesJar());
         inheritedFarmMap.at(5,6).setGround(new DryingRack());
+
+        MovementPlanner movementPlanner = new MapMovementPlanner();
+
+        EnvironmentScanner scanner =
+                new MapEnvironmentScanner(movementPlanner);
+
+        StatefulCreatureFactory creatureFactory =
+                new StatefulCreatureFactory(scanner, movementPlanner);
+
+        Behaviour<Actor, Action> pendingCombatBehaviour =
+                (actor, location) -> new DoNothingAction();
+
+        List<Item> startingBait = Arrays.asList(
+                new Parsnip(),
+                new Tomato(),
+                new Parsnip()
+        );
+
+        CaveMimic mimic = creatureFactory.createCaveMimic(
+                100,
+                startingBait,
+                '?',
+                pendingCombatBehaviour
+        );
+
+        inheritedFarmMap.addActor(mimic, inheritedFarmMap.at(1, 4));
+        mimic.initialiseState(inheritedFarmMap);
+
+        inheritedFarmMap.at(3, 4).addItem(new Parsnip());
+        inheritedFarmMap.at(3, 5).addItem(new Tomato());
 
     }
 }
