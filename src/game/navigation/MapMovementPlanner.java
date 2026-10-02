@@ -75,20 +75,30 @@ public class MapMovementPlanner implements MovementPlanner {
 
     /**
      * Selects a valid neighboring exit that increases threat distance.
-     * Chooses the greatest resulting distance. Equal-distance choices
-     * use the engine's exit ordering.
-     *
      * @param creature the creature that would perform the movement
      * @param origin the creature's current location
      * @param threat the threatening actor's location
      * @return an escape exit, or null if no improving step exists
      */
     @Override
-    public Exit findStepAway(
-            Actor creature,
-            Location origin,
-            Location threat) {
+    public Exit findStepAway(Actor creature, Location origin, Location threat) {
+        return findStepAway(creature, origin, threat, null);
+    }
 
+    /**
+     * Selects an improving escape step while excluding a reserved destination.
+     * Chooses the greatest resulting distance. Equal-distance choices
+     * use the engine's exit ordering.
+     *
+     * @param creature the creature that would perform the movement
+     * @param origin the creature's current location
+     * @param threat the threatening actor's location
+     * @param excludedExit the exit whose destination must be excluded, or null
+     * when no destination is reserved
+     * @return an escape exit, or null if no improving step exists
+     */
+    @Override
+    public Exit findStepAway(Actor creature, Location origin, Location threat, Exit excludedExit) {
         if (origin.map() != threat.map()) {
             return null;
         }
@@ -98,6 +108,11 @@ public class MapMovementPlanner implements MovementPlanner {
 
         for (Exit exit : origin.getExits()) {
             Location destination = exit.getDestination();
+
+            if (excludedExit != null
+                    && destination == excludedExit.getDestination()) {
+                continue;
+            }
 
             if (!isLocalStep(origin, destination)
                     || !destination.canActorEnter(creature)) {
@@ -114,6 +129,29 @@ public class MapMovementPlanner implements MovementPlanner {
         }
 
         return bestExit;
+    }
+
+    /**
+     * Finds a valid adjacent exit matching a grid direction.
+     * Returns null when the matching direction is blocked or unavailable.
+     * Cross-map exits and non-adjacent destinations are excluded.
+     *
+     * @param creature the creature that would perform the movement
+     * @param origin the creature's current location
+     * @param direction the directional exit name supplied by the engine
+     * @return a matching movement exit, or null if none is available
+     */
+    @Override
+    public Exit findStepInDirection(Actor creature, Location origin, String direction) {
+        for (Exit exit : origin.getExits()) {
+            Location destination = exit.getDestination();
+
+            if (exit.getName().equals(direction) && isLocalStep(origin, destination) && destination.canActorEnter(creature)) {
+                return exit;
+            }
+        }
+
+        return null;
     }
 
     private boolean isLocalStep(
