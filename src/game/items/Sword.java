@@ -34,6 +34,9 @@ public class Sword extends Item implements Weapon, Coatable {
         }else{
             result = attacker + " misses " + target + ".";
         }
+        if (coating!=null){
+            result += System.lineSeparator() + coating.applyEffect(attacker,target,map);
+        }
         return result;
     }
 
