@@ -13,7 +13,8 @@ import edu.monash.fit2099.engine.positions.Location;
  * reused by other explosive features in the future.</p>
  *
  * @author <Chin Kai Xuan> <35730374>
- * @version 1.0.0
+ * @author <Lee Le Si> <34599223>
+ * @version 1.1.0
  */
 public class Explosion {
 
@@ -35,13 +36,27 @@ public class Explosion {
      * Triggers the explosion at the given location.
      *
      * <p>The actor standing on the centre tile, if present, is damaged.
-     * Every actor standing on an adjacent tile is also damaged.</p>
+     * Every actor standing on an adjacent tile is also damaged, using
+     * {@link #explodeAround(Location)}.</p>
      *
      * @param centre the centre location of the explosion
      * @return the number of actors affected by the explosion
      */
-    public int explode(Location centre) {
-        int affectedActors = damageActorAt(centre);
+    public int explode(Location centre){
+        return damageActorAt(centre) + explodeAround(centre);
+    }
+    /**
+     * Triggers the explosion around the given location, without damaging
+     * the actor standing on the centre tile itself.
+     *
+     * <p>Used when the source of the blast is the centre actor, e.g. a melon-coated
+     * weapon exploding on its target, or a cave ghost exploding as it dies.</p>
+     *
+     * @param centre the centre location of the explosion
+     * @return the number of actors affected by the explosion
+     */
+    public int explodeAround(Location centre) {
+        int affectedActors = 0;
 
         for (Exit exit : centre.getExits()) {
             affectedActors += damageActorAt(exit.getDestination());
