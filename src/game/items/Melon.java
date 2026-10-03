@@ -2,7 +2,11 @@ package game.items;
 
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
+import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.coatings.Coating;
+import game.coatings.MelonCoating;
+import game.interfaces.CoatingSource;
 
 /**
  * Represents a Melon that can be consumed by an actor.
@@ -13,7 +17,7 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
  * @author <Chin Kai Xuan> <35730374>
  * @version 1.0.0
  */
-public class Melon extends ConsumableItem {
+public class Melon extends ConsumableItem implements CoatingSource {
 
     /**
      * Amount by which maximum health is increased when consumed.
@@ -44,5 +48,19 @@ public class Melon extends ConsumableItem {
         );
 
         return actor + " consumes the Melon and increases maximum health by 10.";
+    }
+
+    @Override
+    public Coating getCoating(){
+        return new MelonCoating();
+    }
+
+    @Override
+    public void onCoatingApplied(Actor actor, Location sourceLocation){
+        if (sourceLocation == null){
+            actor.getInventory().remove(this);
+        }else{
+            sourceLocation.removeItem(this);
+        }
     }
 }
