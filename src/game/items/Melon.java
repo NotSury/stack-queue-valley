@@ -14,8 +14,13 @@ import game.interfaces.CoatingSource;
  * <p>Consuming a Melon increases the actor's maximum health
  * by 10 points.</p>
  *
+ * <p>A Melon can also be used as a coating source (REQ 4). Coating a
+ * weapon with a Melon makes it explode on impact, and the Melon is
+ * used up in the process.</p>
+ *
  * @author <Chin Kai Xuan> <35730374>
- * @version 1.0.0
+ * @author <Lee Le Si> <34599223>
+ * @version 1.1.0
  */
 public class Melon extends ConsumableItem implements CoatingSource {
 
@@ -50,11 +55,22 @@ public class Melon extends ConsumableItem implements CoatingSource {
         return actor + " consumes the Melon and increases maximum health by 10.";
     }
 
+    /**
+     * A melon can coat a weapon so it explodes on impact (REQ 4).
+     *
+     * @return a new melon coating
+     */
     @Override
     public Coating getCoating(){
         return new MelonCoating();
     }
 
+    /**
+     * Applying a melon as a coating uses it up.
+     *
+     * @param actor          the actor who applied the coating
+     * @param sourceLocation where the melon lies, or null if it was carried
+     */
     @Override
     public void onCoatingApplied(Actor actor, Location sourceLocation){
         if (sourceLocation == null){
