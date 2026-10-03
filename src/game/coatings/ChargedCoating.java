@@ -15,6 +15,6 @@ public class ChargedCoating implements Coating {
 
     @Override
     public String toString(){
-        return "Fire Coating";
+        return "Charged Coating";
     }
 }
