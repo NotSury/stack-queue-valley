@@ -11,6 +11,7 @@ import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.capabilities.CombatStatus;
+import game.capabilities.FarmerStatistic;
 import game.items.Hoe;
 import game.items.Sword;
 import game.items.WateringCan;
@@ -43,6 +44,7 @@ public class Farmer extends Actor {
     public Farmer(String name) {
         super("Farmer " + name, '@', 100);
         this.addNewStatistic(ActorStatistics.STAMINA, new BaseStatistic(20));
+        this.addNewStatistic(FarmerStatistic.COINS, new BaseStatistic(10000));
         this.getInventory().add(new Hoe());
         this.getInventory().add(new WateringCan());
         this.enableAbility(CombatStatus.HOSTILE_TARGET);
@@ -86,6 +88,7 @@ public class Farmer extends Actor {
         display.println("HP: " + this.getStatistic(ActorStatistics.HEALTH));
         display.println("SP: " + this.getStatistic(ActorStatistics.STAMINA));
         display.println("Inventory: " + this.getInventory().getItems());
+        display.println("Coins: " + this.getStatistic(FarmerStatistic.COINS));
         display.println("");
 
         // return/print the console menu
