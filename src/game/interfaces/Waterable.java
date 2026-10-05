@@ -1,20 +1,32 @@
 package game.interfaces;
 
+import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Location;
+
 /**
- * Waterable represents a ground that can be watered.
+ * Represents an object that can be watered by an actor.
  *
- * <p>Grounds implementing this interface define the transformation
- * that occurs when they are watered.</p>
+ * <p>Each waterable object determines its own stamina cost and the
+ * effect that occurs when it is watered.</p>
  *
- * @author Lee Le Si 34599223
+ * @author <Chin Kai Xuan> <35730374>
  * @version 1.0.0
  */
 public interface Waterable {
+
     /**
-     * Applies the watering effect to this ground at the given location.
+     * Returns the stamina cost required to water this object.
      *
-     * @param location the location of the ground being watered
+     * @return the stamina cost of watering
      */
-    void water(Location location);
+    int getWateringCost();
+
+    /**
+     * Applies the watering effect of this object.
+     *
+     * @param actor the actor performing the watering action
+     * @param location the location containing the waterable object
+     * @return a description of the watering result
+     */
+    String water(Actor actor, Location location);
 }

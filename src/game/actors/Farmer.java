@@ -10,7 +10,10 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.capabilities.CombatStatus;
+import game.capabilities.FarmerStatistic;
 import game.items.Hoe;
+import game.items.Sword;
 import game.items.WateringCan;
 /**
  * Farmer represents the player-controlled actor in the game.
@@ -23,7 +26,7 @@ import game.items.WateringCan;
  * at the beginning of each turn.</p>
  *
  * @author Lee Le Si 34599223
- * @version 1.0.0
+ * @version 1.1.0
  */
 public class Farmer extends Actor {
     /**
@@ -31,14 +34,21 @@ public class Farmer extends Actor {
      *
      * <p>Creates a Farmer with 100 health points, a maximum stamina of 20,
      * and starting equipment consisting of a Hoe and a WateringCan.</p>
+     * Farmer is marked as a target for hostile creatures.</p>
+     *
+     * <p>A Sword is also given for testing REQ 4 until it can be bought
+     * from the merchant (REQ 3).</p>
      *
      * @param name the name of the Farmer
      */
     public Farmer(String name) {
         super("Farmer " + name, '@', 100);
         this.addNewStatistic(ActorStatistics.STAMINA, new BaseStatistic(20));
+        this.addNewStatistic(FarmerStatistic.COINS, new BaseStatistic(10000));
         this.getInventory().add(new Hoe());
         this.getInventory().add(new WateringCan());
+        this.enableAbility(CombatStatus.HOSTILE_TARGET);
+        this.getInventory().add(new Sword());
     }
     /**
      * Determines the action performed by the Farmer during the current turn.
@@ -78,6 +88,7 @@ public class Farmer extends Actor {
         display.println("HP: " + this.getStatistic(ActorStatistics.HEALTH));
         display.println("SP: " + this.getStatistic(ActorStatistics.STAMINA));
         display.println("Inventory: " + this.getInventory().getItems());
+        display.println("Coins: " + this.getStatistic(FarmerStatistic.COINS));
         display.println("");
 
         // return/print the console menu

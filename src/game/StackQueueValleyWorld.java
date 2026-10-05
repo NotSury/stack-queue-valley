@@ -4,10 +4,9 @@ import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.World;
-import game.actors.Farmer;
+import game.actors.*;
 import game.grounds.*;
-import game.actors.Cow;
-import game.actors.Chicken;
+import game.items.Melon;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,8 +17,9 @@ import java.util.List;
  * farm animals, and processing facilities, and prepares the game
  * environment before the game begins.</p>
  *
- * @author Lee Le Si 34599223
- * @version 1.0.0
+ * @author <Lee Le Si> <34599223>
+ * @author <Chin Kai Xuan> <35730374>
+ * @version 1.2.0
  */
 public class StackQueueValleyWorld extends World {
 
@@ -60,6 +60,15 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.at(6, 3).setGround(new TomatoCrop());
         inheritedFarmMap.at(3,2).setGround(new ParsnipCrop());
         inheritedFarmMap.at(8, 2).setGround(new TomatoCrop());
+
+        inheritedFarmMap.at(2, 3).setGround(new StrawberryCrop());
+        inheritedFarmMap.at(7, 3).setGround(new CauliflowerCrop());
+        inheritedFarmMap.at(5, 1).setGround(new MelonCrop());
+
+        inheritedFarmMap.at(9,0).addActor(new Bat());
+        inheritedFarmMap.at(0,6).addActor(new Slime());
+        inheritedFarmMap.at(9,6).addActor(new CaveGhost());
+        inheritedFarmMap.at(5,4).addItem(new Melon());
 
         Farmer farmer = new Farmer("Bob");
         this.addPlayer(farmer, inheritedFarmMap.at(5, 3));
