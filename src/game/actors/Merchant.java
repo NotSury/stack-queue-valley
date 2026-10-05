@@ -7,6 +7,9 @@ import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.behaviours.WanderBehaviour;
+import game.capabilities.FarmerStatistic;
+import game.actions.SellAction;
+import game.interfaces.Sellable;
 
 public class Merchant extends Actor
 {
@@ -30,4 +33,25 @@ public class Merchant extends Actor
 
         return new DoNothingAction();
     }
+
+    @Override
+    public ActionList allowableActions(Actor otherActor, String direction, GameMap map)
+    {
+        ActionList actions = new ActionList();
+
+        if (!otherActor.hasStatistic(FarmerStatistic.COINS))
+        {
+            return actions;
+        }
+
+        // for every sellable object, get it from inventory
+        // get the ones that implement Sellable interface
+        for (Sellable sellable : otherActor.getInventory().getItemsAs(Sellable.class))
+        {
+            actions.add(new SellAction(sellable, this));
+        }
+
+        return actions;
+    }
+
 }
