@@ -13,13 +13,9 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.capabilities.CombatStatus;
 import game.capabilities.FarmerStatistic;
 import game.items.Hoe;
+import game.items.Pickaxe;
 import game.items.Sword;
 import game.items.WateringCan;
-import game.items.Milk;
-import game.items.Egg;
-import game.items.Stone;
-import game.items.Diamond;
-
 /**
  * Farmer represents the player-controlled actor in the game.
  *
@@ -31,6 +27,7 @@ import game.items.Diamond;
  * at the beginning of each turn.</p>
  *
  * @author Lee Le Si 34599223
+ * @author Khoo Lynn 34598901
  * @version 1.1.0
  */
 public class Farmer extends Actor {
@@ -44,6 +41,9 @@ public class Farmer extends Actor {
      * <p>A Sword is also given for testing REQ 4 until it can be bought
      * from the merchant (REQ 3).</p>
      *
+     * <p>A Pickaxe is added to the Farmer's starting inventory for REQ 2,
+     * allowing the Farmer to perform breaking actions on breakable objects.</p>
+     *
      * @param name the name of the Farmer
      */
     public Farmer(String name) {
@@ -54,12 +54,7 @@ public class Farmer extends Actor {
         this.getInventory().add(new WateringCan());
         this.enableAbility(CombatStatus.HOSTILE_TARGET);
         this.getInventory().add(new Sword());
-
-        // TEMPORARY TESTING FOR REQ 3
-        this.getInventory().add(new Milk());
-        this.getInventory().add(new Egg());
-        this.getInventory().add(new Stone());
-        this.getInventory().add(new Diamond());
+        this.getInventory().add(new Pickaxe());
     }
     /**
      * Determines the action performed by the Farmer during the current turn.
