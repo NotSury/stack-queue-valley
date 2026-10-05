@@ -24,7 +24,7 @@ public class BuySword implements Buyable
     {
         if (buyer.getStatistic(FarmerStatistic.COINS) < PRICE)
         {
-            return buyer + " does not enough coins to buy a Sword.";
+            return buyer + " does not have enough coins to buy a Sword.";
         }
 
         buyer.modifyStatistic(FarmerStatistic.COINS, StatisticOperations.DECREASE, PRICE);
