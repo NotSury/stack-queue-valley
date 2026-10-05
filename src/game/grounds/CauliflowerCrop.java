@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.items.Cauliflower;
+import game.capabilities.GroundAbility;
 
 /**
  * Represents a Cauliflower crop that can be watered and harvested.
@@ -82,7 +83,7 @@ public class CauliflowerCrop extends WaterableCrop {
             for (Exit exit : location.getExits()) {
                 Location adjacentLocation = exit.getDestination();
 
-                if (!(adjacentLocation.getGround() instanceof Crop)) {
+                if (!adjacentLocation.getGround().hasAbility(GroundAbility.CROP)) {
                     adjacentLocation.setGround(new Puddle());
                 }
             }
