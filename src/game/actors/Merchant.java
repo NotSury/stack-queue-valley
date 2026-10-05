@@ -6,14 +6,24 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
+import game.actions.BuyAction;
 import game.behaviours.WanderBehaviour;
 import game.capabilities.FarmerStatistic;
 import game.actions.SellAction;
 import game.interfaces.Sellable;
+import game.interfaces.Buyable;
+import game.trading.BuyParsnipCrop;
+import game.trading.BuyTomatoCrop;
+import game.trading.BuySword;
+
+import java.util.List;
 
 public class Merchant extends Actor
 {
     private final Behaviour<Actor, Action> behaviour = new WanderBehaviour();
+    private final List<Buyable> buyables = List.of(
+            new BuyParsnipCrop(), new BuyTomatoCrop(), new BuySword()
+    );
 
     public Merchant()
     {
@@ -42,6 +52,11 @@ public class Merchant extends Actor
         if (!otherActor.hasStatistic(FarmerStatistic.COINS))
         {
             return actions;
+        }
+
+        for (Buyable buyable : buyables)
+        {
+            actions.add(new BuyAction(buyable, this));
         }
 
         // for every sellable object, get it from inventory
