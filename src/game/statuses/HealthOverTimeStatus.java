@@ -1,25 +1,25 @@
 package game.statuses;
 
 import edu.monash.fit2099.engine.GameEntity;
-import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.positions.Location;
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
 
 /**
- * A status effect that modifies an actor's health once per turn
+ * A status effect that modifies an entity's health once per turn
  * for a limited number of turns.
  *
- * <p>A positive health change heals the actor, while a negative
- * health change damages the actor.</p>
+ * <p>A positive health change heals the entity, while a negative
+ * health change damages the entity.</p>
  *
- * @author <Chin Kai Xuan> <35730374>
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public class HealthOverTimeStatus implements Status {
 
     /**
      * The amount of health changed each turn.
-     * Positive values heal and negative values cause damage.
      */
     private final int healthChange;
 
@@ -47,11 +47,21 @@ public class HealthOverTimeStatus implements Status {
      */
     @Override
     public void tickStatus(GameEntity currentEntity, Location location) {
-        if (currentEntity instanceof Actor actor) {
+
+        if (currentEntity.hasStatistic(ActorStatistics.HEALTH)) {
+
             if (healthChange > 0) {
-                actor.heal(healthChange);
+                currentEntity.modifyStatistic(
+                        ActorStatistics.HEALTH,
+                        StatisticOperations.INCREASE,
+                        healthChange
+                );
             } else if (healthChange < 0) {
-                actor.hurt(Math.abs(healthChange));
+                currentEntity.modifyStatistic(
+                        ActorStatistics.HEALTH,
+                        StatisticOperations.DECREASE,
+                        Math.abs(healthChange)
+                );
             }
 
             remainingTurns--;

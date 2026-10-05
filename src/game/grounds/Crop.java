@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.HarvestAction;
 import game.interfaces.Harvestable;
+import game.capabilities.GroundAbility;
 
 /**
  * Crop is an abstract base class for harvestable crops.
@@ -30,6 +31,7 @@ public abstract class Crop extends Ground implements Harvestable {
      */
     protected Crop(char displayChar, String name) {
         super(displayChar, name);
+        this.enableAbility(GroundAbility.CROP);
     }
 
     /**
