@@ -76,6 +76,9 @@ public class StackQueueValleyWorld extends World {
         Cow cow = new Cow();
         Chicken chicken = new Chicken();
 
+        Merchant merchant = new Merchant();
+        inheritedFarmMap.at(6, 2).addActor(merchant);
+
         inheritedFarmMap.at(1,1).addActor(cow);
         inheritedFarmMap.at(4,5).addActor(chicken);
 
