@@ -25,9 +25,15 @@ public class Merchant extends Actor
             new BuyParsnipCrop(), new BuyTomatoCrop(), new BuySword()
     );
 
+    /**
+     * This represents the Merchant actor in the game.
+     *
+     * The Merchant is displayed on the map using the '$' character.
+     * Farmer can buy or sell items from and to the Merchant when it is adjacent.
+     */
     public Merchant()
     {
-        super("Merchant", 'M', 100);
+        super("Merchant", '$', 100);
     }
 
     @Override
