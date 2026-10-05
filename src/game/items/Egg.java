@@ -10,6 +10,7 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actors.Chicken;
 import game.capabilities.FarmerStatistic;
 import game.interfaces.Sellable;
+import java.util.Random;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +67,10 @@ public class Egg extends Item implements Sellable
             }
 
             if (!availableLocations.isEmpty()) {
-                int randomIndex = (int) (Math.random() * availableLocations.size());
+                Random locationRandom = new Random();
+
+                int randomIndex =
+                        locationRandom.nextInt(availableLocations.size());
 
                 Location chickenLocation = availableLocations.get(randomIndex);
 
