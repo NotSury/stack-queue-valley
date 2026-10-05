@@ -15,11 +15,6 @@ import game.capabilities.FarmerStatistic;
 import game.items.Hoe;
 import game.items.Sword;
 import game.items.WateringCan;
-import game.items.Milk;
-import game.items.Egg;
-import game.items.Stone;
-import game.items.Diamond;
-
 /**
  * Farmer represents the player-controlled actor in the game.
  *
@@ -54,12 +49,6 @@ public class Farmer extends Actor {
         this.getInventory().add(new WateringCan());
         this.enableAbility(CombatStatus.HOSTILE_TARGET);
         this.getInventory().add(new Sword());
-
-        // TEMPORARY TESTING FOR REQ 3
-        this.getInventory().add(new Milk());
-        this.getInventory().add(new Egg());
-        this.getInventory().add(new Stone());
-        this.getInventory().add(new Diamond());
     }
     /**
      * Determines the action performed by the Farmer during the current turn.
