@@ -64,7 +64,7 @@ public class BuyParsnipCrop implements Buyable {
 
             dropLocation.addItem(new Parsnip());
         }
-        return buyer +" bought a Parsnip Crop for "+PRICE + " coins.";
+        return buyer +" bought a Parsnip Crop for "+ PRICE + " coins.";
     }
 
     @Override
