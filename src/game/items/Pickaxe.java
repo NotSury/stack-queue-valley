@@ -16,7 +16,7 @@ public class Pickaxe extends Item {
      */
     public Pickaxe(){
         super("Pickaxe", 'x');
-        this.makeNonPortable();
+        this.makePortable();
         this.enableAbility(ToolAbility.BREAKING);
     }
 }
