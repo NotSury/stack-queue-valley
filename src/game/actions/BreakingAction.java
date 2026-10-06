@@ -40,7 +40,7 @@ public class BreakingAction extends Action {
         if(!actor.hasAbility(ToolAbility.BREAKING)){
             return actor + " does not have a tool that can break " + target + ".";
         }
-        return target.breakby(actor, location);
+        return target.breakBy(actor, location);
     }
 
     /**

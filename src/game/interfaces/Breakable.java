@@ -18,5 +18,5 @@ public interface Breakable {
      * @param location location of the object being broken.
      * @return description of the result.
      */
-    String breakby(Actor actor, Location location);
+    String breakBy(Actor actor, Location location);
 }

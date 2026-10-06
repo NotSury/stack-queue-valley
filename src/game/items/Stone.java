@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.capabilities.FarmerStatistic;
+import game.grounds.Rock;
 import game.interfaces.Sellable;
 
 import java.util.List;
@@ -74,7 +75,7 @@ public class Stone extends Item implements Sellable
 
             Location rockLocation = exits.get(randomIndex).getDestination();
 
-            rockLocation.addItem(new Rock());
+            rockLocation.setGround(new Rock());
 
             return seller + " sold Stone for " + SELL_PRICE
                     + " coins and Merchant built a Rock.";
