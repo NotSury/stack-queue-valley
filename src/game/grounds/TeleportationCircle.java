@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.effects.FireSpread;
 import game.items.Fire;
 import game.teleportation.TeleportDestination;
 
@@ -18,6 +19,7 @@ public class TeleportationCircle extends TeleportationGround {
     private static final int FIRE_DURATION = 2;
     private static final int BURN_DAMAGE = 5;
     private static final int BURN_DURATION = 3;
+    private final FireSpread fireSpread;
 
     /**
      * Creates a TeleportationCircle linked to a fixed destination.
@@ -26,13 +28,7 @@ public class TeleportationCircle extends TeleportationGround {
      */
     public TeleportationCircle(TeleportDestination destination){
         super('*', "Teleportation Circle", destination);
-    }
-
-    private void createFireAround(Location location){
-        for (Exit exit : location.getExits()){
-            Location adjacentLocation = exit.getDestination();
-            adjacentLocation.addItem(new Fire(FIRE_DURATION, BURN_DAMAGE, BURN_DURATION));
-        }
+        this.fireSpread = new FireSpread(FIRE_DURATION, BURN_DAMAGE, BURN_DURATION);
     }
 
     /**
@@ -48,7 +44,7 @@ public class TeleportationCircle extends TeleportationGround {
     public String teleport(Actor actor, GameMap map, TeleportDestination destination){
         Location destinationLocation = destination.getLocation();
         destinationLocation.map().moveActor(actor, destinationLocation);
-        createFireAround(destinationLocation);
+        fireSpread.applyAround(destinationLocation);
         return actor + " travels through the Teleportation Circle to " + destination + ".";
     }
 }
