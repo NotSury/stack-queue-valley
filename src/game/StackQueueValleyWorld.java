@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.World;
 import game.actors.*;
 import game.grounds.*;
+import game.items.Geode;
 import game.items.Melon;
 
 import java.util.Arrays;
@@ -19,7 +20,8 @@ import java.util.List;
  *
  * @author <Lee Le Si> <34599223>
  * @author <Chin Kai Xuan> <35730374>
- * @version 1.2.0
+ * @author <Khoo Lynn> <34598901>
+ * @version 1.3.0
  */
 public class StackQueueValleyWorld extends World {
 
@@ -53,8 +55,21 @@ public class StackQueueValleyWorld extends World {
                 ".........."
         );
 
+        List<String> mines = Arrays.asList(
+                "..........",
+                "..........",
+                "..........",
+                "..........",
+                "..........",
+                "..........",
+                ".........."
+        );
+
         GameMap inheritedFarmMap = new GameMap("Inherited Farm", groundCreator, inheritedFarm);
         this.addGameMap(inheritedFarmMap);
+
+        GameMap minesMap = new GameMap("Mines", groundCreator, mines);
+        this.addGameMap(minesMap);
 
         inheritedFarmMap.at(4, 3).setGround(new ParsnipCrop());
         inheritedFarmMap.at(6, 3).setGround(new TomatoCrop());
@@ -69,6 +84,16 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.at(0,6).addActor(new Slime());
         inheritedFarmMap.at(9,6).addActor(new CaveGhost());
         inheritedFarmMap.at(5,4).addItem(new Melon());
+
+        minesMap.at(2,1).setGround(new Rock());
+        minesMap.at(7,2).setGround(new Rock());
+        minesMap.at(3,5).setGround(new Rock());
+
+        minesMap.at(5,2).setGround(new CopperNode());
+        minesMap.at(7,5).setGround(new CopperNode());
+
+        minesMap.at(1,4).addItem(new Geode());
+        minesMap.at(6,4).addItem(new Geode());
 
         Farmer farmer = new Farmer("Bob");
         this.addPlayer(farmer, inheritedFarmMap.at(5, 3));
