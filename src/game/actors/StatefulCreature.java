@@ -100,6 +100,7 @@ public abstract class StatefulCreature extends Actor {
         CreatureStateType nextStateType = currentState.determineNextState(location);
 
         changeState(nextStateType, location);
+        display.println(this + " state: " + getCurrentStateType());
 
         return currentState.getAction(map.locationOf(this));
     }

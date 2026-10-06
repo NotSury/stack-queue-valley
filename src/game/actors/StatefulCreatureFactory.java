@@ -64,7 +64,7 @@ public class StatefulCreatureFactory {
 
         mimic.registerState(new DisguisedState(mimic, scanner, disguisedDisplayChar));
 
-        mimic.registerState(new LootingState(mimic, scanner, itemSeekingBehaviour));
+        mimic.registerState(new LootingState(mimic, scanner, movementPlanner, itemSeekingBehaviour));
 
         mimic.registerState(new AmbushState(mimic, scanner, movementPlanner, ambushBehaviour));
 
