@@ -10,11 +10,18 @@ import game.grounds.Crop;
 import game.interfaces.Buyable;
 import game.grounds.ParsnipCrop;
 import game.items.Parsnip;
+import game.interfaces.PlantableGround;
+import game.interfaces.PlantableGround;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ *
+ * @author <Vanessa Liau Jia Yee> <34599398>
+ * @version 1.0.0
+ */
 public class BuyParsnipCrop implements Buyable {
     private static final int PRICE = 250;
     private static final int PARSNIP_AMOUNT = 3;
@@ -40,7 +47,7 @@ public class BuyParsnipCrop implements Buyable {
         for (Exit exit : merchantLocation.getExits()) {
             Location location = exit.getDestination();
 
-            if (location.getGroundAs(Crop.class) == null) {
+            if (location.getGroundAs(PlantableGround.class) != null) {
                 availableLocations.add(location);
             }
         }
