@@ -1,8 +1,12 @@
 package game.actors;
 
+import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.items.ItemAbility;
+import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import edu.monash.fit2099.engine.weapons.IntrinsicWeapon;
+import game.interfaces.Hostile;
 import game.states.CreatureStateType;
 
 import java.util.ArrayList;
@@ -14,7 +18,7 @@ import java.util.List;
  * Provides inventory operations used by its state-entry effects.
  * State implementations control when these operations are performed.
  */
-public class CaveMimic extends StatefulCreature {
+public class CaveMimic extends StatefulCreature implements Hostile {
 
     private static final int ADJACENT_RADIUS = 1;
     /**
@@ -24,15 +28,18 @@ public class CaveMimic extends StatefulCreature {
     private char appearance;
 
     /**
-     * Creates a Cave Mimic with health and starting bait.
+     * Creates a Cave Mimic with health, starting bait and a natural weapon.
      * The creature factory must register its states before activating
      * the initial state.
      *
      * @param hitPoints the positive starting and maximum health
      * @param startingBait the portable items supplied as starting bait
+     * @param intrinsicWeapon the weapon used for the Mimic's natural attacks
      */
-    public CaveMimic(int hitPoints, List<Item> startingBait) {
+    public CaveMimic(int hitPoints, List<Item> startingBait, IntrinsicWeapon intrinsicWeapon) {
         super("Cave Mimic", 'M', hitPoints, CreatureStateType.DISGUISED);
+
+        setIntrinsicWeapon(intrinsicWeapon);
         appearance = super.getDisplayChar();
 
         for (Item item : startingBait) {
@@ -124,6 +131,19 @@ public class CaveMimic extends StatefulCreature {
     @Override
     public char getDisplayChar() {
         return appearance;
+    }
+
+    /**
+     * Provides the reaction required by the shared combat interface.
+     * State transitions are evaluated during the Mimic's own turn.
+     *
+     * @param attacker the actor who attacked this creature
+     * @param map the map containing the Mimic
+     * @return an empty string because no additional reaction is performed
+     */
+    @Override
+    public String respondToAttack(Actor attacker, GameMap map) {
+        return "";
     }
 
     private List<Item> getPortableItems(List<Item> items) {

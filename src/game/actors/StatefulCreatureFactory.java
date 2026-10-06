@@ -13,6 +13,7 @@ import game.states.AmbushState;
 import game.states.DisguisedState;
 import game.states.EscapeState;
 import game.states.LootingState;
+import game.weapons.CreatureWeapon;
 
 import java.util.List;
 
@@ -27,6 +28,8 @@ public class StatefulCreatureFactory {
 
     private final EnvironmentScanner scanner;
     private final MovementPlanner movementPlanner;
+    private static final int MIMIC_ATTACK_DAMAGE = 10;
+    private static final int MIMIC_HIT_RATE = 75;
 
     /**
      * Creates a factory using the supplied environmental collaborators.
@@ -53,7 +56,7 @@ public class StatefulCreatureFactory {
      * @return the Cave Mimic with its states and behaviours configured
      */
     public CaveMimic createCaveMimic(int hitPoints, List<Item> startingBait, char disguisedDisplayChar, Behaviour<Actor, Action> ambushBehaviour) {
-        CaveMimic mimic = new CaveMimic(hitPoints, startingBait);
+        CaveMimic mimic = new CaveMimic(hitPoints, startingBait, new CreatureWeapon(MIMIC_ATTACK_DAMAGE, "bites", MIMIC_HIT_RATE, "fangs"));
 
         Behaviour<Actor, Action> itemSeekingBehaviour = new SeekItemBehaviour(scanner, movementPlanner, CaveMimic.DETECTION_RADIUS);
 

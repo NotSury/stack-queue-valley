@@ -10,6 +10,8 @@ import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.World;
 import game.actors.*;
+import game.behaviours.AmbushBehaviour;
+import game.behaviours.AttackBehaviour;
 import game.grounds.*;
 import game.items.Parsnip;
 import game.items.Tomato;
@@ -156,8 +158,7 @@ public class StackQueueValleyWorld extends World {
         StatefulCreatureFactory creatureFactory =
                 new StatefulCreatureFactory(scanner, movementPlanner);
 
-        Behaviour<Actor, Action> pendingCombatBehaviour =
-                (actor, location) -> new DoNothingAction();
+        Behaviour<Actor, Action> ambushBehaviour = new AmbushBehaviour(scanner, movementPlanner, new AttackBehaviour(), CaveMimic.DETECTION_RADIUS);
 
         List<Item> startingBait = Arrays.asList(
                 new Parsnip(),
@@ -169,7 +170,7 @@ public class StackQueueValleyWorld extends World {
                 100,
                 startingBait,
                 '?',
-                pendingCombatBehaviour
+                ambushBehaviour
         );
 
         inheritedFarmMap.addActor(mimic, inheritedFarmMap.at(1, 4));
