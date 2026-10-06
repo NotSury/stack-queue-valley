@@ -2,6 +2,7 @@ package game.states;
 
 import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actions.Action;
+import edu.monash.fit2099.engine.actions.MoveActorAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.Exit;
@@ -10,6 +11,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actors.CaveMimic;
 import game.actors.DecoyMimic;
 import game.actors.StatefulCreatureFactory;
+import game.navigation.EscapePlan;
 import game.navigation.GridDistance;
 import game.navigation.MovementPlanner;
 import game.perception.EnvironmentScanner;
@@ -33,6 +35,7 @@ public class EscapeState extends BehaviourDrivenState {
 
     private DecoyMimic activeDecoy;
     private GameMap decoyMap;
+    private Action firstEscapeAction;
 
     /**
      * Creates an escape state for the supplied Mimic.
@@ -68,53 +71,29 @@ public class EscapeState extends BehaviourDrivenState {
     }
 
     /**
-     * Reveals the Mimic and creates a decoy on an alternative escape tile.
-     * Any previous decoy belonging to this state is removed first.
-     * No new decoy is created if a Farmer or two valid escape steps
-     * cannot be found.
+     * Reveals the Mimic and creates a decoy using its prepared escape plan.
+     * Removes any previous decoy and selects the real Mimic's first movement.
+     * The movement is returned later as its ordinary action rather than
+     * executed as part of this entry effect.
+     * A complete plan must be prepared before transitioning into this state.
      *
      * @param location the Mimic's location when entering this state
-     * @throws IllegalStateException if the engine rejects placement on the
-     * selected valid spawn tile
+     * @throws IllegalStateException if the engine rejects decoy placement
      */
     @Override
     public void onEnter(Location location) {
+        EscapePlan escapePlan = mimic.takeEscapePlan();
+
         mimic.reveal();
         removePreviousDecoy();
 
-        Actor farmer = getScanner().findFarmer(
-                location,
-                CaveMimic.DETECTION_RADIUS
-        );
+        Exit mimicStep = escapePlan.getMimicStep();
+        Exit decoyStep = escapePlan.getDecoyStep();
 
-        if (farmer == null) {
-            return;
-        }
-
-        Location threatLocation = location.map().locationOf(farmer);
-
-        Exit realEscapeStep = movementPlanner.findStepAway(mimic, location, threatLocation);
-
-        if (realEscapeStep == null) {
-            return;
-        }
-
-        Exit decoyEscapeStep = movementPlanner.findStepAway(mimic, location, threatLocation, realEscapeStep);
-
-        if (decoyEscapeStep == null) {
-            return;
-        }
-
-        DecoyMimic decoy = creatureFactory.createDecoy(mimic, decoyEscapeStep.getName());
-
-        Location spawnLocation = decoyEscapeStep.getDestination();
-
-        if (!spawnLocation.canActorEnter(decoy)) {
-            return;
-        }
+        DecoyMimic decoy = creatureFactory.createDecoy(mimic, decoyStep.getName());
 
         try {
-            location.map().addActor(decoy, spawnLocation);
+            location.map().addActor(decoy, decoyStep.getDestination());
         } catch (GameEngineException exception) {
             throw new IllegalStateException(
                     "Unable to place the Mimic's decoy on its selected escape tile.",
@@ -124,6 +103,8 @@ public class EscapeState extends BehaviourDrivenState {
 
         activeDecoy = decoy;
         decoyMap = location.map();
+
+        firstEscapeAction = new MoveActorAction(mimicStep.getDestination(), mimicStep.getName());
     }
 
     /**
@@ -169,6 +150,24 @@ public class EscapeState extends BehaviourDrivenState {
         }
 
         return CreatureStateType.ESCAPE;
+    }
+
+    /**
+     * Returns the planned movement on the first Escape turn.
+     * Subsequent turns delegate to the ordinary fleeing behaviour.
+     *
+     * @param location the Mimic's current location
+     * @return the planned first movement or an ordinary fleeing action
+     */
+    @Override
+    public Action getAction(Location location) {
+        if (firstEscapeAction != null) {
+            Action action = firstEscapeAction;
+            firstEscapeAction = null;
+            return action;
+        }
+
+        return super.getAction(location);
     }
 
     private void removePreviousDecoy() {

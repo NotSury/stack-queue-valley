@@ -6,9 +6,11 @@ import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.items.ItemAbility;
+import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.CaveMimic;
+import game.navigation.EscapePlan;
 import game.navigation.MovementPlanner;
 import game.perception.EnvironmentScanner;
 
@@ -70,8 +72,9 @@ public class AmbushState extends BehaviourDrivenState {
 
     /**
      * Determines whether to escape, disguise or continue confronting the Farmer.
-     * Escaping requires low health, a detected Farmer and an improving
-     * movement step. A cornered Mimic remains in Ambush.
+     * Escaping requires low health, a detected Farmer and two improving
+     * movement steps with different destinations.
+     * Stores the complete plan before selecting Escape.
      *
      * @param location the Mimic's current location
      * @return Escape, Disguised or Ambush according to the surroundings
@@ -97,9 +100,16 @@ public class AmbushState extends BehaviourDrivenState {
 
             Location threatLocation = location.map().locationOf(farmer);
 
-            if (movementPlanner.findStepAway(
-                    mimic, location, threatLocation) != null) {
-                return CreatureStateType.ESCAPE;
+            Exit mimicStep = movementPlanner.findStepAway(mimic, location, threatLocation);
+
+            if (mimicStep != null) {
+                Exit decoyStep = movementPlanner.findStepAway(mimic, location, threatLocation, mimicStep);
+
+                if (decoyStep != null) {
+                    mimic.prepareEscape(new EscapePlan(mimicStep, decoyStep));
+
+                    return CreatureStateType.ESCAPE;
+                }
             }
         }
 
