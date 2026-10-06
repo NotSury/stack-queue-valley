@@ -8,6 +8,7 @@ package game.capabilities;
  * action classes.</p>
  *
  * @author Lee Le Si 34599223
+ * @author Khoo Lynn 34598901
  * @version 1.0.0
  */
 public enum ToolAbility {
@@ -18,5 +19,9 @@ public enum ToolAbility {
     /**
      * Ability that allows an actor to perform watering actions.
      */
-    WATERING
+    WATERING,
+    /**
+     * Ability that allows an actor to break breakable objects.
+     */
+    BREAKING
 }

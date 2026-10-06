@@ -8,44 +8,118 @@ import game.items.Parsnip;
 import java.util.List;
 
 /**
- * ParsnipCrop represents a mature Parsnip crop that can be harvested.
+ * Represents a mature Parsnip crop that can be watered and harvested.
  *
- * <p>Harvesting the crop costs 1 stamina point and adds one Parsnip
- * to the actor's inventory. The crop is then replaced with Dirt.
- * There is also a 50 percent chance that an additional Parsnip is
- * placed on a randomly selected adjacent location.</p>
+ * <p>Harvesting costs 1 stamina and gives the actor one Parsnip.
+ * The crop is then removed, with a 50 percent chance that an additional
+ * Parsnip appears on a randomly selected adjacent tile.</p>
  *
- * @author Lee Le Si 34599223
+ * <p>Watering costs 1 stamina and restores 20 health to the actor.
+ * The crop then has a destruction chance equal to 10 percent plus
+ * the number of times it has been watered.</p>
+ *
+ * @author <Lee Le Si> <34599223>
+ * @author <Chin Kai Xuan> <35730374>
  * @version 1.0.0
  */
-public class ParsnipCrop extends Crop {
+public class ParsnipCrop extends WaterableCrop {
 
     /**
-     * Constructor for the ParsnipCrop class.
-     *
-     * <p>Creates a mature Parsnip crop represented by the 'P'
-     * display character.</p>
+     * Stamina required to harvest this crop.
+     */
+    private static final int HARVEST_COST = 1;
+
+    /**
+     * Stamina required to water this crop.
+     */
+    private static final int WATERING_COST = 1;
+
+    /**
+     * Health restored when this crop is watered.
+     */
+    private static final int HEAL_AMOUNT = 20;
+
+    /**
+     * Base percentage chance that watering destroys the crop.
+     */
+    private static final int BASE_DESTRUCTION_CHANCE = 10;
+
+    /**
+     * Chance of producing an additional Parsnip when harvested.
+     */
+    private static final double EXTRA_PARSNIP_CHANCE = 0.5;
+
+    /**
+     * Constructor for ParsnipCrop.
      */
     public ParsnipCrop() {
         super('P', "Parsnip Crop");
     }
 
     /**
-     * Returns the stamina required to harvest this crop.
+     * Returns the stamina cost required to water this crop.
      *
-     * @return the harvest cost of 1 stamina point
+     * @return 1 stamina point
+     */
+    @Override
+    public int getWateringCost() {
+        return WATERING_COST;
+    }
+
+    /**
+     * Waters the Parsnip crop.
+     *
+     * <p>The watering count is increased and the actor is healed by
+     * 20 health points. The crop then has a destruction chance equal
+     * to 10 plus its watering count.</p>
+     *
+     * @param actor the actor watering the crop
+     * @param location the location containing the crop
+     * @return a description of the watering result
+     */
+    @Override
+    public String water(Actor actor, Location location) {
+        incrementWateringCount();
+
+        actor.heal(HEAL_AMOUNT);
+
+        int destructionChance = Math.min(
+                100,
+                BASE_DESTRUCTION_CHANCE + getWateringCount()
+        );
+
+        boolean destroyed =
+                Math.random() < destructionChance / 100.0;
+
+        if (destroyed) {
+            removeCrop(location);
+
+            return actor
+                    + " waters the Parsnip crop and restores 20 health. "
+                    + "The crop is destroyed.";
+        }
+
+        return actor
+                + " waters the Parsnip crop and restores 20 health. "
+                + "The crop survives.";
+    }
+
+    /**
+     * Returns the stamina cost required to harvest this crop.
+     *
+     * @return 1 stamina point
      */
     @Override
     public int getHarvestCost() {
-        return 1;
+        return HARVEST_COST;
     }
 
     /**
      * Harvests this Parsnip crop.
      *
      * <p>One Parsnip is added to the actor's inventory and the crop is
-     * replaced with Dirt. There is a 50 percent chance that another
-     * Parsnip is placed on a randomly selected adjacent location.</p>
+     * removed. There is also a 50 percent chance that an additional
+     * Parsnip is placed on a randomly selected adjacent tile.</p>
      *
      * @param actor the actor harvesting the crop
      * @param location the location containing the crop
@@ -56,9 +130,7 @@ public class ParsnipCrop extends Crop {
 
         actor.getInventory().add(new Parsnip());
 
-        location.setGround(new Dirt());
-
-        if (Math.random() < 0.5) {
+        if (Math.random() < EXTRA_PARSNIP_CHANCE) {
             List<Exit> exits = location.getExits();
 
             if (!exits.isEmpty()) {
@@ -71,6 +143,8 @@ public class ParsnipCrop extends Crop {
             }
         }
 
-        return actor + " harvest the Parsnip crop";
+        removeCrop(location);
+
+        return actor + " harvests the Parsnip crop";
     }
 }
