@@ -8,6 +8,7 @@ import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.actions.DecoyTurnAction;
+import game.interfaces.Hostile;
 
 /**
  * A temporary imitation of a Cave Mimic.
@@ -15,7 +16,7 @@ import game.actions.DecoyTurnAction;
  * Its ordinary behaviour is supplied by the creature factory, and
  * it expires after three executed turns.
  */
-public class DecoyMimic extends Actor {
+public class DecoyMimic extends Actor implements Hostile {
 
     private static final int LIFETIME_TURNS = 3;
 
@@ -79,6 +80,21 @@ public class DecoyMimic extends Actor {
         if (map.contains(this)) {
             map.removeActor(this);
         }
+    }
+
+    /**
+     * Removes the decoy when an attack exposes its identity.
+     * Called after the weapon and coating effects have resolved,
+     * including when the weapon misses.
+     *
+     * @param attacker the actor who attacked the decoy
+     * @param map the map containing the decoy
+     * @return a message revealing that the attacked creature was a decoy
+     */
+    @Override
+    public String respondToAttack(Actor attacker, GameMap map) {
+        vanish(map);
+        return "The attack exposed the decoy Mimic, and it vanishes.";
     }
 
     /**
