@@ -6,14 +6,19 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.capabilities.FarmerStatistic;
-import game.grounds.Crop;
 import game.grounds.TomatoCrop;
 import game.interfaces.Buyable;
+import game.interfaces.PlantableGround;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ *
+ * @author <Vanessa Liau Jia Yee> <34599398>
+ * @version 1.1.0
+ */
 public class BuyTomatoCrop implements Buyable
 {
     private static final int PRICE = 500;
@@ -37,7 +42,7 @@ public class BuyTomatoCrop implements Buyable
         for (Exit exit : merchantLocation.getExits()) {
             Location location = exit.getDestination();
 
-            if (location.getGroundAs(Crop.class) == null) {
+            if (location.getGroundAs(PlantableGround.class) != null) {
                 availableLocations.add(location);
             }
         }
