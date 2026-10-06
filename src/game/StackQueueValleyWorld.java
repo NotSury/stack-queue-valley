@@ -6,8 +6,10 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.World;
 import game.actors.*;
 import game.grounds.*;
+import game.items.AlienDevice;
 import game.items.Geode;
 import game.items.Melon;
+import game.teleportation.TeleportDestination;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,12 +21,12 @@ import java.util.List;
  * environment before the game begins.</p>
  *
  * <p>Additional areas and features like the Mines map, mining resources, teleportation
- * points and other REQ2 elements are also initialised as port of the game world.</p>
+ * points and other REQ2 elements are also initialised as part of the game world.</p>
  *
  * @author <Lee Le Si> <34599223>
  * @author <Chin Kai Xuan> <35730374>
  * @author <Khoo Lynn> <34598901>
- * @version 1.3.0
+ * @version 1.4.0
  */
 public class StackQueueValleyWorld extends World {
 
@@ -42,8 +44,8 @@ public class StackQueueValleyWorld extends World {
      * <p>This method creates the farm map, places the Farmer and farm animals,
      * adds mature crops, and places the available processing facilities.</p>
      *
-     * <p>It also creates the Mines map and places mining-related grounds and items
-     * required for REQ 2.</p>
+     * <p>It also creates the Mines map and places mining resources,
+     * teleportation points and Alien Device required for REQ2.</p>
      *
      * @throws Exception if an error occurs while initialising the game world
      */
@@ -100,6 +102,25 @@ public class StackQueueValleyWorld extends World {
 
         minesMap.at(1,4).addItem(new Geode());
         minesMap.at(6,4).addItem(new Geode());
+
+        TeleportDestination farmDestination = new TeleportDestination("Inherited Farm", inheritedFarmMap.at(0,0));
+        TeleportDestination minesDestination = new TeleportDestination("Mines", minesMap.at(0,0));
+
+        inheritedFarmMap.at(0,0).setGround(new Ladder(minesDestination));
+        minesMap.at(0,0).setGround(new Ladder(farmDestination));
+
+        TeleportDestination farmCircleDestination = new TeleportDestination("Inherited Farm Circle", inheritedFarmMap.at(1,6));
+        TeleportDestination minesCircleDestination = new TeleportDestination("Mines Circle", minesMap.at(8,6));
+
+        inheritedFarmMap.at(1,6).setGround(new TeleportationCircle(minesCircleDestination));
+        minesMap.at(8,6).setGround(new TeleportationCircle(farmCircleDestination));
+
+        TeleportDestination farmDeviceDestination = new TeleportDestination("Farm Clearing", inheritedFarmMap.at(8,5));
+        TeleportDestination minesDeviceDestination = new TeleportDestination("Mines Clearing", minesMap.at(4,3));
+
+        AlienDevice alienDevice = new AlienDevice(Arrays.asList(farmDeviceDestination, minesDeviceDestination));
+
+        inheritedFarmMap.at(2,6).addItem(alienDevice);
 
         Farmer farmer = new Farmer("Bob");
         this.addPlayer(farmer, inheritedFarmMap.at(5, 3));
