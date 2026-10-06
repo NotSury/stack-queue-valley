@@ -11,6 +11,9 @@ import java.util.Random;
  *
  * <p>When used, there is a 50% chance that the actor falls and takes
  * 25 damage. The actor is teleported regardless of whether the fall occurs.</p>
+ *
+ * @author Khoo Lynn 34598901
+ * @version 1.0.0
  */
 public class Ladder extends TeleportationGround {
     private static final int FALL_DAMAGE = 25;
