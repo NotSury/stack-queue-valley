@@ -10,6 +10,7 @@ import game.capabilities.FarmerStatistic;
 import game.grounds.Rock;
 import game.interfaces.Sellable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -65,16 +66,26 @@ public class Stone extends Item implements Sellable
                 StatisticOperations.INCREASE, SELL_PRICE);
 
         Location merchantLocation = map.locationOf(merchant);
-        List<Exit> exits = merchantLocation.getExits();
 
-        if (!exits.isEmpty())
+        List<Location> availableLocations = new ArrayList<>();
+
+        for (Exit exit : merchantLocation.getExits())
+        {
+            Location location = exit.getDestination();
+
+            if (!location.containsAnActor())
+            {
+                availableLocations.add(location);
+            }
+        }
+
+        if (!availableLocations.isEmpty())
         {
             Random exitRandom = new Random();
 
-            int randomIndex = exitRandom.nextInt(exits.size());
+            int randomIndex = exitRandom.nextInt(availableLocations.size());
 
-            Location rockLocation = exits.get(randomIndex).getDestination();
-
+            Location rockLocation = availableLocations.get(randomIndex);
             rockLocation.setGround(new Rock());
 
             return seller + " sold Stone for " + SELL_PRICE
