@@ -18,6 +18,9 @@ import java.util.List;
  * farm animals, and processing facilities, and prepares the game
  * environment before the game begins.</p>
  *
+ * <p>Additional areas and features like the Mines map, mining resources, teleportation
+ * points and other REQ2 elements are also initialised as port of the game world.</p>
+ *
  * @author <Lee Le Si> <34599223>
  * @author <Chin Kai Xuan> <35730374>
  * @author <Khoo Lynn> <34598901>
@@ -38,6 +41,9 @@ public class StackQueueValleyWorld extends World {
      *
      * <p>This method creates the farm map, places the Farmer and farm animals,
      * adds mature crops, and places the available processing facilities.</p>
+     *
+     * <p>It also creates the Mines map and places mining-related grounds and items
+     * required for REQ 2.</p>
      *
      * @throws Exception if an error occurs while initialising the game world
      */
