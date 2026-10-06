@@ -86,6 +86,8 @@ public class DisguisedState extends EnvironmentAwareState {
             return CreatureStateType.DISGUISED;
         }
 
+        quietTurns++;
+
         if (quietTurns >= REQUIRED_QUIET_TURNS) {
             Location loot = getScanner().findNearestPortableItemLocation(mimic, location, MINIMUM_LOOT_DISTANCE, CaveMimic.DETECTION_RADIUS);
 

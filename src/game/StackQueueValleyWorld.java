@@ -106,6 +106,8 @@ public class StackQueueValleyWorld extends World {
                 pendingCombatBehaviour
         );
 
+        mimic.hurt(70);
+
         inheritedFarmMap.addActor(mimic, inheritedFarmMap.at(1, 4));
         mimic.initialiseState(inheritedFarmMap);
 
