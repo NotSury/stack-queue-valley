@@ -64,7 +64,7 @@ public class StatefulCreatureFactory implements DecoyFactory {
 
         Behaviour<Actor, Action> fleeingBehaviour = new FleeBehaviour(scanner, movementPlanner, CaveMimic.DETECTION_RADIUS);
 
-        mimic.registerState(new DisguisedState(mimic, scanner, disguisedDisplayChar));
+        mimic.registerState(new DisguisedState(mimic, scanner, mimic, mimic, disguisedDisplayChar, CaveMimic.DETECTION_RADIUS));
 
         mimic.registerState(new LootingState(mimic, scanner, movementPlanner, itemSeekingBehaviour));
 

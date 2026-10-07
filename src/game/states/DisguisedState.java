@@ -7,6 +7,8 @@ import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.HealAction;
 import game.actors.CaveMimic;
+import game.interfaces.BaitCarrier;
+import game.interfaces.Disguisable;
 import game.navigation.GridDistance;
 import game.perception.EnvironmentScanner;
 
@@ -24,22 +26,30 @@ public class DisguisedState extends EnvironmentAwareState {
     private static final int MAXIMUM_BAIT_ITEMS = 3;
     private static final int HEALING_PER_TURN = 3;
 
-    private final CaveMimic mimic;
+    private final Disguisable disguisable;
+    private final BaitCarrier baitCarrier;
     private final char disguisedDisplayChar;
+    private final int detectionRadius;
 
     private int quietTurns;
 
     /**
-     * Creates a disguised state for a Cave Mimic.
+     * Creates a disguised state with appearance and bait operations.
+     * The supplied role interfaces must operate on the owning creature.
      *
-     * @param mimic the Mimic that owns this state
+     * @param creature the actor that owns this state
      * @param scanner the scanner used to inspect the surroundings
+     * @param disguisable the owning creature's appearance operations
+     * @param baitCarrier the owning creature's bait operations
      * @param disguisedDisplayChar the character representing the disguise
+     * @param detectionRadius the maximum distance used for environmental scans
      */
-    public DisguisedState(CaveMimic mimic, EnvironmentScanner scanner, char disguisedDisplayChar) {
-        super(mimic, scanner);
-        this.mimic = mimic;
+    public DisguisedState(Actor creature, EnvironmentScanner scanner, Disguisable disguisable, BaitCarrier baitCarrier, char disguisedDisplayChar, int detectionRadius) {
+        super(creature, scanner);
+        this.disguisable = disguisable;
+        this.baitCarrier = baitCarrier;
         this.disguisedDisplayChar = disguisedDisplayChar;
+        this.detectionRadius = detectionRadius;
     }
 
     /**
@@ -60,8 +70,8 @@ public class DisguisedState extends EnvironmentAwareState {
      */
     @Override
     public void onEnter(Location location) {
-        mimic.disguise(disguisedDisplayChar);
-        mimic.scatterBait(location, MAXIMUM_BAIT_ITEMS);
+        disguisable.disguise(disguisedDisplayChar);
+        baitCarrier.scatterBait(location, MAXIMUM_BAIT_ITEMS);
         quietTurns = 0;
     }
 
@@ -76,7 +86,7 @@ public class DisguisedState extends EnvironmentAwareState {
      */
     @Override
     public CreatureStateType determineNextState(Location location) {
-        Actor farmer = getScanner().findFarmer(location, CaveMimic.DETECTION_RADIUS);
+        Actor farmer = getScanner().findFarmer(location, detectionRadius);
 
         if (farmer != null) {
             quietTurns = 0;
@@ -93,7 +103,7 @@ public class DisguisedState extends EnvironmentAwareState {
         quietTurns++;
 
         if (quietTurns >= REQUIRED_QUIET_TURNS) {
-            Location loot = getScanner().findNearestPortableItemLocation(mimic, location, MINIMUM_LOOT_DISTANCE, CaveMimic.DETECTION_RADIUS);
+            Location loot = getScanner().findNearestPortableItemLocation(getCreature(), location, MINIMUM_LOOT_DISTANCE, detectionRadius);
 
             if (loot != null) {
                 return CreatureStateType.LOOTING;
@@ -112,7 +122,7 @@ public class DisguisedState extends EnvironmentAwareState {
      */
     @Override
     public Action getAction(Location location) {
-        if (mimic.getStatistic(ActorStatistics.HEALTH) >= mimic.getMaximumStatistic(ActorStatistics.HEALTH)) {
+        if (getCreature().getStatistic(ActorStatistics.HEALTH) >= getCreature().getMaximumStatistic(ActorStatistics.HEALTH)) {
             return super.getAction(location);
         }
 

@@ -6,6 +6,8 @@ import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.weapons.IntrinsicWeapon;
+import game.interfaces.BaitCarrier;
+import game.interfaces.Disguisable;
 import game.interfaces.Hostile;
 import game.states.CreatureStateType;
 
@@ -18,7 +20,7 @@ import java.util.List;
  * Provides inventory operations used by its state-entry effects.
  * State implementations control when these operations are performed.
  */
-public class CaveMimic extends StatefulCreature implements Hostile {
+public class CaveMimic extends StatefulCreature implements Hostile, Disguisable, BaitCarrier {
 
     private static final int ADJACENT_RADIUS = 1;
     /**
@@ -57,6 +59,7 @@ public class CaveMimic extends StatefulCreature implements Hostile {
      * @param maximumItems the non-negative maximum number of items to scatter
      * @return the number of items transferred to the ground
      */
+    @Override
     public int scatterBait(Location origin, int maximumItems) {
         Iterator<Item> bait = getPortableItems(getInventory().getItems()).iterator();
 
@@ -92,6 +95,7 @@ public class CaveMimic extends StatefulCreature implements Hostile {
      * @param origin the Mimic's current location
      * @return the number of items transferred into the inventory
      */
+    @Override
     public int reclaimAdjacentItems(Location origin) {
         int reclaimedItems = 0;
 
@@ -112,6 +116,7 @@ public class CaveMimic extends StatefulCreature implements Hostile {
      *
      * @param displayChar the character used to represent the disguise
      */
+    @Override
     public void disguise(char displayChar) {
         appearance = displayChar;
     }
@@ -119,6 +124,7 @@ public class CaveMimic extends StatefulCreature implements Hostile {
     /**
      * Restores the Mimic's normal displayed appearance.
      */
+    @Override
     public void reveal() {
         appearance = super.getDisplayChar();
     }
