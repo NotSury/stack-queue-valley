@@ -1,11 +1,24 @@
 package game;
 
+import edu.monash.fit2099.engine.actions.Action;
+import edu.monash.fit2099.engine.actions.DoNothingAction;
+import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
+import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.World;
 import game.actors.*;
+import game.behaviours.AmbushBehaviour;
+import game.behaviours.AttackBehaviour;
 import game.grounds.*;
+import game.items.Parsnip;
+import game.items.Tomato;
+import game.navigation.MapMovementPlanner;
+import game.navigation.MovementPlanner;
+import game.perception.EnvironmentScanner;
+import game.perception.MapEnvironmentScanner;
 import game.items.AlienDevice;
 import game.items.Geode;
 import game.items.Melon;
@@ -136,6 +149,37 @@ public class StackQueueValleyWorld extends World {
 
         inheritedFarmMap.at(6,5).setGround(new PreservesJar());
         inheritedFarmMap.at(5,6).setGround(new DryingRack());
+
+        MovementPlanner movementPlanner = new MapMovementPlanner();
+
+        EnvironmentScanner scanner =
+                new MapEnvironmentScanner(movementPlanner);
+
+        StatefulCreatureFactory creatureFactory =
+                new StatefulCreatureFactory(scanner, movementPlanner);
+
+        Behaviour<Actor, Action> ambushBehaviour = new AmbushBehaviour(scanner, movementPlanner, new AttackBehaviour(), CaveMimic.DETECTION_RADIUS);
+
+        List<Item> startingBait = Arrays.asList(
+                new Parsnip(),
+                new Tomato(),
+                new Parsnip()
+        );
+
+        CaveMimic mimic = creatureFactory.createCaveMimic(
+                100,
+                startingBait,
+                '?',
+                ambushBehaviour
+        );
+
+        mimic.hurt(70);
+
+        inheritedFarmMap.addActor(mimic, inheritedFarmMap.at(1, 4));
+        mimic.initialiseState(inheritedFarmMap);
+
+        inheritedFarmMap.at(3, 4).addItem(new Parsnip());
+        inheritedFarmMap.at(3, 5).addItem(new Tomato());
 
     }
 }

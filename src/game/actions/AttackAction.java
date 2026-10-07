@@ -68,7 +68,7 @@ public class AttackAction extends Action {
         });
 
         // 3. the target dies if the attack (or its coating) left it with no health
-        if (!target.isConscious()){
+        if (map.contains(target) && !target.isConscious()){
             result.append(System.lineSeparator()).append(target.unconscious(actor, map));
         }
         return result.toString();
