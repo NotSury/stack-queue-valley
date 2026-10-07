@@ -47,6 +47,11 @@ public class WeavingState extends BehaviourDrivenState {
         this.awareness = awareness;
     }
 
+    /**
+     * Returns the identifier used to register and select the Weaving state.
+     *
+     * @return the Weaving state identifier
+     */
     @Override
     public CreatureStateType getType() {
         return CreatureStateType.WEAVING;
@@ -83,7 +88,7 @@ public class WeavingState extends BehaviourDrivenState {
     }
 
     /**
-     * Prioritises intruders, then checks whether useful weaving remains.
+     * Prioritizes intruders, then checks whether useful weaving remains.
      * Returns to Nesting when no active Farmer or eligible reachable site exists.
      *
      * @param location the Spider's current location

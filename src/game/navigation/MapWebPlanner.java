@@ -16,6 +16,11 @@ public class MapWebPlanner implements WebPlanner {
 
     private final int placementRadius;
 
+    /**
+     * Creates a planner for web sites within the supplied nest radius.
+     *
+     * @param placementRadius the maximum web-site distance from the nest
+     */
     public MapWebPlanner(int placementRadius) {
         this.placementRadius = placementRadius;
     }

@@ -10,10 +10,15 @@ import game.navigation.WebPlanner;
 import game.statuses.WebBoundStatus;
 
 /**
- * Assesses reachable Farmers using the Spider's fixed nest and pursuit limits.
- * Accepts walking or a useful jump as an approach to the Farmer.
+ * Shares Farmer detection, nest-threat assessment and navigation queries
+ * between all four Spider states.
+ * Uses injected planners to assess safe walking, useful jumps and
+ * reachable web-placement opportunities without changing the map.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.1.0
  */
-public class MapSpiderAwareness implements SpiderAwareness {
+public class MapSpiderAwareness implements SpiderTargetTracker {
 
     private static final int NEST_THREAT_RADIUS = 3;
 
@@ -26,6 +31,18 @@ public class MapSpiderAwareness implements SpiderAwareness {
     private final int detectionRadius;
     private final int leashRadius;
 
+    /**
+     * Creates shared environmental assessment for one Spider.
+     * All supplied collaborators must operate on the same owning creature.
+     *
+     * @param creature the owning Spider
+     * @param scanner the scanner used to detect Farmers
+     * @param webPlanner the safe walking and web-placement planner
+     * @param jumpPlanner the tactical jump planner
+     * @param network the owning Spider's web network
+     * @param detectionRadius the maximum Farmer detection distance
+     * @param leashRadius the maximum pursuit distance from the nest
+     */
     public MapSpiderAwareness(
             Actor creature,
             EnvironmentScanner scanner,
@@ -50,7 +67,6 @@ public class MapSpiderAwareness implements SpiderAwareness {
      * pursuit distance from the fixed nest.
      * Accepts the Farmer when adjacent, approachable through safe walking,
      * or approachable through a useful tactical jump.
-     * Does not move actors or change the environment.
      *
      * @param origin the owning Spider's current location
      * @return the detected approachable Farmer, or null when none qualifies
@@ -80,11 +96,8 @@ public class MapSpiderAwareness implements SpiderAwareness {
             return null;
         }
 
-        if (GridDistance.between(origin, target) == 1
-                || webPlanner.findStepTowards(
-                creature, origin, target) != null
-                || jumpPlanner.findBestLanding(
-                creature, origin, target) != null) {
+        if (canWalkToTarget(origin, target)
+                || findUsefulLanding(origin, target) != null) {
             return farmer;
         }
 
@@ -120,5 +133,64 @@ public class MapSpiderAwareness implements SpiderAwareness {
         return nestDistance <= leashRadius
                 && (nestDistance <= NEST_THREAT_RADIUS
                 || farmer.hasStatus(WebBoundStatus.class));
+    }
+
+    /**
+     * Checks whether a target is adjacent or can be approached through
+     * a safe walking route on the same map.
+     *
+     * @param origin the Spider's current location
+     * @param target the target's location
+     * @return true when a walking approach is available
+     */
+    @Override
+    public boolean canWalkToTarget(Location origin, Location target) {
+        if (origin.map() != target.map()) {
+            return false;
+        }
+
+        return GridDistance.between(origin, target) == 1 || webPlanner.findStepTowards(creature, origin, target) != null;
+    }
+
+    /**
+     * Finds a legal jump landing that improves the approach to a target.
+     * Rejects targets located on another map.
+     *
+     * @param origin the Spider's current location
+     * @param target the target's location
+     * @return a useful landing, or null when none exists
+     */
+    @Override
+    public Location findUsefulLanding(Location origin, Location target) {
+        if (origin.map() != target.map()) {
+            return null;
+        }
+
+        return jumpPlanner.findBestLanding(
+                creature,
+                origin,
+                target
+        );
+    }
+
+    /**
+     * Checks for an eligible reachable web site using the shared planner.
+     * Placement eligibility includes the web network's active-web limit.
+     *
+     * @param origin the Spider's current location
+     * @return true when a reachable placement opportunity exists
+     */
+    @Override
+    public boolean hasWebGap(Location origin) {
+        return webPlanner.findPlacementTarget(
+                creature,
+                origin,
+                network
+        ) != null;
+    }
+
+    @Override
+    public Actor findActiveTarget(Location origin) {
+        return findActiveFarmer(origin);
     }
 }
