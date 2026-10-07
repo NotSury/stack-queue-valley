@@ -85,11 +85,12 @@ public class EscapeState extends BehaviourDrivenState {
      * Removes any previous decoy belonging to this state.
      *
      * @param location the Mimic's location when entering this state
+     * @return a description of decoy creation or why no decoy was created
      * @throws IllegalStateException if the engine rejects placement
      * on the selected valid spawn tile
      */
     @Override
-    public void onEnter(Location location) {
+    public String onEnter(Location location) {
         Actor farmer = getScanner().findNearestActorWith(location, detectionRadius, ActorRole.FARMER);
 
         EscapePlan plan = null;
@@ -105,7 +106,7 @@ public class EscapeState extends BehaviourDrivenState {
         firstEscapeAction = null;
 
         if (plan == null) {
-            return;
+            return getCreature() + " reveals itself but cannot create a decoy";
         }
 
         Exit mimicStep = plan.getMimicStep();
@@ -116,7 +117,7 @@ public class EscapeState extends BehaviourDrivenState {
         Location spawnLocation = decoyStep.getDestination();
 
         if (!spawnLocation.canActorEnter(decoy)) {
-            return;
+            return getCreature() + " reveals itself but cannot place a decoy on the selected tile.";
         }
 
         try {
@@ -132,6 +133,10 @@ public class EscapeState extends BehaviourDrivenState {
         decoyMap = location.map();
 
         firstEscapeAction = new MoveActorAction(mimicStep.getDestination(), mimicStep.getName());
+
+        return getCreature() + " reveals itself and creates a decoy at ("
+                + spawnLocation.x() + ", " + spawnLocation.y()
+                + "), preparing to escape " + mimicStep.getName() + ".";
     }
 
     /**

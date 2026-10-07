@@ -26,6 +26,8 @@ public abstract class StatefulCreature extends Actor {
 
     private CreatureState currentState;
 
+    private String pendingEntryMessage = "";
+
     /**
      * Creates a creature with an initial state identifier.
      * States must be registered before initial activation.
@@ -90,17 +92,19 @@ public abstract class StatefulCreature extends Actor {
     public final Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
         if (!isConscious()) {
             unconscious(map);
+            display.println(unconscious(map));
             return new DoNothingAction();
         }
 
         initialiseState(map);
+        printEntryMessage(display);
 
         Location location = map.locationOf(this);
 
         CreatureStateType nextStateType = currentState.determineNextState(location);
 
         changeState(nextStateType, location);
-        display.println(this + " state: " + getCurrentStateType());
+        printEntryMessage(display);
 
         return currentState.getAction(map.locationOf(this));
     }
@@ -120,6 +124,13 @@ public abstract class StatefulCreature extends Actor {
         }
 
         currentState = nextState;
-        currentState.onEnter(location);
+        pendingEntryMessage = currentState.onEnter(location);
+    }
+
+    private void printEntryMessage(Display display) {
+        if (!pendingEntryMessage.isEmpty()) {
+            display.println(pendingEntryMessage);
+            pendingEntryMessage = "";
+        }
     }
 }

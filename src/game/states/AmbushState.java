@@ -70,14 +70,22 @@ public class AmbushState extends BehaviourDrivenState {
      * @param location the Mimic's current location.
      */
     @Override
-    public void onEnter(Location location) {
+    public String onEnter(Location location) {
         disguisable.reveal();
 
         Actor farmer = getScanner().findNearestActorWith(location, ADJACENT_RADIUS, ActorRole.FARMER);
 
+        String message = getCreature() + " reveals itself.";
+
         if (farmer != null) {
-            stealDroppedItem(farmer, location.map());
+            String theftMessage = stealDroppedItem(farmer, location.map());
+
+            if (!theftMessage.isEmpty()) {
+                message += System.lineSeparator() + theftMessage;
+            }
         }
+
+        return message;
     }
 
     /**
@@ -113,11 +121,11 @@ public class AmbushState extends BehaviourDrivenState {
         return CreatureStateType.AMBUSH;
     }
 
-    private void stealDroppedItem(Actor farmer, GameMap map) {
+    private String stealDroppedItem(Actor farmer, GameMap map) {
         Item stolenItem = findDroppablePortableItem(farmer);
 
         if (stolenItem == null) {
-            return;
+            return "";
         }
 
         Action dropAction = stolenItem.getDropAction(farmer);
@@ -129,11 +137,11 @@ public class AmbushState extends BehaviourDrivenState {
             farmerLocation.removeItem(stolenItem);
             getCreature().getInventory().add(stolenItem);
 
-            System.out.println(
-                    getCreature() + " forces " + farmer
-                            + " to drop the " + stolenItem
-                            + " and steals it."
-            );
+            return getCreature() + " forces " + farmer
+                    + " to drop the " + stolenItem
+                    + " and steals it.";
         }
+
+        return "";
     }
 }

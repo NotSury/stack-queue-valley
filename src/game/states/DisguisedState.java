@@ -64,13 +64,16 @@ public class DisguisedState extends EnvironmentAwareState {
      * Applies the disguise, scatters adjacent bait and resets
      * the quiet-turn counter.
      *
-     * @param location the Mimic's current location
+     * @param location the creature's current location
+     * @return a description of the disguise and scattered bait
      */
     @Override
-    public void onEnter(Location location) {
+    public String onEnter(Location location) {
         disguisable.disguise(disguisedDisplayChar);
-        baitCarrier.scatterBait(location, MAXIMUM_BAIT_ITEMS);
+        int scatteredItems = baitCarrier.scatterBait(location, MAXIMUM_BAIT_ITEMS);
         quietTurns = 0;
+
+        return getCreature() + " disguises itself and scatters bait onto " + scatteredItems + " adjacent tiles.";
     }
 
     /**

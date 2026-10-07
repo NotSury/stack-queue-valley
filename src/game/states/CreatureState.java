@@ -28,13 +28,14 @@ public interface CreatureState{
 
     /**
      * Performs the immediate effects of entering this state.
-     * Called once on initial state activation or when the creature
-     * changes to this state. It must not be called again merely because
-     * the creature remains in this state.
+     * Called once on initial activation or when the creature changes state.
+     * Remaining in the same state must not repeat these effects.
      *
-     * @param location location the creature's current location
+     * @param location the creature's current location
+     * @return a description of the entry effects, or an empty string
+     * when there is nothing to report
      */
-    void onEnter(Location location);
+    String onEnter(Location location);
 
     /**
      * Selects the creature's ordinary action for this turn without executing it.

@@ -79,17 +79,27 @@ public class LootingState extends BehaviourDrivenState {
     }
 
     /**
-     * Reveals the Mimic, reclaims adjacent items, pulls up to two
-     * distant items and records the inventory baseline for this visit.
+     * Reveals the creature, reclaims adjacent items, pulls distant loot
+     * and records the inventory baseline for this visit.
      *
-     * @param location the Mimic's current location
+     * @param location the creature's current location
+     * @return a description of reclaimed and pulled items
      */
     @Override
-    public void onEnter(Location location) {
+    public String onEnter(Location location) {
         disguisable.reveal();
-        baitCarrier.reclaimAdjacentItems(location);
-        pullNearbyItems(location);
+        int reclaimedItems = baitCarrier.reclaimAdjacentItems(location);
+        String pullMessage = pullNearbyItems(location);
+
         initialInventorySize = getCreature().getInventory().getItems().size();
+
+        String message = getCreature() + " reveals itself and reclaims " + reclaimedItems + " adjacent items.";
+
+        if (!pullMessage.isEmpty()) {
+            message += System.lineSeparator() + pullMessage;
+        }
+
+        return message;
     }
 
     /**
@@ -131,7 +141,8 @@ public class LootingState extends BehaviourDrivenState {
         return CreatureStateType.LOOTING;
     }
 
-    private void pullNearbyItems(Location location) {
+    private String pullNearbyItems(Location location) {
+        StringBuilder messages = new StringBuilder();
         Map<Item, Location> sources = new LinkedHashMap<>();
         Map<Item, Location> destinations = new HashMap<>();
 
@@ -177,11 +188,13 @@ public class LootingState extends BehaviourDrivenState {
             source.removeItem(item);
             destination.addItem(item);
 
-            System.out.println(
+            messages.append(
                     getCreature() + " pulls " + item
                             + " from (" + source.x() + ", " + source.y() + ")"
-                            + " to (" + destination.x() + ", " + destination.y() + ")");
-
+                            + " to (" + destination.x() + ", " + destination.y() + ")"
+            ).append(System.lineSeparator());
         }
+
+        return messages.toString().stripTrailing();
     }
 }
