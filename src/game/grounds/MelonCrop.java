@@ -57,7 +57,7 @@ public class MelonCrop extends WaterableCrop {
      * Constructor for MelonCrop.
      */
     public MelonCrop() {
-        super('M', "Melon Crop");
+        super('W', "Melon Crop");
     }
 
     /**
