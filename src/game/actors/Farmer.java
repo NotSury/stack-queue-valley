@@ -57,7 +57,6 @@ public class Farmer extends Actor {
 
         this.getInventory().add(new Hoe());
         this.getInventory().add(new WateringCan());
-        this.getInventory().add(new Sword());
         this.getInventory().add(new Pickaxe());
     }
     /**
