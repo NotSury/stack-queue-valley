@@ -40,12 +40,25 @@ public class Egg extends Item implements Sellable
         this.makePortable();
     }
 
+    /**
+     * Returns the selling price of Egg.
+     *
+     * @return the selling price in coins
+     */
     @Override
     public int getSellPrice()
     {
         return SELL_PRICE;
     }
 
+    /**
+     * Sells the Egg to the Merchant.
+     *
+     * @param seller the actor selling the Egg
+     * @param merchant the Merchant buying the Egg
+     * @param map the current game map
+     * @return a message describing the result of the sale
+     */
     @Override
     public String sell(Actor seller, Actor merchant, GameMap map) {
         seller.getInventory().remove(this);

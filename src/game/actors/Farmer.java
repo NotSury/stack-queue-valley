@@ -16,7 +16,6 @@ import game.capabilities.CombatStatus;
 import game.capabilities.FarmerStatistic;
 import game.items.Hoe;
 import game.items.Pickaxe;
-import game.items.Sword;
 import game.items.WateringCan;
 /**
  * Farmer represents the player-controlled actor in the game.
@@ -30,6 +29,7 @@ import game.items.WateringCan;
  *
  * @author Lee Le Si 34599223
  * @author Khoo Lynn 34598901
+ * @author Vanessa Liau Jia Yee 34599398
  * @version 1.1.0
  */
 public class Farmer extends Actor {
@@ -58,7 +58,6 @@ public class Farmer extends Actor {
 
         this.getInventory().add(new Hoe());
         this.getInventory().add(new WateringCan());
-        this.getInventory().add(new Sword());
         this.getInventory().add(new Pickaxe());
     }
     /**

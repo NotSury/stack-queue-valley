@@ -32,12 +32,25 @@ public class Milk extends Item implements Sellable
         this.makePortable();
     }
 
+    /**
+     * Returns the selling price of Milk.
+     *
+     * @return the selling price in coins
+     */
     @Override
     public int getSellPrice()
     {
         return SELL_PRICE;
     }
 
+    /**
+     * Sells the Milk to the Merchant.
+     *
+     * @param seller the actor selling the Milk
+     * @param merchant the Merchant buying the Milk
+     * @param map the current game map
+     * @return a message describing the result of the sale
+     */
     @Override
     public String sell(Actor seller, Actor merchant, GameMap map)
     {

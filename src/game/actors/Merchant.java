@@ -18,6 +18,19 @@ import game.trading.BuySword;
 
 import java.util.List;
 
+/**
+ * This represents the Merchant actor in the game.
+ *
+ * The Merchant has 100 hit points and wanders around the game map.
+ * When an actor with a coin statistic is adjacent to the Merchant,
+ * the actor may buy available products or sell items that implement
+ * the Sellable interface.
+ *
+ * The Merchant is represented by the '$' character.
+ *
+ * @author Vanessa Liau Jia Yee <34599398>
+ * @version 1.0.0
+ */
 public class Merchant extends Actor
 {
     private final Behaviour<Actor, Action> behaviour = new WanderBehaviour();
@@ -36,6 +49,16 @@ public class Merchant extends Actor
         super("Merchant", '$', 100);
     }
 
+    /**
+     * This determines the action performed by the Merchant during its turn.
+     *
+     * @param actions collection of possible Actions for this Actor
+     * @param lastAction The Action this Actor took last turn. Can do
+     * interesting things in conjunction with Action.getNextAction()
+     * @param map the map containing the Actor
+     * @param display the I/O object to which messages may be written
+     * @return the action performed by the Merchant
+     */
     @Override
     public Action playTurn(ActionList actions, Action lastAction,
                            GameMap map, Display display)
@@ -50,6 +73,14 @@ public class Merchant extends Actor
         return new DoNothingAction();
     }
 
+    /**
+     * Returns the trading actions available to an actor adjacent to the Merchant.
+     *
+     * @param otherActor the Actor that might be performing attack
+     * @param direction String representing the direction of the other Actor
+     * @param map current GameMap
+     * @return a list of available buy and sell actions
+     */
     @Override
     public ActionList allowableActions(Actor otherActor, String direction, GameMap map)
     {
