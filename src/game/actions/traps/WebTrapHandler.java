@@ -3,6 +3,7 @@ package game.actions.traps;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import game.actions.WebBoundAction;
+import game.capabilities.ActorRole;
 import game.capabilities.WebAbility;
 import game.statuses.WebBoundStatus;
 
@@ -25,7 +26,8 @@ public final class WebTrapHandler {
      * @return true if a new binding was applied
      */
     public static boolean tryBind(Actor actor) {
-        if (!actor.isConscious()
+        if (!actor.hasAbility(ActorRole.FARMER)
+                || !actor.isConscious()
                 || actor.hasAbility(WebAbility.IMMUNE_TO_WEBS)
                 || actor.hasStatus(WebBoundStatus.class)) {
             return false;
