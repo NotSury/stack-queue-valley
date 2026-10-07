@@ -23,8 +23,9 @@ public interface MovementPlanner {
     Exit findStepTowards(Actor creature, Location origin, Location target);
 
     /**
-     * Selects a valid adjacent step that increases distance from a threat.
-     * Chooses the step with the greatest resulting distance.
+     * Finds the first step of a bounded route away from a threat.
+     * The route destination must increase threat distance.
+     * The first step may move sideways but never closer to the threat.
      * Movement remains on the origin map.
      *
      * @param creature the creature that would perform the movement
@@ -35,7 +36,8 @@ public interface MovementPlanner {
     Exit findStepAway(Actor creature, Location origin, Location threat);
 
     /**
-     * Selects an improving escape step while excluding a reserved destination.
+     * Finds an escape route while excluding a reserved destination.
+     * The reserved tile must not appear anywhere along the route.
      *
      * @param creature the creature that would perform the movement
      * @param origin the creature's current location

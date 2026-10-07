@@ -16,6 +16,8 @@ import java.util.Queue;
  */
 public class MapMovementPlanner implements MovementPlanner {
 
+    private static final int MAXIMUM_ESCAPE_STEPS = 3;
+
     /**
      * Finds the first step along a shortest valid movement route.
      * Uses breadth-first search. An occupied target is approached
@@ -74,7 +76,9 @@ public class MapMovementPlanner implements MovementPlanner {
     }
 
     /**
-     * Selects a valid neighboring exit that increases threat distance.
+     * Finds the first step of a bounded escape route.
+     * The first step may move sideways but never closer to the threat.
+     *
      * @param creature the creature that would perform the movement
      * @param origin the creature's current location
      * @param threat the threatening actor's location
@@ -86,16 +90,18 @@ public class MapMovementPlanner implements MovementPlanner {
     }
 
     /**
-     * Selects an improving escape step while excluding a reserved destination.
-     * Chooses the greatest resulting distance. Equal-distance choices
-     * use the engine's exit ordering.
+     * Searches escape routes up to three movement steps long.
+     * Destinations must be farther from the threat than the origin.
+     * Prefers destinations with an onward exit, then greater threat
+     * distance, then shorter routes. Remaining ties use exit ordering.
+     * The reserved destination is excluded throughout the search.
      *
      * @param creature the creature that would perform the movement
      * @param origin the creature's current location
      * @param threat the threatening actor's location
      * @param excludedExit the exit whose destination must be excluded, or null
      * when no destination is reserved
-     * @return an escape exit, or null if no improving step exists
+     * @return the first escape exit, or null if no improving route exists
      */
     @Override
     public Exit findStepAway(Actor creature, Location origin, Location threat, Exit excludedExit) {
@@ -103,28 +109,84 @@ public class MapMovementPlanner implements MovementPlanner {
             return null;
         }
 
+        Location excludedDestination = excludedExit == null
+                ? null : excludedExit.getDestination();
+
+        Queue<Location> pending = new ArrayDeque<>();
+        Map<Location, Exit> firstSteps = new HashMap<>();
+        Map<Location, Integer> depths = new HashMap<>();
+
+        pending.add(origin);
+        firstSteps.put(origin, null);
+        depths.put(origin, 0);
+
+        int originalDistance = GridDistance.between(origin, threat);
+
         Exit bestExit = null;
-        int bestDistance = GridDistance.between(origin, threat);
+        boolean bestHasOnwardExit = false;
+        int bestDistance = originalDistance;
+        int bestDepth = Integer.MAX_VALUE;
 
-        for (Exit exit : origin.getExits()) {
-            Location destination = exit.getDestination();
+        while (!pending.isEmpty()) {
+            Location current = pending.remove();
+            int currentDepth = depths.get(current);
 
-            if (excludedExit != null
-                    && destination == excludedExit.getDestination()) {
+            if (currentDepth >= MAXIMUM_ESCAPE_STEPS) {
                 continue;
             }
 
-            if (!isLocalStep(origin, destination)
-                    || !destination.canActorEnter(creature)) {
-                continue;
-            }
+            for (Exit exit : current.getExits()) {
+                Location destination = exit.getDestination();
 
-            int candidateDistance =
-                    GridDistance.between(destination, threat);
+                if (!isLocalStep(current, destination)
+                        || destination == excludedDestination
+                        || firstSteps.containsKey(destination)
+                        || !destination.canActorEnter(creature)) {
+                    continue;
+                }
 
-            if (candidateDistance > bestDistance) {
-                bestExit = exit;
-                bestDistance = candidateDistance;
+                int candidateDistance =
+                        GridDistance.between(destination, threat);
+
+                if (current == origin
+                        && candidateDistance < originalDistance) {
+                    continue;
+                }
+
+                Exit firstStep = current == origin
+                        ? exit : firstSteps.get(current);
+
+                int candidateDepth = currentDepth + 1;
+
+                firstSteps.put(destination, firstStep);
+                depths.put(destination, candidateDepth);
+                pending.add(destination);
+
+                if (candidateDistance <= originalDistance) {
+                    continue;
+                }
+
+                boolean candidateHasOnwardExit = hasOnwardExit(
+                        creature,
+                        destination,
+                        current,
+                        excludedDestination);
+
+                boolean betterCandidate =
+                        bestExit == null
+                                || (candidateHasOnwardExit && !bestHasOnwardExit)
+                                || (candidateHasOnwardExit == bestHasOnwardExit
+                                && candidateDistance > bestDistance)
+                                || (candidateHasOnwardExit == bestHasOnwardExit
+                                && candidateDistance == bestDistance
+                                && candidateDepth < bestDepth);
+
+                if (betterCandidate) {
+                    bestExit = firstStep;
+                    bestHasOnwardExit = candidateHasOnwardExit;
+                    bestDistance = candidateDistance;
+                    bestDepth = candidateDepth;
+                }
             }
         }
 
@@ -152,6 +214,21 @@ public class MapMovementPlanner implements MovementPlanner {
         }
 
         return null;
+    }
+
+    private boolean hasOnwardExit(Actor creature, Location location, Location previousLocation, Location excludeDestination) {
+        for (Exit exit : location.getExits()) {
+            Location destination = exit.getDestination();
+
+            if (destination != previousLocation
+                    && destination != excludeDestination
+                    && isLocalStep(location, destination)
+                    && destination.canActorEnter(creature)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean isLocalStep(

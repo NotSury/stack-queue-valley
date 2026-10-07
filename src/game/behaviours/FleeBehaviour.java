@@ -30,13 +30,14 @@ public class FleeBehaviour extends EnvironmentAwareBehaviour {
     }
 
     /**
-     * Selects a one-tile movement action away from a detected Farmer.
-     * Returns null when no Farmer is detected or no valid step
-     * increases the distance from the Farmer.
+     * Selects the first movement step of a bounded escape route.
+     * Replans each turn using the current terrain and actor positions.
+     * A sideways first step is allowed when the route reaches a
+     * location farther from the Farmer.
      *
      * @param actor the actor performing the behaviour
      * @param location the location of the current actor
-     * @return an escape movement action, or null if none is available
+     * @return an escape movement action, or null if no improving route exists
      */
     @Override
     public Action operate(Actor actor, Location location) {
