@@ -14,8 +14,7 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
  * health change damages the entity.</p>
  *
  * @author Chin Kai Xuan 35730374
- * @author Khoo Lynn 34598901
- * @version 1.1.0
+ * @version 1.0.0
  */
 public class HealthOverTimeStatus implements Status {
 
@@ -67,25 +66,6 @@ public class HealthOverTimeStatus implements Status {
 
             remainingTurns--;
         }
-    }
-
-    /**
-     * Check whether this status applies the given health change.
-     *
-     * @param healthChange the health change to compare.
-     * @return true if the health change matches.
-     */
-    public boolean hasHealthChange(int healthChange){
-        return this.healthChange == healthChange;
-    }
-
-    /**
-     * Resets the remaining duration of this status.
-     *
-     * @param duration the new number of remaining turns.
-     */
-    public void refresh(int duration){
-        this.remainingTurns = duration;
     }
 
     /**

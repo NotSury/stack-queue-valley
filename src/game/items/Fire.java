@@ -1,6 +1,5 @@
 package game.items;
 
-import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Location;
 import game.statuses.HealthOverTimeStatus;
@@ -24,22 +23,10 @@ public class Fire extends Item {
         this.burnDuration = burnDuration;
     }
 
-    private void applyBurn(Actor actor){
-        int healthChange = -damagePerTurn;
-
-        for (HealthOverTimeStatus status : actor.statusesOf(HealthOverTimeStatus.class)){
-            if (status.hasHealthChange(healthChange)){
-                status.refresh(burnDuration);
-                return;
-            }
-        }
-        actor.addStatus(new HealthOverTimeStatus(healthChange, burnDuration));
-    }
-
     @Override
     public void tick(Location currentLocation){
         if (currentLocation.containsAnActor()){
-            applyBurn(currentLocation.getActor());
+            currentLocation.getActor().addStatus(new HealthOverTimeStatus(-damagePerTurn, burnDuration));
         }
 
         remainingTurns--;
