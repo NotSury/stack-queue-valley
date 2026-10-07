@@ -7,7 +7,6 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.weapons.IntrinsicWeapon;
 import game.interfaces.Hostile;
-import game.navigation.EscapePlan;
 import game.states.CreatureStateType;
 
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ public class CaveMimic extends StatefulCreature implements Hostile {
      */
     public static final int DETECTION_RADIUS = 3;
     private char appearance;
-    private EscapePlan pendingEscapePlan;
 
     /**
      * Creates a Cave Mimic with health, starting bait and a natural weapon.
@@ -123,29 +121,6 @@ public class CaveMimic extends StatefulCreature implements Hostile {
      */
     public void reveal() {
         appearance = super.getDisplayChar();
-    }
-
-    /**
-     * Stores the complete plan selected before entering Escape.
-     * Both exits must be valid and have different destinations.
-     *
-     * @param escapePlan the plan for the upcoming Escape transition
-     */
-    public void prepareEscape(EscapePlan escapePlan) {
-        pendingEscapePlan = escapePlan;
-    }
-
-    /**
-     * Returns and clears the plan prepared for entering Escape.
-     * Called once during Escape entry, immediately after a successful
-     * transition decision has prepared the plan.
-     *
-     * @return the prepared escape plan
-     */
-    public EscapePlan takeEscapePlan() {
-        EscapePlan escapePlan = pendingEscapePlan;
-        pendingEscapePlan = null;
-        return escapePlan;
     }
 
     /**

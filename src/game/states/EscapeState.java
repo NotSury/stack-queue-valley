@@ -71,26 +71,45 @@ public class EscapeState extends BehaviourDrivenState {
     }
 
     /**
-     * Reveals the Mimic and creates a decoy using its prepared escape plan.
-     * Removes any previous decoy and selects the real Mimic's first movement.
-     * The movement is returned later as its ordinary action rather than
-     * executed as part of this entry effect.
-     * A complete plan must be prepared before transitioning into this state.
+     * Reveals the Mimic and creates a decoy on a separate escape tile.
+     * Calculates the plan before applying entry effects and reserves
+     * the Mimic's first movement action before the decoy can affect routing.
+     * Removes any previous decoy belonging to this state.
      *
      * @param location the Mimic's location when entering this state
-     * @throws IllegalStateException if the engine rejects decoy placement
+     * @throws IllegalStateException if the engine rejects placement
+     * on the selected valid spawn tile
      */
     @Override
     public void onEnter(Location location) {
-        EscapePlan escapePlan = mimic.takeEscapePlan();
+        Actor farmer = getScanner().findFarmer(location, CaveMimic.DETECTION_RADIUS);
+
+        EscapePlan plan = null;
+
+        if (farmer != null) {
+            Location threatLocation = location.map().locationOf(farmer);
+
+            plan = movementPlanner.planEscape(mimic, location, threatLocation);
+        }
 
         mimic.reveal();
         removePreviousDecoy();
+        firstEscapeAction = null;
 
-        Exit mimicStep = escapePlan.getMimicStep();
-        Exit decoyStep = escapePlan.getDecoyStep();
+        if (plan == null) {
+            return;
+        }
+
+        Exit mimicStep = plan.getMimicStep();
+        Exit decoyStep = plan.getDecoyStep();
 
         DecoyMimic decoy = creatureFactory.createDecoy(mimic, decoyStep.getName());
+
+        Location spawnLocation = decoyStep.getDestination();
+
+        if (!spawnLocation.canActorEnter(decoy)) {
+            return;
+        }
 
         try {
             location.map().addActor(decoy, decoyStep.getDestination());

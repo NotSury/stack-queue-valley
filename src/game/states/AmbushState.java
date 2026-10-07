@@ -6,11 +6,9 @@ import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.items.ItemAbility;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.CaveMimic;
-import game.navigation.EscapePlan;
 import game.navigation.MovementPlanner;
 import game.perception.EnvironmentScanner;
 
@@ -22,7 +20,7 @@ import game.perception.EnvironmentScanner;
 public class AmbushState extends BehaviourDrivenState {
 
     private static final int ADJACENT_RADIUS = 1;
-    private static final double ESCAPE_HEATH_RATIO = 0.30;
+    private static final double ESCAPE_HEALTH_RATIO = 0.30;
 
     private final CaveMimic mimic;
     private final MovementPlanner movementPlanner;
@@ -72,44 +70,31 @@ public class AmbushState extends BehaviourDrivenState {
 
     /**
      * Determines whether to escape, disguise or continue confronting the Farmer.
-     * Escaping requires low health, a detected Farmer and two improving
-     * movement steps with different destinations.
-     * Stores the complete plan before selecting Escape.
+     * Escaping requires low health, a detected Farmer and separate valid
+     * escape steps for the Mimic and its decoy.
      *
      * @param location the Mimic's current location
-     * @return Escape, Disguised or Ambush according to the surroundings
+     * @return the next state according to health and the surroundings
      */
     @Override
     public CreatureStateType determineNextState(Location location) {
         Actor farmer = getScanner().findFarmer(location, CaveMimic.DETECTION_RADIUS);
 
         if (farmer == null) {
-            if (mimic.hasAbility(ItemAbility.PORTABLE)) {
-                return CreatureStateType.DISGUISED;
-            }
-
-            return CreatureStateType.AMBUSH;
+            return CreatureStateType.DISGUISED;
         }
 
         double escapeHealthThreshold =
                 mimic.getMaximumStatistic(ActorStatistics.HEALTH)
-                        * ESCAPE_HEATH_RATIO;
+                        * ESCAPE_HEALTH_RATIO;
 
         if (mimic.getStatistic(ActorStatistics.HEALTH)
                 <= escapeHealthThreshold) {
 
             Location threatLocation = location.map().locationOf(farmer);
 
-            Exit mimicStep = movementPlanner.findStepAway(mimic, location, threatLocation);
-
-            if (mimicStep != null) {
-                Exit decoyStep = movementPlanner.findStepAway(mimic, location, threatLocation, mimicStep);
-
-                if (decoyStep != null) {
-                    mimic.prepareEscape(new EscapePlan(mimicStep, decoyStep));
-
-                    return CreatureStateType.ESCAPE;
-                }
+            if (movementPlanner.planEscape(mimic, location, threatLocation) != null) {
+                return CreatureStateType.ESCAPE;
             }
         }
 

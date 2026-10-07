@@ -216,6 +216,23 @@ public class MapMovementPlanner implements MovementPlanner {
         return null;
     }
 
+    @Override
+    public EscapePlan planEscape(Actor creature, Location origin, Location threat) {
+        Exit mimicStep = findStepAway(creature, origin, threat);
+
+        if (mimicStep == null) {
+            return null;
+        }
+
+        Exit decoyStep = findStepAway(creature, origin, threat, mimicStep);
+
+        if (decoyStep == null) {
+            return null;
+        }
+
+        return new EscapePlan(mimicStep, decoyStep);
+    }
+
     private boolean hasOnwardExit(Actor creature, Location location, Location previousLocation, Location excludeDestination) {
         for (Exit exit : location.getExits()) {
             Location destination = exit.getDestination();

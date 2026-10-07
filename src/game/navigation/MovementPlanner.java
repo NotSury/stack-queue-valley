@@ -57,4 +57,16 @@ public interface MovementPlanner {
      * @return a matching movement exit, or null if none is available
      */
     Exit findStepInDirection(Actor creature, Location origin, String direction);
+
+    /**
+     * Plans separate first steps for a creature and its decoy.
+     * Reserves the creature's destination while selecting the decoy's route.
+     * Does not move actors or change the environment.
+     *
+     * @param creature the creature that would escape
+     * @param origin the creature's current location
+     * @param threat the threatening actor's location
+     * @return the escape plan, or null if two valid steps cannot be found
+     */
+    EscapePlan planEscape(Actor creature, Location origin, Location threat);
 }
