@@ -2,6 +2,7 @@ package game.states;
 
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.DoNothingAction;
+import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Location;
 import game.perception.EnvironmentScanner;
 
@@ -12,15 +13,27 @@ import game.perception.EnvironmentScanner;
  */
 public abstract class EnvironmentAwareState implements CreatureState {
 
+    private final Actor creature;
     private final EnvironmentScanner scanner;
 
     /**
-     * Creates a state with access to environmental information.
+     * Creates a state with an owning actor and environmental information.
      *
+     * @param creature the actor that owns this state
      * @param scanner the scanner used to inspect the surroundings
      */
-    protected EnvironmentAwareState(EnvironmentScanner scanner) {
+    protected EnvironmentAwareState(Actor creature, EnvironmentScanner scanner) {
+        this.creature = creature;
         this.scanner = scanner;
+    }
+
+    /**
+     * Returns the actor that owns this state.
+     *
+     * @return the owning actor
+     */
+    protected final Actor getCreature() {
+        return creature;
     }
 
     /**

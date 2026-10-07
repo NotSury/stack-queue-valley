@@ -37,7 +37,7 @@ public class DisguisedState extends EnvironmentAwareState {
      * @param disguisedDisplayChar the character representing the disguise
      */
     public DisguisedState(CaveMimic mimic, EnvironmentScanner scanner, char disguisedDisplayChar) {
-        super(scanner);
+        super(mimic, scanner);
         this.mimic = mimic;
         this.disguisedDisplayChar = disguisedDisplayChar;
     }
