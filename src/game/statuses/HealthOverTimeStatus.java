@@ -1,6 +1,7 @@
 package game.statuses;
 
 import edu.monash.fit2099.engine.GameEntity;
+import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.positions.Location;
@@ -14,7 +15,8 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
  * health change damages the entity.</p>
  *
  * @author Chin Kai Xuan 35730374
- * @version 1.0.0
+ * @author Khoo Lynn 34598901
+ * @version 1.1.0
  */
 public class HealthOverTimeStatus implements Status {
 
@@ -62,6 +64,12 @@ public class HealthOverTimeStatus implements Status {
                         StatisticOperations.DECREASE,
                         Math.abs(healthChange)
                 );
+
+                Actor actor = location.getActor();
+
+                if (actor == currentEntity && !actor.isConscious()){
+                    location.map().removeActor(actor);
+                }
             }
 
             remainingTurns--;

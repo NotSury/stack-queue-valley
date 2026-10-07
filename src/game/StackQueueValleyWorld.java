@@ -3,10 +3,12 @@ package game;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
 import game.actors.*;
 import game.grounds.*;
 import game.items.AlienDevice;
+import game.items.Fire;
 import game.items.Geode;
 import game.items.Melon;
 import game.teleportation.TeleportDestination;
@@ -103,17 +105,25 @@ public class StackQueueValleyWorld extends World {
         minesMap.at(1,4).addItem(new Geode());
         minesMap.at(6,4).addItem(new Geode());
 
-        TeleportDestination farmDestination = new TeleportDestination("Inherited Farm", inheritedFarmMap.at(0,0));
-        TeleportDestination minesDestination = new TeleportDestination("Mines", minesMap.at(0,0));
+        TeleportDestination farmDestination = new TeleportDestination("Inherited Farm Ladder", inheritedFarmMap.at(0,0));
+        TeleportDestination minesDestination = new TeleportDestination("Mines Ladder", minesMap.at(0,0));
+        TeleportDestination farmDestination2 = new TeleportDestination("Inherited Farm Ladder 2", inheritedFarmMap.at(9,4));
+        TeleportDestination minesDestination2 = new TeleportDestination("Mines Ladder 2", minesMap.at(9,0));
 
         inheritedFarmMap.at(0,0).setGround(new Ladder(minesDestination));
         minesMap.at(0,0).setGround(new Ladder(farmDestination));
+        inheritedFarmMap.at(9,4).setGround(new Ladder(minesDestination2));
+        minesMap.at(9,0).setGround(new Ladder(farmDestination2));
 
         TeleportDestination farmCircleDestination = new TeleportDestination("Inherited Farm Circle", inheritedFarmMap.at(1,6));
         TeleportDestination minesCircleDestination = new TeleportDestination("Mines Circle", minesMap.at(8,6));
+        TeleportDestination farmCircleDestination2 = new TeleportDestination("Inherited Farm Circle 2", inheritedFarmMap.at(8,6));
+        TeleportDestination minesCircleDestination2 = new TeleportDestination("Mines Circle 2", minesMap.at(1,6));
 
         inheritedFarmMap.at(1,6).setGround(new TeleportationCircle(minesCircleDestination));
         minesMap.at(8,6).setGround(new TeleportationCircle(farmCircleDestination));
+        inheritedFarmMap.at(8,6).setGround(new TeleportationCircle(minesCircleDestination2));
+        minesMap.at(1,6).setGround(new TeleportationCircle(farmCircleDestination2));
 
         TeleportDestination farmDeviceDestination = new TeleportDestination("Farm Clearing", inheritedFarmMap.at(8,5));
         TeleportDestination minesDeviceDestination = new TeleportDestination("Mines Clearing", minesMap.at(4,3));
