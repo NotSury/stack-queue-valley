@@ -66,11 +66,11 @@ public class StatefulCreatureFactory implements DecoyFactory {
 
         mimic.registerState(new DisguisedState(mimic, scanner, mimic, mimic, disguisedDisplayChar, CaveMimic.DETECTION_RADIUS));
 
-        mimic.registerState(new LootingState(mimic, scanner, movementPlanner, itemSeekingBehaviour));
+        mimic.registerState(new LootingState(mimic, scanner, movementPlanner, mimic, mimic, itemSeekingBehaviour, CaveMimic.DETECTION_RADIUS));
 
-        mimic.registerState(new AmbushState(mimic, scanner, movementPlanner, ambushBehaviour));
+        mimic.registerState(new AmbushState(mimic, scanner, movementPlanner, mimic, ambushBehaviour, CaveMimic.DETECTION_RADIUS));
 
-        mimic.registerState(new EscapeState(mimic, scanner, movementPlanner, this, fleeingBehaviour));
+        mimic.registerState(new EscapeState(mimic, scanner, movementPlanner, mimic, this, fleeingBehaviour, CaveMimic.DETECTION_RADIUS));
 
         return mimic;
     }

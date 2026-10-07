@@ -8,6 +8,8 @@ import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.CaveMimic;
+import game.interfaces.BaitCarrier;
+import game.interfaces.Disguisable;
 import game.navigation.GridDistance;
 import game.navigation.MovementPlanner;
 import game.perception.EnvironmentScanner;
@@ -30,22 +32,40 @@ public class LootingState extends BehaviourDrivenState {
     private static final int MAXIMUM_PULL_ITEMS = 2;
     private static final int MINIMUM_PULL_DISTANCE = 2;
 
-    private final CaveMimic mimic;
+    private final Disguisable disguisable;
+    private final BaitCarrier baitCarrier;
+    private final int detectionRadius;
+
     private final MovementPlanner movementPlanner;
 
     private int initialInventorySize;
 
     /**
-     * Creates a looting state with an item-seeking and entry-time pulling.
+     * Creates a looting state with appearance, bait and movement support.
+     * The supplied role interfaces must operate on the owning creature.
      *
-     * @param mimic the Mimic that owns this state
-     * @param scanner the scanner used to inspect the surroundings
-     * @param itemSeekingBehaviour the behaviour used to approach and collect loot
+     * @param creature the actor that owns this state
+     * @param scanner the scanner used to detect Farmers and portable items
+     * @param movementPlanner the planner used to pull reachable items
+     * @param disguisable the owning creature's appearance operations
+     * @param baitCarrier the owning creature's bait operations
+     * @param itemSeekingBehaviour the behaviour used during ordinary looting turns
+     * @param detectionRadius the maximum distance used for environmental scans
      */
-    public LootingState(CaveMimic mimic, EnvironmentScanner scanner, MovementPlanner movementPlanner, Behaviour<Actor, Action> itemSeekingBehaviour) {
-        super(mimic, scanner, itemSeekingBehaviour);
-        this.mimic = mimic;
+    public LootingState(
+            Actor creature,
+            EnvironmentScanner scanner,
+            MovementPlanner movementPlanner,
+            Disguisable disguisable,
+            BaitCarrier baitCarrier,
+            Behaviour<Actor, Action> itemSeekingBehaviour,
+            int detectionRadius
+    ) {
+        super(creature, scanner, itemSeekingBehaviour);
         this.movementPlanner = movementPlanner;
+        this.disguisable = disguisable;
+        this.baitCarrier = baitCarrier;
+        this.detectionRadius = detectionRadius;
     }
 
     /**
@@ -66,10 +86,10 @@ public class LootingState extends BehaviourDrivenState {
      */
     @Override
     public void onEnter(Location location) {
-        mimic.reveal();
-        mimic.reclaimAdjacentItems(location);
+        disguisable.reveal();
+        baitCarrier.reclaimAdjacentItems(location);
         pullNearbyItems(location);
-        initialInventorySize = mimic.getInventory().getItems().size();
+        initialInventorySize = getCreature().getInventory().getItems().size();
     }
 
     /**
@@ -84,7 +104,7 @@ public class LootingState extends BehaviourDrivenState {
     @Override
     public CreatureStateType determineNextState(Location location) {
         Actor farmer = getScanner().findFarmer(
-                location, CaveMimic.DETECTION_RADIUS);
+                location, detectionRadius);
 
         if (farmer != null) {
             Location farmerLocation = location.map().locationOf(farmer);
@@ -98,14 +118,14 @@ public class LootingState extends BehaviourDrivenState {
         }
 
         int newItemsCollected =
-                mimic.getInventory().getItems().size() - initialInventorySize;
+                getCreature().getInventory().getItems().size() - initialInventorySize;
 
         if (newItemsCollected >= COLLECTION_GOAL) {
             return CreatureStateType.DISGUISED;
         }
 
         Location loot = getScanner().findNearestPortableItemLocation(
-                mimic, location, 0, CaveMimic.DETECTION_RADIUS);
+                getCreature(), location, 0, detectionRadius);
 
         if (loot == null) {
             return CreatureStateType.DISGUISED;
@@ -119,20 +139,20 @@ public class LootingState extends BehaviourDrivenState {
         Map<Item, Location> destinations = new HashMap<>();
 
         for (Location source
-                : location.getNearbyLocations(CaveMimic.DETECTION_RADIUS)) {
+                : location.getNearbyLocations(detectionRadius)) {
 
             if (sources.size() >= MAXIMUM_PULL_ITEMS) {
                 break;
             }
 
             if (GridDistance.between(location, source) < MINIMUM_PULL_DISTANCE
-                    || !source.canActorEnter(mimic)
+                    || !source.canActorEnter(getCreature())
                     || source.getItems().isEmpty()) {
                 continue;
             }
 
             Exit step = movementPlanner.findStepTowards(
-                    mimic, source, location);
+                    getCreature(), source, location);
 
             if (step == null) {
                 continue;
@@ -161,7 +181,7 @@ public class LootingState extends BehaviourDrivenState {
             destination.addItem(item);
 
             System.out.println(
-                    mimic + " pulls " + item
+                    getCreature() + " pulls " + item
                             + " from (" + source.x() + ", " + source.y() + ")"
                             + " to (" + destination.x() + ", " + destination.y() + ")");
 

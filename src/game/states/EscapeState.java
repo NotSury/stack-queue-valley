@@ -11,6 +11,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actors.CaveMimic;
 import game.actors.DecoyMimic;
 import game.interfaces.DecoyFactory;
+import game.interfaces.Disguisable;
 import game.navigation.EscapePlan;
 import game.navigation.GridDistance;
 import game.navigation.MovementPlanner;
@@ -29,7 +30,9 @@ public class EscapeState extends BehaviourDrivenState {
     private static final int ADJACENT_RADIUS = 1;
     private static final int MINIMUM_LOOT_DISTANCE = 0;
 
-    private final CaveMimic mimic;
+    private final Disguisable disguisable;
+    private final int detectionRadius;
+
     private final MovementPlanner movementPlanner;
     private final DecoyFactory decoyFactory;
 
@@ -38,26 +41,32 @@ public class EscapeState extends BehaviourDrivenState {
     private Action firstEscapeAction;
 
     /**
-     * Creates an escape state for the supplied Mimic.
-     * The supplied fleeing behaviour should use the same movement planner
-     * and detection radius as this state's escape decisions.
+     * Creates an escape state with appearance, movement and decoy support.
+     * The supplied appearance operations must operate on the owning creature.
+     * The fleeing behaviour should use the same planner and detection radius.
      *
-     * @param mimic the Mimic controlled by this state
-     * @param scanner the scanner used to detect Farmers and items
+     * @param creature the actor that owns this state
+     * @param scanner the scanner used to detect Farmers and portable items
      * @param movementPlanner the planner used to select escape steps
+     * @param disguisable the owning creature's appearance operations
      * @param decoyFactory the collaborator used to construct decoys
      * @param fleeingBehaviour the behaviour used during ordinary escape turns
+     * @param detectionRadius the maximum distance used for environmental scans
      */
-    public EscapeState(CaveMimic mimic,
-                       EnvironmentScanner scanner,
-                       MovementPlanner movementPlanner,
-                       DecoyFactory decoyFactory,
-                       Behaviour<Actor, Action> fleeingBehaviour
+    public EscapeState(
+            Actor creature,
+            EnvironmentScanner scanner,
+            MovementPlanner movementPlanner,
+            Disguisable disguisable,
+            DecoyFactory decoyFactory,
+            Behaviour<Actor, Action> fleeingBehaviour,
+            int detectionRadius
     ) {
-        super(mimic, scanner, fleeingBehaviour);
-        this.mimic = mimic;
+        super(creature, scanner, fleeingBehaviour);
         this.movementPlanner = movementPlanner;
+        this.disguisable = disguisable;
         this.decoyFactory = decoyFactory;
+        this.detectionRadius = detectionRadius;
     }
 
     /**
@@ -82,17 +91,17 @@ public class EscapeState extends BehaviourDrivenState {
      */
     @Override
     public void onEnter(Location location) {
-        Actor farmer = getScanner().findFarmer(location, CaveMimic.DETECTION_RADIUS);
+        Actor farmer = getScanner().findFarmer(location, detectionRadius);
 
         EscapePlan plan = null;
 
         if (farmer != null) {
             Location threatLocation = location.map().locationOf(farmer);
 
-            plan = movementPlanner.planEscape(mimic, location, threatLocation);
+            plan = movementPlanner.planEscape(getCreature(), location, threatLocation);
         }
 
-        mimic.reveal();
+        disguisable.reveal();
         removePreviousDecoy();
         firstEscapeAction = null;
 
@@ -103,7 +112,7 @@ public class EscapeState extends BehaviourDrivenState {
         Exit mimicStep = plan.getMimicStep();
         Exit decoyStep = plan.getDecoyStep();
 
-        DecoyMimic decoy = decoyFactory.createDecoy(mimic, decoyStep.getName());
+        DecoyMimic decoy = decoyFactory.createDecoy(getCreature(), decoyStep.getName());
 
         Location spawnLocation = decoyStep.getDestination();
 
@@ -139,7 +148,7 @@ public class EscapeState extends BehaviourDrivenState {
     public CreatureStateType determineNextState(Location location) {
         Actor farmer = getScanner().findFarmer(
                 location,
-                CaveMimic.DETECTION_RADIUS
+                detectionRadius
         );
 
         if (farmer != null) {
@@ -147,7 +156,7 @@ public class EscapeState extends BehaviourDrivenState {
 
             if (GridDistance.between(location, threatLocation) == ADJACENT_RADIUS
                     && movementPlanner.findStepAway(
-                    mimic,
+                    getCreature(),
                     location,
                     threatLocation
             ) == null) {
@@ -158,10 +167,10 @@ public class EscapeState extends BehaviourDrivenState {
         }
 
         Location lootLocation = getScanner().findNearestPortableItemLocation(
-                mimic,
+                getCreature(),
                 location,
                 MINIMUM_LOOT_DISTANCE,
-                CaveMimic.DETECTION_RADIUS
+                detectionRadius
         );
 
         if (lootLocation != null) {

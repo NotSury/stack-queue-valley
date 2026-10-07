@@ -9,6 +9,7 @@ import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.CaveMimic;
+import game.interfaces.Disguisable;
 import game.navigation.MovementPlanner;
 import game.perception.EnvironmentScanner;
 
@@ -22,21 +23,34 @@ public class AmbushState extends BehaviourDrivenState {
     private static final int ADJACENT_RADIUS = 1;
     private static final double ESCAPE_HEALTH_RATIO = 0.30;
 
-    private final CaveMimic mimic;
+    private final Disguisable disguisable;
+    private final int detectionRadius;
+
     private final MovementPlanner movementPlanner;
 
     /**
-     * Creates an ambush state with combat and escape-planning support.
+     * Creates an ambush state with appearance, combat and escape-planning support.
+     * The supplied appearance operations must operate on the owning creature.
      *
-     * @param mimic the Mimic that owns this state
+     * @param creature the actor that owns this state
      * @param scanner the scanner used to detect Farmers
      * @param movementPlanner the planner used to check escape opportunities
+     * @param disguisable the owning creature's appearance operations
      * @param combatBehaviour the behaviour used for ordinary pursuit and attacks
+     * @param detectionRadius the maximum distance used to detect Farmers
      */
-    public AmbushState(CaveMimic mimic, EnvironmentScanner scanner, MovementPlanner movementPlanner, Behaviour<Actor, Action> combatBehaviour) {
-        super(mimic, scanner, combatBehaviour);
-        this.mimic = mimic;
+    public AmbushState(
+            Actor creature,
+            EnvironmentScanner scanner,
+            MovementPlanner movementPlanner,
+            Disguisable disguisable,
+            Behaviour<Actor, Action> combatBehaviour,
+            int detectionRadius
+    ) {
+        super(creature, scanner, combatBehaviour);
         this.movementPlanner = movementPlanner;
+        this.disguisable = disguisable;
+        this.detectionRadius = detectionRadius;
     }
 
     /**
@@ -59,7 +73,7 @@ public class AmbushState extends BehaviourDrivenState {
      */
     @Override
     public void onEnter(Location location) {
-        mimic.reveal();
+        disguisable.reveal();
 
         Actor farmer = getScanner().findFarmer(location, ADJACENT_RADIUS);
 
@@ -78,22 +92,22 @@ public class AmbushState extends BehaviourDrivenState {
      */
     @Override
     public CreatureStateType determineNextState(Location location) {
-        Actor farmer = getScanner().findFarmer(location, CaveMimic.DETECTION_RADIUS);
+        Actor farmer = getScanner().findFarmer(location, detectionRadius);
 
         if (farmer == null) {
             return CreatureStateType.DISGUISED;
         }
 
         double escapeHealthThreshold =
-                mimic.getMaximumStatistic(ActorStatistics.HEALTH)
+                getCreature().getMaximumStatistic(ActorStatistics.HEALTH)
                         * ESCAPE_HEALTH_RATIO;
 
-        if (mimic.getStatistic(ActorStatistics.HEALTH)
+        if (getCreature().getStatistic(ActorStatistics.HEALTH)
                 <= escapeHealthThreshold) {
 
             Location threatLocation = location.map().locationOf(farmer);
 
-            if (movementPlanner.planEscape(mimic, location, threatLocation) != null) {
+            if (movementPlanner.planEscape(getCreature(), location, threatLocation) != null) {
                 return CreatureStateType.ESCAPE;
             }
         }
@@ -129,9 +143,9 @@ public class AmbushState extends BehaviourDrivenState {
 
         if (farmerLocation.getItems().contains(stolenItem)) {
             farmerLocation.removeItem(stolenItem);
-            mimic.getInventory().add(stolenItem);
+            getCreature().getInventory().add(stolenItem);
 
-            System.out.println(mimic + " forces " + farmer + " to drop the " + stolenItem + " and steals it.");
+            System.out.println(getCreature() + " forces " + farmer + " to drop the " + stolenItem + " and steals it.");
         }
     }
 }

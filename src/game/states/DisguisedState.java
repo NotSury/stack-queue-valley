@@ -6,7 +6,6 @@ import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.HealAction;
-import game.actors.CaveMimic;
 import game.interfaces.BaitCarrier;
 import game.interfaces.Disguisable;
 import game.navigation.GridDistance;
