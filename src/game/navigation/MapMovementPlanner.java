@@ -77,12 +77,15 @@ public class MapMovementPlanner implements MovementPlanner {
 
     /**
      * Finds the first step of a bounded escape route.
-     * The first step may move sideways but never closer to the threat.
+     * Prefers routes that increase distance from the threat.
+     * When no improving route is found, a non-approaching route
+     * that preserves the current grid distance may be used instead.
+     * The first movement step never reduces the distance to the threat.
      *
      * @param creature the creature that would perform the movement
      * @param origin the creature's current location
      * @param threat the threatening actor's location
-     * @return an escape exit, or null if no improving step exists
+     * @return an escape exit, or null if no valid non-approaching route exists
      */
     @Override
     public Exit findStepAway(Actor creature, Location origin, Location threat) {
@@ -91,17 +94,24 @@ public class MapMovementPlanner implements MovementPlanner {
 
     /**
      * Searches escape routes up to three movement steps long.
-     * Destinations must be farther from the threat than the origin.
-     * Prefers destinations with an onward exit, then greater threat
-     * distance, then shorter routes. Remaining ties use exit ordering.
-     * The reserved destination is excluded throughout the search.
+     * Prefers routes that increase grid distance from the threat.
+     * If none are available, considers non-approaching routes that
+     * preserve the original grid distance.
+     *
+     * Improving routes prefer an onward exit, greater threat distance
+     * and then shorter route length. Neutral routes prefer an onward
+     * exit, greater Manhattan separation and then shorter route length.
+     * Remaining ties follow the engine's exit ordering.
+     *
+     * The first step never moves closer to the threat, and the reserved
+     * destination is excluded throughout the search.
      *
      * @param creature the creature that would perform the movement
      * @param origin the creature's current location
      * @param threat the threatening actor's location
      * @param excludedExit the exit whose destination must be excluded, or null
      * when no destination is reserved
-     * @return the first escape exit, or null if no improving route exists
+     * @return the first escape exit, or null if no valid non-approaching route exists
      */
     @Override
     public Exit findStepAway(Actor creature, Location origin, Location threat, Exit excludedExit) {
@@ -126,6 +136,10 @@ public class MapMovementPlanner implements MovementPlanner {
         boolean bestHasOnwardExit = false;
         int bestDistance = originalDistance;
         int bestDepth = Integer.MAX_VALUE;
+        Exit bestNeutralExit = null;
+        boolean bestNeutralHasOnwardExit = false;
+        int bestNeutralManhattanDistance = Integer.MIN_VALUE;
+        int bestNeutralDepth = Integer.MAX_VALUE;
 
         while (!pending.isEmpty()) {
             Location current = pending.remove();
@@ -162,15 +176,36 @@ public class MapMovementPlanner implements MovementPlanner {
                 depths.put(destination, candidateDepth);
                 pending.add(destination);
 
-                if (candidateDistance <= originalDistance) {
+                if (candidateDistance < originalDistance) {
                     continue;
                 }
 
-                boolean candidateHasOnwardExit = hasOnwardExit(
-                        creature,
-                        destination,
-                        current,
-                        excludedDestination);
+                boolean candidateHasOnwardExit =
+                        hasOnwardExit(creature, destination, current, excludedDestination);
+
+                if (candidateDistance == originalDistance) {
+                    int candidateManhattanDistance =
+                            Math.abs(destination.x() - threat.x())
+                                    + Math.abs(destination.y() - threat.y());
+
+                    boolean betterNeutralCandidate =
+                            bestNeutralExit == null
+                                    || (candidateHasOnwardExit && !bestNeutralHasOnwardExit)
+                                    || (candidateHasOnwardExit == bestNeutralHasOnwardExit
+                                    && candidateManhattanDistance > bestNeutralManhattanDistance)
+                                    || (candidateHasOnwardExit == bestNeutralHasOnwardExit
+                                    && candidateManhattanDistance == bestNeutralManhattanDistance
+                                    && candidateDepth < bestNeutralDepth);
+
+                    if (betterNeutralCandidate) {
+                        bestNeutralExit = firstStep;
+                        bestNeutralHasOnwardExit = candidateHasOnwardExit;
+                        bestNeutralManhattanDistance = candidateManhattanDistance;
+                        bestNeutralDepth = candidateDepth;
+                    }
+
+                    continue;
+                }
 
                 boolean betterCandidate =
                         bestExit == null
@@ -190,7 +225,7 @@ public class MapMovementPlanner implements MovementPlanner {
             }
         }
 
-        return bestExit;
+        return bestExit != null ? bestExit : bestNeutralExit;
     }
 
     /**
@@ -216,6 +251,17 @@ public class MapMovementPlanner implements MovementPlanner {
         return null;
     }
 
+    /**
+     * Creates separate escape steps for a creature and its decoy.
+     * The creature's selected destination is excluded when choosing
+     * the decoy's route so that they begin escaping in different directions.
+     *
+     * @param creature the creature preparing to escape
+     * @param origin the creature's current location
+     * @param threat the threatening actor's location
+     * @return an escape plan, or null when two distinct escape steps
+     * cannot be selected
+     */
     @Override
     public EscapePlan planEscape(Actor creature, Location origin, Location threat) {
         Exit mimicStep = findStepAway(creature, origin, threat);

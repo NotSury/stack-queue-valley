@@ -23,15 +23,14 @@ public interface MovementPlanner {
     Exit findStepTowards(Actor creature, Location origin, Location target);
 
     /**
-     * Finds the first step of a bounded route away from a threat.
-     * The route destination must increase threat distance.
-     * The first step may move sideways but never closer to the threat.
-     * Movement remains on the origin map.
+     * Finds a movement step away from a threat.
+     * Prefers movement that increases distance from the threat, while
+     * permitting a non-approaching step when no improving route is available.
      *
      * @param creature the creature that would perform the movement
      * @param origin the creature's current location
      * @param threat the threatening actor's location
-     * @return an escape exit, or null if no improving step exists
+     * @return an escape exit, or null if no valid non-approaching route exists
      */
     Exit findStepAway(Actor creature, Location origin, Location threat);
 
