@@ -1,8 +1,11 @@
 package game.states;
 
+import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.Location;
+import game.actions.HealAction;
 import game.actors.CaveMimic;
 import game.navigation.GridDistance;
 import game.perception.EnvironmentScanner;
@@ -19,6 +22,7 @@ public class DisguisedState extends EnvironmentAwareState {
     private static final int REQUIRED_QUIET_TURNS = 5;
     private static final int MINIMUM_LOOT_DISTANCE = 2;
     private static final int MAXIMUM_BAIT_ITEMS = 3;
+    private static final int HEALING_PER_TURN = 3;
 
     private final CaveMimic mimic;
     private final char disguisedDisplayChar;
@@ -97,6 +101,22 @@ public class DisguisedState extends EnvironmentAwareState {
         }
 
         return CreatureStateType.DISGUISED;
+    }
+
+    /**
+     * Selects health recovery while the Mimic remains disguised.
+     * Remains idle when its health is already full.
+     *
+     * @param location the Mimic's current location
+     * @return a healing action, or an idle action at maximum health
+     */
+    @Override
+    public Action getAction(Location location) {
+        if (mimic.getStatistic(ActorStatistics.HEALTH) >= mimic.getMaximumStatistic(ActorStatistics.HEALTH)) {
+            return super.getAction(location);
+        }
+
+        return new HealAction(HEALING_PER_TURN);
     }
 
 }
