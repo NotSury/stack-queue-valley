@@ -109,9 +109,9 @@ public class EscapeState extends BehaviourDrivenState {
 
     /**
      * Determines whether the Mimic continues escaping or changes state.
-     * An adjacent Farmer with no available escape step causes an ambush.
-     * When no Farmer is detected, reachable portable loot causes looting.
-     * Otherwise, the Mimic remains in this state.
+     * An adjacent Farmer with no available escape route causes an ambush.
+     * With no detected Farmer, reachable portable loot causes looting.
+     * Otherwise, the Mimic returns to Disguised.
      *
      * @param location the Mimic's current location
      * @return the next state type
@@ -149,7 +149,7 @@ public class EscapeState extends BehaviourDrivenState {
             return CreatureStateType.LOOTING;
         }
 
-        return CreatureStateType.ESCAPE;
+        return CreatureStateType.DISGUISED;
     }
 
     /**

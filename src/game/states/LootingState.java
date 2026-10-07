@@ -75,8 +75,8 @@ public class LootingState extends BehaviourDrivenState {
     /**
      * Determines whether to ambush, disguise or continue looting.
      * An adjacent Farmer carrying a portable item takes priority.
-     * Returning to Disguised requires no detected Farmer and portable
-     * bait in the Mimic's inventory.
+     * With no detected Farmer, returns to Disguised when the collection
+     * goal is reached or no reachable portable loot remains.
      *
      * @param location the creature's current location
      * @return Ambush, Disguised or Looting according to the surroundings
@@ -97,20 +97,18 @@ public class LootingState extends BehaviourDrivenState {
             return CreatureStateType.LOOTING;
         }
 
-        if (mimic.hasAbility(ItemAbility.PORTABLE)) {
-            int newItemsCollected =
-                    mimic.getInventory().getItems().size() - initialInventorySize;
+        int newItemsCollected =
+                mimic.getInventory().getItems().size() - initialInventorySize;
 
-            if (newItemsCollected >= COLLECTION_GOAL) {
-                return CreatureStateType.DISGUISED;
-            }
+        if (newItemsCollected >= COLLECTION_GOAL) {
+            return CreatureStateType.DISGUISED;
+        }
 
-            Location loot = getScanner().findNearestPortableItemLocation(
-                    mimic, location, 0, CaveMimic.DETECTION_RADIUS);
+        Location loot = getScanner().findNearestPortableItemLocation(
+                mimic, location, 0, CaveMimic.DETECTION_RADIUS);
 
-            if (loot == null) {
-                return CreatureStateType.DISGUISED;
-            }
+        if (loot == null) {
+            return CreatureStateType.DISGUISED;
         }
 
         return CreatureStateType.LOOTING;
