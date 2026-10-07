@@ -8,7 +8,6 @@ import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actors.CaveMimic;
 import game.actors.DecoyMimic;
 import game.interfaces.DecoyFactory;
 import game.interfaces.Disguisable;
@@ -27,7 +26,6 @@ import game.perception.EnvironmentScanner;
  */
 public class EscapeState extends BehaviourDrivenState {
 
-    private static final int ADJACENT_RADIUS = 1;
     private static final int MINIMUM_LOOT_DISTANCE = 0;
 
     private final Disguisable disguisable;
@@ -136,10 +134,11 @@ public class EscapeState extends BehaviourDrivenState {
     }
 
     /**
-     * Determines whether the Mimic continues escaping or changes state.
+     * Determines whether the creature continues escaping or changes state.
      * An adjacent Farmer with no available escape route causes an ambush.
-     * With no detected Farmer, reachable portable loot causes looting.
-     * Otherwise, the Mimic returns to Disguised.
+     * Other detected Farmers cause the creature to remain in Escape.
+     * With no detected Farmer, reachable portable loot causes Looting.
+     * Otherwise, the creature returns to Disguised.
      *
      * @param location the Mimic's current location
      * @return the next state type

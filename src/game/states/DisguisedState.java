@@ -3,12 +3,10 @@ package game.states;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
-import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.HealAction;
 import game.interfaces.BaitCarrier;
 import game.interfaces.Disguisable;
-import game.navigation.GridDistance;
 import game.perception.EnvironmentScanner;
 
 /**
@@ -90,9 +88,7 @@ public class DisguisedState extends EnvironmentAwareState {
         if (farmer != null) {
             quietTurns = 0;
 
-            Location farmerLocation = location.map().locationOf(farmer);
-
-            if (GridDistance.between(location, farmerLocation) == 1 && farmer.hasAbility(ItemAbility.PORTABLE)) {
+            if (canStealFrom(farmer, location)) {
                 return CreatureStateType.AMBUSH;
             }
 

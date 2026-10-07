@@ -5,10 +5,8 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.items.Item;
-import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actors.CaveMimic;
 import game.interfaces.Disguisable;
 import game.navigation.MovementPlanner;
 import game.perception.EnvironmentScanner;
@@ -20,7 +18,6 @@ import game.perception.EnvironmentScanner;
  */
 public class AmbushState extends BehaviourDrivenState {
 
-    private static final int ADJACENT_RADIUS = 1;
     private static final double ESCAPE_HEALTH_RATIO = 0.30;
 
     private final Disguisable disguisable;
@@ -116,27 +113,13 @@ public class AmbushState extends BehaviourDrivenState {
     }
 
     private void stealDroppedItem(Actor farmer, GameMap map) {
-        Item stolenItem = null;
-        Action dropAction = null;
+        Item stolenItem = findDroppablePortableItem(farmer);
 
-        for (Item item : farmer.getInventory().getItems()) {
-            if (!item.hasAbility(ItemAbility.PORTABLE)) {
-                continue;
-            }
-
-            Action candidateDrop = item.getDropAction(farmer);
-
-            if (candidateDrop != null) {
-                stolenItem = item;
-                dropAction = candidateDrop;
-                break;
-            }
-        }
-
-        if (dropAction == null) {
+        if (stolenItem == null) {
             return;
         }
 
+        Action dropAction = stolenItem.getDropAction(farmer);
         dropAction.execute(farmer, map);
 
         Location farmerLocation = map.locationOf(farmer);
@@ -145,7 +128,11 @@ public class AmbushState extends BehaviourDrivenState {
             farmerLocation.removeItem(stolenItem);
             getCreature().getInventory().add(stolenItem);
 
-            System.out.println(getCreature() + " forces " + farmer + " to drop the " + stolenItem + " and steals it.");
+            System.out.println(
+                    getCreature() + " forces " + farmer
+                            + " to drop the " + stolenItem
+                            + " and steals it."
+            );
         }
     }
 }

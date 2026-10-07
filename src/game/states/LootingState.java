@@ -7,7 +7,6 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actors.CaveMimic;
 import game.interfaces.BaitCarrier;
 import game.interfaces.Disguisable;
 import game.navigation.GridDistance;
@@ -107,10 +106,7 @@ public class LootingState extends BehaviourDrivenState {
                 location, detectionRadius);
 
         if (farmer != null) {
-            Location farmerLocation = location.map().locationOf(farmer);
-
-            if (GridDistance.between(location, farmerLocation) == 1
-                    && farmer.hasAbility(ItemAbility.PORTABLE)) {
+            if (canStealFrom(farmer, location)) {
                 return CreatureStateType.AMBUSH;
             }
 
