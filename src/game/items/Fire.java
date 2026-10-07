@@ -1,5 +1,6 @@
 package game.items;
 
+import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Location;
 import game.statuses.HealthOverTimeStatus;
@@ -9,7 +10,7 @@ import game.statuses.HealthOverTimeStatus;
  * applies a damage-over-time effect to actors standing on it.
  *
  * @author Khoo Lynn 34598901
- * @version 1.0.0
+ * @version 1.1.0
  */
 public class Fire extends Item {
     private int remainingTurns;
@@ -23,10 +24,22 @@ public class Fire extends Item {
         this.burnDuration = burnDuration;
     }
 
+    private void applyBurn(Actor actor){
+        int healthChange = -damagePerTurn;
+
+        for (HealthOverTimeStatus status : actor.statusesOf(HealthOverTimeStatus.class)){
+            if (status.hasHealthChange(healthChange)){
+                status.refresh(burnDuration);
+                return;
+            }
+        }
+        actor.addStatus(new HealthOverTimeStatus(healthChange, burnDuration));
+    }
+
     @Override
     public void tick(Location currentLocation){
         if (currentLocation.containsAnActor()){
-            currentLocation.getActor().addStatus(new HealthOverTimeStatus(-damagePerTurn, burnDuration));
+            applyBurn(currentLocation.getActor());
         }
 
         remainingTurns--;
