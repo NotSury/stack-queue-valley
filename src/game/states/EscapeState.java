@@ -10,7 +10,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.CaveMimic;
 import game.actors.DecoyMimic;
-import game.actors.StatefulCreatureFactory;
+import game.interfaces.DecoyFactory;
 import game.navigation.EscapePlan;
 import game.navigation.GridDistance;
 import game.navigation.MovementPlanner;
@@ -31,7 +31,7 @@ public class EscapeState extends BehaviourDrivenState {
 
     private final CaveMimic mimic;
     private final MovementPlanner movementPlanner;
-    private final StatefulCreatureFactory creatureFactory;
+    private final DecoyFactory decoyFactory;
 
     private DecoyMimic activeDecoy;
     private GameMap decoyMap;
@@ -45,19 +45,19 @@ public class EscapeState extends BehaviourDrivenState {
      * @param mimic the Mimic controlled by this state
      * @param scanner the scanner used to detect Farmers and items
      * @param movementPlanner the planner used to select escape steps
-     * @param creatureFactory the factory used to construct decoys
+     * @param decoyFactory the collaborator used to construct decoys
      * @param fleeingBehaviour the behaviour used during ordinary escape turns
      */
     public EscapeState(CaveMimic mimic,
                        EnvironmentScanner scanner,
                        MovementPlanner movementPlanner,
-                       StatefulCreatureFactory creatureFactory,
+                       DecoyFactory decoyFactory,
                        Behaviour<Actor, Action> fleeingBehaviour
     ) {
         super(mimic, scanner, fleeingBehaviour);
         this.mimic = mimic;
         this.movementPlanner = movementPlanner;
-        this.creatureFactory = creatureFactory;
+        this.decoyFactory = decoyFactory;
     }
 
     /**
@@ -103,7 +103,7 @@ public class EscapeState extends BehaviourDrivenState {
         Exit mimicStep = plan.getMimicStep();
         Exit decoyStep = plan.getDecoyStep();
 
-        DecoyMimic decoy = creatureFactory.createDecoy(mimic, decoyStep.getName());
+        DecoyMimic decoy = decoyFactory.createDecoy(mimic, decoyStep.getName());
 
         Location spawnLocation = decoyStep.getDestination();
 

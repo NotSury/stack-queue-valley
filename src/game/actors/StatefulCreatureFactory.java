@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.items.Item;
 import game.behaviours.DirectionalMoveBehaviour;
 import game.behaviours.FleeBehaviour;
 import game.behaviours.SeekItemBehaviour;
+import game.interfaces.DecoyFactory;
 import game.navigation.MovementPlanner;
 import game.perception.EnvironmentScanner;
 import game.states.AmbushState;
@@ -24,12 +25,13 @@ import java.util.List;
  * Combat behaviour is supplied by the caller so that creature assembly
  * does not depend on a particular combat implementation.
  */
-public class StatefulCreatureFactory {
+public class StatefulCreatureFactory implements DecoyFactory {
 
     private final EnvironmentScanner scanner;
     private final MovementPlanner movementPlanner;
     private static final int MIMIC_ATTACK_DAMAGE = 10;
     private static final int MIMIC_HIT_RATE = 75;
+    private static final int DECOY_LIFETIME_TURNS = 3;
 
     /**
      * Creates a factory using the supplied environmental collaborators.
@@ -82,7 +84,8 @@ public class StatefulCreatureFactory {
      * @param direction the direction obtained from the selected spawn exit
      * @return the newly created decoy
      */
-    public DecoyMimic createDecoy(CaveMimic original, String direction) {
-        return new DecoyMimic(original, new DirectionalMoveBehaviour(movementPlanner, direction));
+    @Override
+    public DecoyMimic createDecoy(Actor original, String direction) {
+        return new DecoyMimic(original, new DirectionalMoveBehaviour(movementPlanner, direction), DECOY_LIFETIME_TURNS);
     }
 }

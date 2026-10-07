@@ -14,28 +14,28 @@ import game.interfaces.Hostile;
  * A temporary imitation of a Cave Mimic.
  * Copies the original Mimic's visible appearance at creation.
  * Its ordinary behaviour is supplied by the creature factory, and
- * it expires after three executed turns.
+ * it expires after the configured number of executed turns.
  */
 public class DecoyMimic extends Actor implements Hostile {
-
-    private static final int LIFETIME_TURNS = 3;
 
     private final Behaviour<Actor, Action> movementBehaviour;
     private final String appearanceDescription;
 
-    private int remainingTurns = LIFETIME_TURNS;
+    private int remainingTurns;
 
     /**
      * Creates a temporary imitation of a Cave Mimic.
      *
      * @param original the Mimic whose visible appearance is copied
      * @param movementBehaviour the behaviour used to select movement
+     * @param lifetimeTurns the number of executed turns before the decoy expires
      */
-    public DecoyMimic(CaveMimic original, Behaviour<Actor, Action> movementBehaviour) {
+    public DecoyMimic(Actor original, Behaviour<Actor, Action> movementBehaviour, int lifetimeTurns) {
         super("Cave Mimic", original.getDisplayChar(), 1);
 
         this.movementBehaviour = movementBehaviour;
         this.appearanceDescription = original.toString();
+        this.remainingTurns = lifetimeTurns;
     }
 
     /**
