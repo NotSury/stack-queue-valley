@@ -2,6 +2,7 @@ package game.items;
 
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Location;
+import game.interfaces.MovementHazard;
 import game.statuses.HealthOverTimeStatus;
 
 /**
@@ -11,7 +12,7 @@ import game.statuses.HealthOverTimeStatus;
  * @author Khoo Lynn 34598901
  * @version 1.1.0
  */
-public class Fire extends Item {
+public class Fire extends Item implements MovementHazard {
     private int remainingTurns;
     private final int damagePerTurn;
     private final int burnDuration;

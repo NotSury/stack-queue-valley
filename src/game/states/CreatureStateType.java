@@ -29,5 +29,25 @@ public enum CreatureStateType {
      * The Cave Mimic creates a temporary decoy on entry
      * and attempts to flee from the Farmer.
      */
-    ESCAPE
+    ESCAPE,
+
+    /**
+     * The Spider returns home and guards its nest.
+     */
+    NESTING,
+
+    /**
+     * The Spider builds traps around its nest.
+     */
+    WEAVING,
+
+    /**
+     * The Spider pursues or attacks an intruding Farmer.
+     */
+    HUNTING,
+
+    /**
+     * The Spider uses useful two-tile jump towards the Farmer.
+     */
+    POUNCING
 }

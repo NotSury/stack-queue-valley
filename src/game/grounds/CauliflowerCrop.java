@@ -51,7 +51,7 @@ public class CauliflowerCrop extends WaterableCrop {
      * Constructor for CauliflowerCrop.
      */
     public CauliflowerCrop() {
-        super('C', "Cauliflower Crop");
+        super('F', "Cauliflower Crop");
     }
 
     /**
