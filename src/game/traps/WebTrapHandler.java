@@ -1,4 +1,4 @@
-package game.actions.traps;
+package game.traps;
 
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;

@@ -10,7 +10,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
-import game.actions.traps.WebTrapHandler;
+import game.traps.WebTrapHandler;
 import game.capabilities.ActorRole;
 import game.capabilities.CombatStatus;
 import game.capabilities.FarmerStatistic;
