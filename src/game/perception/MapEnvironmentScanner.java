@@ -26,14 +26,14 @@ public class MapEnvironmentScanner implements EnvironmentScanner {
     }
 
     /**
-     * Finds the nearest conscious Farmer within the detection radius.
-     *
+     * Finds the nearest conscious actor with the requested ability.
      * Excludes the origin. Equal-distance matches use the ordering
      * supplied by the engine's nearby-location list.
      *
      * @param origin the location from which to scan
      * @param radius the non-negative maximum detection distance
-     * @return a detected Farmer, or null if none is detected
+     * @param ability the ability required on the detected actor
+     * @return the nearest matching actor, or null if none is detected
      */
     @Override
     public Actor findNearestActorWith(Location origin, int radius, Enum<?> ability) {

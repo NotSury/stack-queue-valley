@@ -43,7 +43,7 @@ public interface MovementPlanner {
      * @param threat the threatening actor's location
      * @param excludedExit the exit whose destination must be excluded, or null
      * when no destination is reserved
-     * @return an escape exit, or null if no improving step exists
+     * @return an escape exit, or null if no improving or distance-preserving route exists
      */
     Exit findStepAway(Actor creature, Location origin, Location threat, Exit excludedExit);
 

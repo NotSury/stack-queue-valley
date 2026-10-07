@@ -11,8 +11,9 @@ import game.perception.EnvironmentScanner;
 
 /**
  * Selects movement away from a nearby Farmer.
- * Uses the environmental scanner to detect a threat and the movement planner
- * to select an adjacent step that increases threat distance.
+ * Uses an environmental scanner to detect the threat and an injected
+ * movement planner to select the first step of an escape route.
+ * Supports distance-preserving movement when no improving route exists.
  */
 public class FleeBehaviour extends EnvironmentAwareBehaviour {
 
@@ -21,7 +22,7 @@ public class FleeBehaviour extends EnvironmentAwareBehaviour {
     /**
      * Creates a behaviour that detects and flees from nearby Farmers.
      *
-     * @param scanner the scanenr used to detect Farmers
+     * @param scanner the scanner used to detect Farmers
      * @param movementPlanner the planner used to select escape steps
      * @param detectionRadius the non-negative maximum threat detection distance
      */
@@ -33,12 +34,14 @@ public class FleeBehaviour extends EnvironmentAwareBehaviour {
     /**
      * Selects the first movement step of a bounded escape route.
      * Replans each turn using the current terrain and actor positions.
-     * A sideways first step is allowed when the route reaches a
-     * location farther from the Farmer.
+     * Prefers routes ending farther from the Farmer, falling back to
+     * distance-preserving routes when no improving route exists.
+     * The selected first step never moves closer to the Farmer.
      *
      * @param actor the actor performing the behaviour
-     * @param location the location of the current actor
-     * @return an escape movement action, or null if no improving route exists
+     * @param location the actor's current location
+     * @return an escape movement action, or null when no valid
+     * non-approaching movement is available
      */
     @Override
     public Action operate(Actor actor, Location location) {

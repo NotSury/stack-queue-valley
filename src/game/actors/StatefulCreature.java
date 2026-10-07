@@ -91,7 +91,6 @@ public abstract class StatefulCreature extends Actor {
     @Override
     public final Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
         if (!isConscious()) {
-            unconscious(map);
             display.println(unconscious(map));
             return new DoNothingAction();
         }

@@ -67,7 +67,8 @@ public class AmbushState extends BehaviourDrivenState {
      * engine drop action. The Mimic then takes that same item from
      * the Farmer's tile without moving.
      *
-     * @param location the Mimic's current location.
+     * @param location the Mimic's current location
+     * @return a description of revealing the creature and any items stolen
      */
     @Override
     public String onEnter(Location location) {
