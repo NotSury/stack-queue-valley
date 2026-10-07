@@ -52,10 +52,10 @@ public class AmbushState extends BehaviourDrivenState {
     }
 
     /**
-     * Reveals the Mimic and forces an adjacent Farmer to drop one item.
-     * The item is placed on the Farmer's current tile through its
-     * engine drop action. No drop occurs when no adjacent Farmer
-     * or eligible item is available.
+     * Reveals the Mimic and steals one item from an adjacent Farmer.
+     * The Farmer first drops an eligible portable item through its
+     * engine drop action. The Mimic then takes that same item from
+     * the Farmer's tile without moving.
      *
      * @param location the Mimic's current location.
      */
@@ -66,7 +66,7 @@ public class AmbushState extends BehaviourDrivenState {
         Actor farmer = getScanner().findFarmer(location, ADJACENT_RADIUS);
 
         if (farmer != null) {
-            forceDropItem(farmer, location.map());
+            stealDroppedItem(farmer, location.map());
         }
     }
 
@@ -116,19 +116,37 @@ public class AmbushState extends BehaviourDrivenState {
         return CreatureStateType.AMBUSH;
     }
 
-    private void forceDropItem(Actor farmer, GameMap map) {
+    private void stealDroppedItem(Actor farmer, GameMap map) {
+        Item stolenItem = null;
         Action dropAction = null;
 
         for (Item item : farmer.getInventory().getItems()) {
-            dropAction = item.getDropAction(farmer);
+            if (!item.hasAbility(ItemAbility.PORTABLE)) {
+                continue;
+            }
 
-            if (dropAction != null) {
+            Action candidateDrop = item.getDropAction(farmer);
+
+            if (candidateDrop != null) {
+                stolenItem = item;
+                dropAction = candidateDrop;
                 break;
             }
         }
 
-        if (dropAction != null) {
-            dropAction.execute(farmer, map);
+        if (dropAction == null) {
+            return;
+        }
+
+        dropAction.execute(farmer, map);
+
+        Location farmerLocation = map.locationOf(farmer);
+
+        if (farmerLocation.getItems().contains(stolenItem)) {
+            farmerLocation.removeItem(stolenItem);
+            mimic.getInventory().add(stolenItem);
+
+            System.out.println(mimic + " forces " + farmer + " to drop the " + stolenItem + " and steals it.");
         }
     }
 }
