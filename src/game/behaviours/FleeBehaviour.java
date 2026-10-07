@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.actions.MoveActorAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
+import game.capabilities.ActorRole;
 import game.navigation.MovementPlanner;
 import game.perception.EnvironmentScanner;
 
@@ -41,7 +42,7 @@ public class FleeBehaviour extends EnvironmentAwareBehaviour {
      */
     @Override
     public Action operate(Actor actor, Location location) {
-        Actor farmer = getScanner().findFarmer(location, detectionRadius);
+        Actor farmer = getScanner().findNearestActorWith(location, detectionRadius, ActorRole.FARMER);
 
         if (farmer == null) {
             return null;

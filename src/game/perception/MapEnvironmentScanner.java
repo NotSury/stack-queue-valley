@@ -4,13 +4,11 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.Location;
-import game.capabilities.ActorRole;
 import game.navigation.GridDistance;
 import game.navigation.MovementPlanner;
 
 /**
- * Inspects map locations for Farmers and portable items.
- *
+ * Inspects map locations for actors with requested abilities and portable items.
  * Uses an injected movement planner to check item reachability.
  * Detection distance includes diagonal neighbors.
  */
@@ -38,8 +36,8 @@ public class MapEnvironmentScanner implements EnvironmentScanner {
      * @return a detected Farmer, or null if none is detected
      */
     @Override
-    public Actor findFarmer(Location origin, int radius) {
-        Actor nearestFarmer = null;
+    public Actor findNearestActorWith(Location origin, int radius, Enum<?> ability) {
+        Actor nearestActor = null;
         int nearestDistance = Integer.MAX_VALUE;
 
         for (Location location : origin.getNearbyLocations(radius)) {
@@ -48,18 +46,17 @@ public class MapEnvironmentScanner implements EnvironmentScanner {
             }
 
             Actor actor = location.getActor();
-            int candidateDistance =
-                    GridDistance.between(origin, location);
+            int candidateDistance = GridDistance.between(origin, location);
 
-            if (actor.hasAbility(ActorRole.FARMER)
+            if (actor.hasAbility(ability)
                     && actor.isConscious()
                     && candidateDistance < nearestDistance) {
-                nearestFarmer = actor;
+                nearestActor = actor;
                 nearestDistance = candidateDistance;
             }
         }
 
-        return nearestFarmer;
+        return nearestActor;
     }
 
     /**

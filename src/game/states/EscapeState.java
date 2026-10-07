@@ -9,6 +9,7 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.DecoyMimic;
+import game.capabilities.ActorRole;
 import game.interfaces.DecoyFactory;
 import game.interfaces.Disguisable;
 import game.navigation.EscapePlan;
@@ -89,7 +90,7 @@ public class EscapeState extends BehaviourDrivenState {
      */
     @Override
     public void onEnter(Location location) {
-        Actor farmer = getScanner().findFarmer(location, detectionRadius);
+        Actor farmer = getScanner().findNearestActorWith(location, detectionRadius, ActorRole.FARMER);
 
         EscapePlan plan = null;
 
@@ -145,9 +146,10 @@ public class EscapeState extends BehaviourDrivenState {
      */
     @Override
     public CreatureStateType determineNextState(Location location) {
-        Actor farmer = getScanner().findFarmer(
+        Actor farmer = getScanner().findNearestActorWith(
                 location,
-                detectionRadius
+                detectionRadius,
+                ActorRole.FARMER
         );
 
         if (farmer != null) {

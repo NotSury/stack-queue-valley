@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.HealAction;
+import game.capabilities.ActorRole;
 import game.interfaces.BaitCarrier;
 import game.interfaces.Disguisable;
 import game.perception.EnvironmentScanner;
@@ -83,7 +84,7 @@ public class DisguisedState extends EnvironmentAwareState {
      */
     @Override
     public CreatureStateType determineNextState(Location location) {
-        Actor farmer = getScanner().findFarmer(location, detectionRadius);
+        Actor farmer = getScanner().findNearestActorWith(location, detectionRadius, ActorRole.FARMER);
 
         if (farmer != null) {
             quietTurns = 0;

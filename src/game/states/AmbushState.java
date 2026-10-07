@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.capabilities.ActorRole;
 import game.interfaces.Disguisable;
 import game.navigation.MovementPlanner;
 import game.perception.EnvironmentScanner;
@@ -72,7 +73,7 @@ public class AmbushState extends BehaviourDrivenState {
     public void onEnter(Location location) {
         disguisable.reveal();
 
-        Actor farmer = getScanner().findFarmer(location, ADJACENT_RADIUS);
+        Actor farmer = getScanner().findNearestActorWith(location, ADJACENT_RADIUS, ActorRole.FARMER);
 
         if (farmer != null) {
             stealDroppedItem(farmer, location.map());
@@ -89,7 +90,7 @@ public class AmbushState extends BehaviourDrivenState {
      */
     @Override
     public CreatureStateType determineNextState(Location location) {
-        Actor farmer = getScanner().findFarmer(location, detectionRadius);
+        Actor farmer = getScanner().findNearestActorWith(location, detectionRadius, ActorRole.FARMER);
 
         if (farmer == null) {
             return CreatureStateType.DISGUISED;

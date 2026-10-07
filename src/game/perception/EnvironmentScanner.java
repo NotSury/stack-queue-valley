@@ -11,13 +11,15 @@ import edu.monash.fit2099.engine.positions.Location;
 public interface EnvironmentScanner {
 
     /**
-     * Finds a Farmer within the specified detection radius.
+     * Finds the nearest conscious actor with the requested ability.
+     * Excludes the origin and uses a fixed ordering for equal-distance matches.
      *
      * @param origin the location from which to scan
-     * @param radius the maximum detection distance
-     * @return a detected Farmer, or null if none is detected
+     * @param radius the non-negative maximum detection distance
+     * @param ability the ability required on the detected actor
+     * @return the nearest matching actor, or null if none is detected
      */
-    Actor findFarmer(Location origin, int radius);
+    Actor findNearestActorWith(Location origin, int radius, Enum<?> ability);
 
     /**
      * Finds the nearest reachable location containing a portable item

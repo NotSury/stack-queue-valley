@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
+import game.capabilities.ActorRole;
 import game.interfaces.BaitCarrier;
 import game.interfaces.Disguisable;
 import game.navigation.GridDistance;
@@ -102,8 +103,8 @@ public class LootingState extends BehaviourDrivenState {
      */
     @Override
     public CreatureStateType determineNextState(Location location) {
-        Actor farmer = getScanner().findFarmer(
-                location, detectionRadius);
+        Actor farmer = getScanner().findNearestActorWith(
+                location, detectionRadius, ActorRole.FARMER);
 
         if (farmer != null) {
             if (canStealFrom(farmer, location)) {
