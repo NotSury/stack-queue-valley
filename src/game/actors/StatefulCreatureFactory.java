@@ -8,6 +8,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.behaviours.*;
 import game.interfaces.DecoyFactory;
 import game.interfaces.WebNetwork;
+import game.navigation.HazardAwareMovementPlanner;
 import game.navigation.JumpPlanner;
 import game.navigation.MovementPlanner;
 import game.navigation.WebPlanner;
@@ -20,13 +21,19 @@ import game.weapons.CreatureWeapon;
 
 import java.util.List;
 
+
 /**
  * Constructs creatures and assembles their states and behaviours.
  * The supplied scanner and movement planner are shared by the states and
  * behaviours created by this factory.
  * Combat behaviour is supplied by the caller so that creature assembly
  * does not depend on a particular combat implementation.
+ *
+ * @author Surya Muni Peragas
+ * @author Lee Le Si 34599223
  */
+
+
 public class StatefulCreatureFactory implements DecoyFactory {
 
     private final EnvironmentScanner scanner;
@@ -132,18 +139,22 @@ public class StatefulCreatureFactory implements DecoyFactory {
         );
 
         Behaviour<Actor, Action> huntingBehaviour = new SpiderHuntBehaviour(
-                targetTracker,
-                webPlanner,
-                attackBehaviour
-        );
+                  targetTracker,
+                  new AmbushBehaviour(
+                          scanner,
+                          new HazardAwareMovementPlanner(movementPlanner,webPlanner),
+                          attackBehaviour,
+                          NestSpider.DETECTION_RADIUS
+                  )
+          );
 
-        Behaviour<Actor, Action> pounceBehaviour = new PounceBehaviour(
-                scanner,
-                jumpPlanner,
-                NestSpider.DETECTION_RADIUS
-        );
+       Behaviour<Actor, Action> pounceBehaviour = new PounceBehaviour(
+              network,
+              jumpPlanner,
+              webPlanner
+       );
 
-        spider.registerState(new NestingState(
+       spider.registerState(new NestingState(
                 spider,
                 scanner,
                 network,
