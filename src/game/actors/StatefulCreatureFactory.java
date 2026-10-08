@@ -4,16 +4,18 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.items.Item;
-import game.behaviours.DirectionalMoveBehaviour;
-import game.behaviours.FleeBehaviour;
-import game.behaviours.SeekItemBehaviour;
+import edu.monash.fit2099.engine.positions.Location;
+import game.behaviours.*;
 import game.interfaces.DecoyFactory;
+import game.interfaces.WebNetwork;
+import game.navigation.JumpPlanner;
 import game.navigation.MovementPlanner;
+import game.navigation.WebPlanner;
 import game.perception.EnvironmentScanner;
-import game.states.AmbushState;
-import game.states.DisguisedState;
-import game.states.EscapeState;
-import game.states.LootingState;
+import game.perception.MapSpiderAwareness;
+import game.perception.SpiderTargetTracker;
+import game.states.*;
+import game.traps.SpiderWebNetwork;
 import game.weapons.CreatureWeapon;
 
 import java.util.List;
@@ -32,6 +34,9 @@ public class StatefulCreatureFactory implements DecoyFactory {
     private static final int MIMIC_ATTACK_DAMAGE = 10;
     private static final int MIMIC_HIT_RATE = 75;
     private static final int DECOY_LIFETIME_TURNS = 3;
+
+    private static final int SPIDER_ATTACK_DAMAGE = 12;
+    private static final int SPIDER_HIT_RATE = 75;
 
     /**
      * Creates a factory using the supplied environmental collaborators.
@@ -73,6 +78,105 @@ public class StatefulCreatureFactory implements DecoyFactory {
         mimic.registerState(new EscapeState(mimic, scanner, movementPlanner, mimic, this, fleeingBehaviour, CaveMimic.DETECTION_RADIUS));
 
         return mimic;
+    }
+
+    /**
+     * Creates an unplaced Nest Spider with all four states registered.
+     * Shares one web network and one target-assessment object between its states.
+     * Uses the supplied planners for safe walking, web placement and jumping.
+     * The Spider must be placed on the nest's map before initialiseState
+     * is called, so its initial web-placement effects can run.
+     *
+     * @param hitPoints the Spider's starting and maximum health
+     * @param nestLocation the Spider's fixed nest location
+     * @param webPlanner the safe walking and web-placement planner
+     * @param jumpPlanner the tactical jump planner
+     * @param attackBehaviour the behaviour used for adjacent attacks
+     * @return the Spider with its states and behaviours configured
+     */
+    public NestSpider createNestSpider(
+            int hitPoints,
+            Location nestLocation,
+            WebPlanner webPlanner,
+            JumpPlanner jumpPlanner,
+            Behaviour<Actor, Action> attackBehaviour
+    ) {
+        NestSpider spider = new NestSpider(
+                hitPoints,
+                new CreatureWeapon(
+                        SPIDER_ATTACK_DAMAGE,
+                        "bites",
+                        SPIDER_HIT_RATE,
+                        "fangs"
+                )
+        );
+
+        WebNetwork network = new SpiderWebNetwork(
+                spider,
+                nestLocation
+        );
+
+        SpiderTargetTracker targetTracker = new MapSpiderAwareness(
+                spider,
+                scanner,
+                webPlanner,
+                jumpPlanner,
+                network,
+                NestSpider.DETECTION_RADIUS,
+                NestSpider.PURSUIT_RADIUS
+        );
+
+        Behaviour<Actor, Action> weavingBehaviour = new WeaveWebBehaviour(
+                webPlanner,
+                network
+        );
+
+        Behaviour<Actor, Action> huntingBehaviour = new SpiderHuntBehaviour(
+                targetTracker,
+                webPlanner,
+                attackBehaviour
+        );
+
+        Behaviour<Actor, Action> pounceBehaviour = new PounceBehaviour(
+                scanner,
+                jumpPlanner,
+                NestSpider.DETECTION_RADIUS
+        );
+
+        spider.registerState(new NestingState(
+                spider,
+                scanner,
+                network,
+                webPlanner,
+                targetTracker
+        ));
+
+        spider.registerState(new WeavingState(
+                spider,
+                scanner,
+                network,
+                webPlanner,
+                targetTracker,
+                weavingBehaviour
+        ));
+
+        spider.registerState(new HuntingState(
+                spider,
+                scanner,
+                huntingBehaviour,
+                targetTracker,
+                network
+        ));
+
+        spider.registerState(new PouncingState(
+                spider,
+                scanner,
+                pounceBehaviour,
+                targetTracker,
+                network
+        ));
+
+        return spider;
     }
 
     /**
