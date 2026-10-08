@@ -15,6 +15,10 @@ import java.util.List;
  * Catches one eligible actor and is consumed when triggered.
  * Unused webs expire after their configured lifetime.
  * Hidden webs display the item or ground beneath them.
+ *
+ * @author Surya Muni Peragas
+ * @author Lee Le Si 34599223
+ * version 1.1.0
  */
 public class Web extends Item {
 
