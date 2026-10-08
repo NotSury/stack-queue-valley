@@ -18,7 +18,7 @@ import game.capabilities.GroundAbility;
  * <p>Concrete crop classes are responsible for defining their own
  * harvest cost and harvesting effect.</p>
  *
- * @author <Chin Kai Xuan> <35730374>
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public abstract class Crop extends Ground implements Harvestable {

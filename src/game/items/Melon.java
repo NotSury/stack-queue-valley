@@ -10,7 +10,7 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
  * <p>Consuming a Melon increases the actor's maximum health
  * by 10 points.</p>
  *
- * @author <Chin Kai Xuan> <35730374>
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public class Melon extends ConsumableItem {

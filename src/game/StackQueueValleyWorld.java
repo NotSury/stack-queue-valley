@@ -18,8 +18,8 @@ import java.util.List;
  * farm animals, and processing facilities, and prepares the game
  * environment before the game begins.</p>
  *
- * @author <Lee Le Si> <34599223>
- * @author <Chin Kai Xuan> <35730374>
+ * @author Lee Le Si 34599223
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public class StackQueueValleyWorld extends World {

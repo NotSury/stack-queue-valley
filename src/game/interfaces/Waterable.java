@@ -9,7 +9,7 @@ import edu.monash.fit2099.engine.positions.Location;
  * <p>Each waterable object determines its own stamina cost and the
  * effect that occurs when it is watered.</p>
  *
- * @author <Chin Kai Xuan> <35730374>
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public interface Waterable {

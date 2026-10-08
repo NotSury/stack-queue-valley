@@ -10,7 +10,7 @@ import game.statuses.HealthOverTimeStatus;
  * 2 turns when consumed. A rotten Strawberry causes the actor to lose
  * 1 health point per turn for the next 3 turns.</p>
  *
- * @author <Chin Kai Xuan> <35730374>
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public class Strawberry extends ConsumableItem {

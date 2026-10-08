@@ -16,8 +16,8 @@ import game.interfaces.Waterable;
  * transformed into a Puddle. Tilling and watering actions are only made
  * available when the actor is standing directly on the Dirt.</p>
  *
- * @author <Lee Le Si> <34599223>
- * @author <Chin Kai Xuan> <35730374>
+ * @author Lee Le Si 34599223
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public class Dirt extends Ground implements Tillable, Waterable {
