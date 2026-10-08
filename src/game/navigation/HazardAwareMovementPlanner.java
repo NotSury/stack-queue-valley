@@ -4,7 +4,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 
-public class HazardAwareMovementPlanner extends MovementPlanner{
+public class HazardAwareMovementPlanner implements MovementPlanner{
 
     private final MovementPlanner basePlanner;
 
