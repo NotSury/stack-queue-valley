@@ -17,7 +17,7 @@ import game.traps.WebAlert;
  *
  * @author Surya Muni Peragas 35651628
  * @author Lee Le Si 34599223
- * @version 1.1.0
+ * @version 1.2.0
  */
 public class MapSpiderAwareness implements SpiderTargetTracker {
 
@@ -26,6 +26,12 @@ public class MapSpiderAwareness implements SpiderTargetTracker {
      * How far from an alert location a Farmer is still noticed.
      */
     private static final int ALERT_SEARCH_RADIUS = 2;
+
+
+    /**
+     * Entry webs placed when Weaving starts, used for the capacity check.
+     */
+    private static final int WEAVING_ENTRY_WEBS = 1;
 
     private final Actor creature;
     private final EnvironmentScanner scanner;
@@ -171,7 +177,7 @@ public class MapSpiderAwareness implements SpiderTargetTracker {
      */
     @Override
     public boolean isNestIntruded(){
-        return findFarmerAround(network.getNestLocation(), NEST_THREAT_RADIUS) != null;
+        return findFarmerNear(network.getNestLocation(), NEST_THREAT_RADIUS) != null;
     }
 
 
@@ -187,7 +193,7 @@ public class MapSpiderAwareness implements SpiderTargetTracker {
             return null;
         }
 
-        return findFarmerAround(alert.getLocation(), ALERT_SEARCH_RADIUS);
+        return findFarmerNear(alert.getLocation(), ALERT_SEARCH_RADIUS);
     }
 
     /**
@@ -200,7 +206,8 @@ public class MapSpiderAwareness implements SpiderTargetTracker {
      * @param radius how far from the centre to search
      * @return the Farmer found, or null if none
      */
-    private Actor findFarmerAround(Location centre, int radius){
+    @Override
+    public Actor findFarmerNear(Location centre, int radius){
         if (centre.containsAnActor()){
             Actor actor = centre.getActor();
             if (actor.hasAbility(ActorRole.FARMER) && actor.isConscious()){
@@ -277,4 +284,73 @@ public class MapSpiderAwareness implements SpiderTargetTracker {
     public Actor findActiveTarget(Location origin) {
         return findActiveFarmer(origin);
     }
+
+
+    /**
+     * Finds a conscious Farmer within the nest-threat radius of the nest.
+     *
+     * @return the intruding Farmer, or null if the nest is undisturbed
+     */
+    @Override
+    public Actor findNestIntruder() {
+        return findFarmerNear(network.getNestLocation(), NEST_THREAT_RADIUS);
+    }
+
+    /**
+     * Marks a Farmer as the Spider's current target.
+     *
+     * @param farmer the Farmer to pursue
+     */
+    @Override
+    public void engage(Actor farmer) {
+        engagedFarmer = farmer;
+    }
+
+    /**
+     * Returns the engaged Farmer while he can still be pursued from the
+     * Spider's current location; otherwise drops the engagement.
+     *
+     * @return the engaged Farmer, or null if there is none
+     */
+    @Override
+    public Actor getEngagedTarget() {
+        if (engagedFarmer == null || !network.getNestLocation().map().contains(creature)) {
+            engagedFarmer = null;
+            return null;
+        }
+
+        Location origin = network.getNestLocation().map().locationOf(creature);
+
+        if (!isPursuable(origin, engagedFarmer)) {
+            engagedFarmer = null;
+        }
+        return engagedFarmer;
+    }
+
+    /**
+     * Checks for a reachable web site and room for one entry web plus
+     * one ordinary web.
+     *
+     * @param origin the Spider's current location
+     * @return true if the Spider can start weaving
+     */
+    @Override
+    public boolean canStartWeaving(Location origin) {
+        return webPlanner.hasReachableWeavingWork(creature, origin, network)
+                && webPlanner.hasCapacityForWeaving(network, WEAVING_ENTRY_WEBS);
+    }
+
+    /**
+     * Checks whether the latest alert can be reached by a useful jump or
+     * a safe walk from the Spider's location.
+     *
+     * @param origin the Spider's current location
+     * @return true if there is an alert and it can be approached
+     */
+    @Override
+    public boolean canInvestigateAlert(Location origin) {
+        Location alert = network.getAlertLocation();
+        return alert != null && jumpPlanner.canApproach(creature, origin, alert);
+    }
+
 }
