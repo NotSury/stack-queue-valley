@@ -11,6 +11,10 @@ import java.util.*;
 /**
  * Ranks web sites by choke points, existing web coverage and walking distance.
  * Uses safe breath-first routes and fixed coordinate tie-breakers.
+ *
+* @author Surya Muni Peragas 35651628
+* @author Lee Le Si 34599223
+* @version 1.1.0
  */
 public class MapWebPlanner implements WebPlanner {
 
@@ -159,6 +163,31 @@ public class MapWebPlanner implements WebPlanner {
                 && GridDistance.between(site, nest) <= placementRadius
                 && network.canPlaceAt(site);
     }
+
+    /**
+     * Checks whether a reachable eligible web site exists.
+     *
+     * @param creature the Spider placing webs
+     * @param origin the Spider's current location
+     * @param network the Spider's web network
+     * @return true if reachable weaving work exists
+     */
+   @Override
+   public boolean hasReachableWeavingWork(Actor creature, Location origin, WebNetwork network) {
+        return findPlacementTarget(creature, origin, network) != null;
+   }
+
+    /**
+     * Checks for free slots for all entry webs plus one ordinary web.
+     *
+     * @param network the Spider's web network
+     * @param entryWebs the number of entry webs Weaving places on entry
+     * @return true if there is enough capacity
+     */
+   @Override
+   public boolean hasCapacityForWeaving(WebNetwork network, int entryWebs){
+       return network.getRemainingCapacity() >= Math.max(0, entryWebs) + 1;
+   }
 
     private Routes buildRoutes(Actor creature, Location origin) {
         Routes routes = new Routes();
