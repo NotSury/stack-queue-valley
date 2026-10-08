@@ -9,7 +9,7 @@ import game.interfaces.WebNetwork;
 import game.items.Web;
 import game.navigation.GridDistance;
 import game.navigation.MovementSafety;
-
+import game.interfaces.WebTriggerRecorder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -21,7 +21,7 @@ import java.util.Random;
  * Randomness controls only the initial visibility of a web.
  * Placement eligibility and active counts ignore visibility.
  */
-public class SpiderWebNetwork implements WebNetwork {
+public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
 
     private static final int MAXIMUM_ACTIVE_WEBS = 6;
     private static final int WEB_LIFETIME_TURNS = 10;
@@ -30,6 +30,9 @@ public class SpiderWebNetwork implements WebNetwork {
     private final Location nestLocation;
     private final List<Web> webs = new ArrayList<>();
     private final Random visibilityRandom = new Random();
+
+    private WebAlert latestAlert;
+    private long nextEventId = 1;
 
     /**
      * Creates a web network for one creature.
@@ -126,7 +129,8 @@ public class SpiderWebNetwork implements WebNetwork {
                 owner,
                 location,
                 WEB_LIFETIME_TURNS,
-                hidden
+                hidden,
+                this
         );
 
         location.addItem(web);
@@ -196,6 +200,26 @@ public class SpiderWebNetwork implements WebNetwork {
         }
 
         return message;
+    }
+
+    @Override
+    public void recordTrigger(Location location) {
+        latestAlert = new WebAlert(nextEventId, location);
+        nextEventId++;
+    }
+
+    @Override
+    public WebAlert getLatestAlert() {
+        return latestAlert;
+    }
+
+    @Override
+    public boolean clearAlert(long eventId) {
+        if  (latestAlert == null || latestAlert.getEventId() != eventId) {
+            return false;
+        }
+        latestAlert = null;
+        return true;
     }
 
     private void removeInactiveRecords() {
