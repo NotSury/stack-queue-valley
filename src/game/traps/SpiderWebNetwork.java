@@ -32,10 +32,6 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
 
     private static final int MAXIMUM_ACTIVE_WEBS = 6;
     private static final int WEB_LIFETIME_TURNS = Web.MAXIMUM_LIFETIME;
-    /**
-     * Number of guard webs kept next to the nest.
-     */
-    private static final int GUARD_WEBS = 2;
 
     /**
      * Distance from the nest at which guard webs sit.
@@ -291,14 +287,15 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
     }
 
     /**
-     * Keeps two guard webs on the tiles directly next to the nest.
-     * Tiles are tried in a fixed order (top row first, then left to
-     * right), so the result is deterministic.
+     * Keeps the given number of guard webs on the tiles directly next to
+     * the nest. Tiles are tried in a fixed order (top row first, then left
+     * to right), so the result is deterministic.
      *
+     * @param guardWebs how many guard webs the nest should have
      * @return the number of guard webs placed
      */
     @Override
-    public int maintainGuardWebs(){
+    public int maintainGuardWebs(int guardWebs){
         removeInactiveRecords();
 
         int guards = countGuardWebs();
@@ -308,7 +305,7 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
         sites.sort(Comparator.comparing(Location::y).thenComparing(Location::x));
 
         for (Location site : sites) {
-            if (guards + placed >= GUARD_WEBS){
+            if (guards + placed >= guardWebs){
                 break;
             }
             if (GridDistance.between(site, nestLocation) == GUARD_RADIUS
@@ -348,18 +345,88 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
      * Reveals every owned web through the Farmer's next turn and extends
      * each lifespan, up to eight turns.
      *
+     * @param target the Farmer the webs are revealed to
      * @param turns the turns added to each web
-     * @return the number of webs revealed
+     * @return a description of the reveal
      */
     @Override
-    public int revealAndReinforceAll(int turns) {
+    public String revealAndReinforceAll(Actor target, int turns) {
         removeInactiveRecords();
 
         for (Web web : webs) {
             web.revealTemporarily(TEMPORARY_REVEAL_TICKS);
             web.reinforce(turns);
         }
-        return webs.size();
+
+        return owner + " reveals " + webs.size() + " web(s) to " + target
+                + " and reinforces them by " + turns + " turn(s).";
+    }
+
+    /**
+     * Places up to a number of entry webs next to a location, trying the
+     * tiles closest to the focus first when one is given.
+     *
+     * @param origin the location the webs are placed around
+     * @param count the maximum number of entry webs to place
+     * @param focus the location to place webs towards, or null
+     * @return the number of entry webs placed
+     */
+    @Override
+    public int placeEntryWebs(Location origin, int count, Location focus) {
+        if (origin.map() != nestLocation.map()) {
+            return 0;
+        }
+
+        List<Location> sites = new ArrayList<>(origin.getNearbyLocations(GUARD_RADIUS));
+        Comparator<Location> order = Comparator.comparingInt(Location::y)
+                .thenComparingInt(Location::x);
+        if (focus != null && focus.map() == origin.map()) {
+            order = Comparator.comparingInt((Location site) -> GridDistance.between(site, focus))
+                    .thenComparing(order);
+        }
+        sites.sort(order);
+
+        int placed = 0;
+        for (Location site : sites) {
+            if (placed >= count) {
+                break;
+            }
+            if (site != origin && placeEntryWeb(site)) {
+                placed++;
+            }
+        }
+        return placed;
+    }
+
+    /**
+     * Checks whether a number of ordinary webs can still be placed.
+     *
+     * @param webs the number of webs needed
+     * @return true if there are at least that many free slots
+     */
+    @Override
+    public boolean hasCapacityFor(int webs) {
+        return getRemainingCapacity() >= webs;
+    }
+
+    /**
+     * Returns where the latest uncleared alert was raised.
+     *
+     * @return the alert location, or null if there is no alert
+     */
+    @Override
+    public Location getAlertLocation() {
+        return latestAlert == null ? null : latestAlert.getLocation();
+    }
+
+    /**
+     * Returns the event id of the latest uncleared alert.
+     *
+     * @return the alert's event id, or 0 if there is no alert
+     */
+    @Override
+    public long getAlertVersion() {
+        return latestAlert == null ? 0 : latestAlert.getEventId();
     }
 
     /**
