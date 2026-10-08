@@ -27,7 +27,7 @@ import java.util.List;
  * Entry creates one Spiderling when a safe spawn tile exists
  * and maintains two guard webs around the nest.
  *
- * @author Surya Muni Peragas
+ * @author Surya Muni Peragas 35651628
  * @version 1.1.0
  */
 public class NestingState extends EnvironmentAwareState {

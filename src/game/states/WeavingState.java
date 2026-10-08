@@ -16,7 +16,7 @@ import game.perception.SpiderTargetTracker;
  * Expands the web network through strategic ordinary placement.
  * Entry places one adjacent web and reinforces nearby owned webs.
  *
- * @author Surya Muni Peragas
+ * @author Surya Muni Peragas 35651628
  * @version 1.1.0
  */
 public class WeavingState extends BehaviourDrivenState {
