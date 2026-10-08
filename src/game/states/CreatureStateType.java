@@ -47,7 +47,8 @@ public enum CreatureStateType {
     HUNTING,
 
     /**
-     * The Spider uses useful two-tile jump towards the Farmer.
+     * The Spider investigates an owned-web alert using tactical
+     * two-tile jumps and safe walking.
      */
     POUNCING
 }

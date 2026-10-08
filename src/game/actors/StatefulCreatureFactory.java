@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Location;
 import game.behaviours.*;
 import game.interfaces.DecoyFactory;
+import game.interfaces.SpiderlingFactory;
 import game.interfaces.WebNetwork;
 import game.navigation.HazardAwareMovementPlanner;
 import game.navigation.JumpPlanner;
@@ -35,7 +36,7 @@ import java.util.List;
  */
 
 
-public class StatefulCreatureFactory implements DecoyFactory {
+public class StatefulCreatureFactory implements DecoyFactory, SpiderlingFactory {
 
     private final EnvironmentScanner scanner;
     private final MovementPlanner movementPlanner;
@@ -89,18 +90,16 @@ public class StatefulCreatureFactory implements DecoyFactory {
     }
 
     /**
-     * Creates an unplaced Nest Spider with all four states registered.
-     * Shares one web network and one target-assessment object between its states.
-     * Uses the supplied planners for safe walking, web placement and jumping.
-     * The Spider must be placed on the nest's map before initialiseState
-     * is called, so its initial web-placement effects can run.
+     * Creates an unplaced Nest Spider with four distinct states.
+     * Shares one web network and target tracker across those states.
+     * Initial entry effects run after placement through initialiseState.
      *
      * @param hitPoints the Spider's starting and maximum health
-     * @param nestLocation the Spider's fixed nest location
-     * @param webPlanner the safe walking and web-placement planner
-     * @param jumpPlanner the tactical jump planner
-     * @param attackBehaviour the behaviour used for adjacent attacks
-     * @return the Spider with its states and behaviours configured
+     * @param nestLocation the fixed nest location
+     * @param webPlanner the safe walking and strategic placement planner
+     * @param jumpPlanner the legal two-tile jump planner
+     * @param attackBehaviour the existing adjacent attack behaviour
+     * @return the assembled Nest Spider
      */
     public NestSpider createNestSpider(
             int hitPoints,
@@ -134,10 +133,8 @@ public class StatefulCreatureFactory implements DecoyFactory {
                 NestSpider.PURSUIT_RADIUS
         );
 
-        Behaviour<Actor, Action> weavingBehaviour = new WeaveWebBehaviour(
-                webPlanner,
-                network
-        );
+        Behaviour<Actor, Action> weavingBehaviour =
+                new WeaveWebBehaviour(webPlanner, network);
 
         Behaviour<Actor, Action> huntingBehaviour = new SpiderHuntBehaviour(
                   targetTracker,
@@ -160,14 +157,14 @@ public class StatefulCreatureFactory implements DecoyFactory {
                 scanner,
                 network,
                 webPlanner,
-                targetTracker
+                targetTracker,
+                this
         ));
 
         spider.registerState(new WeavingState(
                 spider,
                 scanner,
                 network,
-                webPlanner,
                 targetTracker,
                 weavingBehaviour
         ));
@@ -203,5 +200,15 @@ public class StatefulCreatureFactory implements DecoyFactory {
     @Override
     public DecoyMimic createDecoy(Actor original, String direction) {
         return new DecoyMimic(original, new DirectionalMoveBehaviour(movementPlanner, direction), DECOY_LIFETIME_TURNS);
+    }
+
+    /**
+     * Creates an independent Spiderling using existing NPC wandering.
+     *
+     * @return an unplaced, short-lived Spiderling
+     */
+    @Override
+    public Spiderling createSpiderling() {
+        return new Spiderling(new WanderBehaviour());
     }
 }

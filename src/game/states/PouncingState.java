@@ -4,9 +4,11 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.actors.NestSpider;
 import game.interfaces.WebNetwork;
 import game.navigation.GridDistance;
 import game.perception.EnvironmentScanner;
@@ -20,26 +22,35 @@ import game.perception.SpiderTargetTracker;
  * @version 1.0.0
  */
 public class PouncingState extends BehaviourDrivenState {
-    private static final int ENTRY_WEB_LIMIT = 2;
-    private static final int WEB_RADIUS = 3;
+    private static final int ENTRY_WEB_COUNT = 2;
+    private static final int ARRIVAL_RADIUS = 1;
+    private static final int INVESTIGATION_RADIUS = 2;
 
     private final SpiderTargetTracker targetTracker;
-    private final WebNetwork webNetwork;
+    private final WebNetwork network;
+
+    private Location investigationLocation;
+    private long investigationVersion;
 
     /**
-     * Creates the Spider's pouncing state.
+     * Creates a Pouncing state.
      *
-     * @param creature the Spider that owns this state.
-     * @param scanner the environmental scanner.
-     * @param pounceBehaviour the tactical jumping behaviour.
-     * @param targetTracker the shared target assessment.
-     * @param webNetwork the Spider's owned webs.
+     * @param creature the owning Spider
+     * @param scanner the environmental scanner
+     * @param pounceBehaviour the alert-directed movement behaviour
+     * @param targetTracker the shared environmental assessment
+     * @param network the owning Spider's web network
      */
-    public PouncingState(Actor creature, EnvironmentScanner scanner, Behaviour<Actor, Action> pounceBehaviour,
-                         SpiderTargetTracker targetTracker, WebNetwork webNetwork){
+    public PouncingState(
+            Actor creature,
+            EnvironmentScanner scanner,
+            Behaviour<Actor, Action> pounceBehaviour,
+            SpiderTargetTracker targetTracker,
+            WebNetwork network
+    ) {
         super(creature, scanner, pounceBehaviour);
         this.targetTracker = targetTracker;
-        this.webNetwork = webNetwork;
+        this.network = network;
     }
 
     /**
@@ -60,84 +71,131 @@ public class PouncingState extends BehaviourDrivenState {
      * @param location the creature's current location
      * @return the selected state identifier.
      */
+    /**
+     * Redirects newer alerts, investigates after arrival, and concludes
+     * alerts that cannot be approached safely.
+     *
+     * @param location the Spider's current location
+     * @return Pouncing, Hunting, Weaving or Nesting
+     */
     @Override
-    public CreatureStateType determineNextState(Location location){
-        Actor target = targetTracker.findActiveTarget(location);
+    public CreatureStateType determineNextState(Location location) {
+        Location latestAlert = network.getAlertLocation();
 
-        if (target == null){
-            return targetTracker.hasWebGap(location) ? CreatureStateType.WEAVING : CreatureStateType.NESTING;
+        if (latestAlert == null) {
+            investigationLocation = null;
+            return selectRestOrWeaving(location);
         }
 
-        Location targetLocation = location.map().locationOf(target);
+        if (network.getAlertVersion() != investigationVersion) {
+            updateInvestigation();
+            return CreatureStateType.POUNCING;
+        }
 
-        boolean usefulJump = targetTracker.findUsefulLanding(location, targetLocation) != null;
+        if (investigationLocation == null
+                || investigationLocation.map() != location.map()) {
+            clearInvestigation();
+            return selectRestOrWeaving(location);
+        }
 
-        if (!usefulJump && targetTracker.canWalkToTarget(location, targetLocation)){
-            return CreatureStateType.HUNTING;
+        if (GridDistance.between(
+                location,
+                investigationLocation
+        ) <= ARRIVAL_RADIUS) {
+            Actor farmer = targetTracker.findFarmerNear(
+                    investigationLocation,
+                    INVESTIGATION_RADIUS
+            );
+
+            clearInvestigation();
+
+            if (farmer != null) {
+                targetTracker.engage(farmer);
+                return CreatureStateType.HUNTING;
+            }
+
+            return selectRestOrWeaving(location);
+        }
+
+        if (!targetTracker.canInvestigateAlert(location)) {
+            clearInvestigation();
+            return selectRestOrWeaving(location);
         }
 
         return CreatureStateType.POUNCING;
     }
 
     /**
-     * Places up to two webs around the active Farmer. Only eligible locations within the
-     * nest's web area are used.
+     * Records the current alert and establishes departure traps.
+     * Prefers eligible tiles behind the direction towards the alert.
      *
-     * @param location the creature's current location
-     * @return a description of placed webs or an empty string.
+     * @param location the Spider's location on entry
+     * @return a description of the departure trap effect
      */
     @Override
-    public String onEnter(Location location){
-        Actor target = targetTracker.findActiveTarget(location);
+    public String onEnter(Location location) {
+        updateInvestigation();
 
-        if (target == null){
-            return "";
-        }
+        int placed = network.placeEntryWebs(
+                location,
+                ENTRY_WEB_COUNT,
+                investigationLocation
+        );
 
-        GameMap map = location.map();
-        Location targetLocation = map.locationOf(target);
-        Location nest = webNetwork.getNestLocation();
-        int placed = 0;
-
-        for (int y = targetLocation.y() - 1; y <= targetLocation.y() + 1 && placed < ENTRY_WEB_LIMIT; y++) {
-            for (int x = targetLocation.x() - 1; x <= targetLocation.x() + 1 && placed < ENTRY_WEB_LIMIT; x++) {
-                if (!map.getXRange().contains(x) || !map.getYRange().contains(y)) {
-                    continue;
-                }
-
-                Location candidate = map.at(x, y);
-
-                if (candidate == targetLocation || candidate == nest
-                        || GridDistance.between(nest, candidate) > WEB_RADIUS) {
-                    continue;
-                }
-
-                if (webNetwork.placeAt(candidate)) {
-                    placed++;
-                }
-            }
-        }
-
-        if (placed == 0) {
-            return "";
-        }
-
-        return getCreature() + " spreads " + placed + " web trap(s) around " + target + ".";
+        return getCreature() + " establishes "
+                + placed + " departure web(s) before investigating.";
     }
 
     /**
-     * Selects a pounce while an active target remains. Falls back to an idle action
-     * when no jump is selected.
+     * Delegates movement towards the current alert.
+     * Already-arrived investigations wait for the next transition check.
      *
-     * @param location the creature's current location
-     * @return a jump action or an idle action.
+     * @param location the Spider's current location
+     * @return a pouncing, walking or idle action
      */
     @Override
-    public Action getAction(Location location){
-        if (targetTracker.findActiveTarget(location) == null){
+    public Action getAction(Location location) {
+        Location alert = network.getAlertLocation();
+
+        if (alert == null
+                || alert.map() != location.map()
+                || GridDistance.between(location, alert)
+                <= ARRIVAL_RADIUS) {
             return new DoNothingAction();
         }
 
         return super.getAction(location);
+    }
+
+    private void updateInvestigation() {
+        investigationLocation = network.getAlertLocation();
+        investigationVersion = network.getAlertVersion();
+    }
+
+    private void clearInvestigation() {
+        network.clearAlert(investigationVersion);
+        investigationLocation = null;
+    }
+
+    private CreatureStateType selectRestOrWeaving(Location location) {
+        if (isRecovered()
+                && targetTracker.canStartWeaving(location)) {
+            return CreatureStateType.WEAVING;
+        }
+
+        return CreatureStateType.NESTING;
+    }
+
+    private boolean isRecovered() {
+        int health = getCreature().getStatistic(
+                ActorStatistics.HEALTH
+        );
+
+        int maximumHealth = getCreature().getMaximumStatistic(
+                ActorStatistics.HEALTH
+        );
+
+        return health * 100
+                >= maximumHealth * NestSpider.RECOVERED_THRESHOLD;
     }
 }

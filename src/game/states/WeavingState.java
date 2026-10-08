@@ -2,49 +2,51 @@ package game.states;
 
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.Location;
+import game.actors.NestSpider;
 import game.interfaces.WebNetwork;
 import game.navigation.WebPlanner;
 import game.perception.EnvironmentScanner;
 import game.perception.SpiderAwareness;
+import game.perception.SpiderTargetTracker;
 
 /**
- * Expands the nest's web network through targeted trap placement.
- * Enters Hunting for an intruder or Nesting when both the Farmer
- * and available web sites are absent.
+ * Expands the web network through strategic ordinary placement.
+ * Entry places one adjacent web and reinforces nearby owned webs.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.1.0
  */
 public class WeavingState extends BehaviourDrivenState {
 
-    private static final int MAXIMUM_ENTRY_WEBS = 2;
-    private static final int ENTRY_RADIUS = 2;
+    private static final int ENTRY_WEB_COUNT = 1;
+    private static final int REINFORCEMENT_RADIUS = 2;
+    private static final int REINFORCEMENT_AMOUNT = 3;
 
     private final WebNetwork network;
-    private final WebPlanner planner;
-    private final SpiderAwareness awareness;
+    private final SpiderTargetTracker targetTracker;
 
     /**
-     * Creates a weaving state using the owning Spider's collaborators.
+     * Creates a Weaving state.
      *
-     * @param creature the Spider that owns this state
+     * @param creature the owning Spider
      * @param scanner the environmental scanner
      * @param network the owning Spider's web network
-     * @param planner the safe walking and web-site planner
-     * @param awareness the shared Farmer assessment
-     * @param weavingBehaviour the behaviour used for ordinary web placement
+     * @param targetTracker the shared environmental assessment
+     * @param weavingBehaviour the strategic ordinary placement behaviour
      */
     public WeavingState(
             Actor creature,
             EnvironmentScanner scanner,
             WebNetwork network,
-            WebPlanner planner,
-            SpiderAwareness awareness,
+            SpiderTargetTracker targetTracker,
             Behaviour<Actor, Action> weavingBehaviour
     ) {
         super(creature, scanner, weavingBehaviour);
         this.network = network;
-        this.planner = planner;
-        this.awareness = awareness;
+        this.targetTracker = targetTracker;
     }
 
     /**
@@ -58,58 +60,70 @@ public class WeavingState extends BehaviourDrivenState {
     }
 
     /**
-     * Instantly spreads up to two webs onto reachable nearby approach sites.
-     * These entry webs are separate from ordinary turn-by-turn weaving.
+     * Places one adjacent entry web and reinforces nearby owned webs.
+     * A new web already starts at the maximum eight-tick lifetime.
      *
-     * @param location the Spider's location when entering this state
-     * @return a description of the entry effect
+     * @param location the Spider's location on entry
+     * @return a description of placement and reinforcement
      */
     @Override
     public String onEnter(Location location) {
-        int placed = 0;
+        int placed = network.placeEntryWebs(
+                location,
+                ENTRY_WEB_COUNT,
+                null
+        );
 
-        for (Location tile : location.getNearbyLocations(ENTRY_RADIUS)) {
-            if (!planner.isPlacementTargetValid(
-                    getCreature(), location, tile, network)) {
-                continue;
-            }
+        int reinforced = network.reinforceNearby(
+                location,
+                REINFORCEMENT_RADIUS,
+                REINFORCEMENT_AMOUNT
+        );
 
-            if (network.placeAt(tile)) {
-                placed++;
-            }
-
-            if (placed == MAXIMUM_ENTRY_WEBS) {
-                break;
-            }
-        }
-
-        return getCreature() + " spreads " + placed
-                + " approach webs around its nest.";
+        return getCreature() + " places " + placed
+                + " entry web(s) and reinforces "
+                + reinforced + " nearby web(s).";
     }
 
     /**
-     * Prioritizes intruders, then checks whether useful weaving remains.
-     * Returns to Nesting when no active Farmer or eligible reachable site exists.
+     * Prioritises alerts and nest intrusion before recovery and capacity.
      *
      * @param location the Spider's current location
-     * @return Hunting, Nesting or Weaving
+     * @return Pouncing, Hunting, Nesting or Weaving
      */
     @Override
     public CreatureStateType determineNextState(Location location) {
-        Actor farmer = awareness.findActiveFarmer(location);
+        if (network.getAlertLocation() != null) {
+            return CreatureStateType.POUNCING;
+        }
 
-        if (awareness.isIntruder(farmer)) {
+        Actor intruder = targetTracker.findNestIntruder();
+
+        if (intruder != null) {
+            targetTracker.engage(intruder);
             return CreatureStateType.HUNTING;
         }
 
-        if (farmer == null
-                && planner.findPlacementTarget(
-                getCreature(), location, network) == null) {
+        if (requiresRecovery()
+                || !network.hasCapacityFor(1)
+                || !targetTracker.hasWebGap(location)) {
             return CreatureStateType.NESTING;
         }
 
         return CreatureStateType.WEAVING;
     }
 
+    private boolean requiresRecovery() {
+        int health = getCreature().getStatistic(
+                ActorStatistics.HEALTH
+        );
+
+        int maximumHealth = getCreature().getMaximumStatistic(
+                ActorStatistics.HEALTH
+        );
+
+        return health * 100
+                <= maximumHealth * NestSpider.RECOVERY_THRESHOLD;
+    }
 
 }
