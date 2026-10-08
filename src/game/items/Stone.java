@@ -30,6 +30,8 @@ public class Stone extends Item implements Sellable
 
     /**
      * Constructor for Stone class.
+     *
+     * With the display character 's'
      */
     public Stone()
     {

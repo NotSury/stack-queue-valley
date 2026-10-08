@@ -23,6 +23,8 @@ public class Diamond extends Item implements Sellable {
 
     /**
      * Constructor for Diamond class.
+     *
+     * With the display character 'D'
      */
     public Diamond() {
         super("Diamond", 'D');
