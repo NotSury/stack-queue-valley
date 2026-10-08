@@ -5,7 +5,7 @@ import edu.monash.fit2099.engine.positions.Location;
 /**
  * Manages the webs belonging to one creature.
  */
-public interface WebNetwork {
+public interface WebNetwork extends WebAlertSource {
 
     /**
      * Returns the creature's fixed nest location.
@@ -49,4 +49,14 @@ public interface WebNetwork {
      * @return a description of the effects, or an empty string
      */
     String activeNearbyWebs(Location origin, int radius);
+
+    int getRemainingCapacity();
+
+    boolean playEntryWeb(Location location);
+
+    int maintainGuardWebs();
+
+    int reinforcedNearby(Location origin, int radius, int turns);
+
+    int revealAndReinforceAll(int turns);
 }
