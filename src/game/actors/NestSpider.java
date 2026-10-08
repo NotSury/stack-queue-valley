@@ -8,52 +8,78 @@ import game.interfaces.Hostile;
 import game.states.CreatureStateType;
 
 /**
- * A hostile stateful Spider that guards a fixed nest, weaves traps
- * and uses tactical jumps when pursuing the Farmer.
- * The factory assembles its states and web network.
- * The Spider is immune to web bindings.
+ * A stateful Spider that guards a fixed nest and manages owned webs.
+ * Investigates web alerts through Pouncing and walks during Hunting.
+ * The factory assembles its states, behaviours and collaborators.
  *
  * @author Surya Muni Peragas
- * @version 1.0.0
+ * @version 1.1.0
  */
 public class NestSpider extends StatefulCreature implements Hostile {
 
     /**
-     * Maximum distance used to detect an active Farmer.
+     * General detection range supplied to Spider assessment.
+     * Nest intrusion and alert investigation use their own centres.
      */
     public static final int DETECTION_RADIUS = 4;
 
     /**
-     * Maximum web-placement distance from the fixed nest.
+     * Maximum ordinary web-placement distance from the nest.
      */
-    public static final int WEB_PLACEMENT_RADIUS = 3;
+    public static final int WEB_PLACEMENT_RADIUS = 4;
 
     /**
-     * Maximum distance from the nest used for pursuit assessment.
+     * Maximum Farmer distance from the nest during continued Hunting.
      */
-    public static final int PURSUIT_RADIUS = 6;
+    public static final int PURSUIT_RADIUS = 4;
+
+    /**
+     * Distance from the nest that counts as direct intrusion.
+     */
+    public static final int NEST_THREAT_RADIUS = 3;
+
+    /**
+     * Maximum number of active webs owned by this Spider.
+     */
+    public static final int MAXIMUM_ACTIVE_WEBS = 6;
+
+    /**
+     * Starting and maximum reinforced lifetime of a web.
+     */
+    public static final int WEB_LIFETIME_TURNS = 8;
+
+    /**
+     * Health percentage at or below which recovery is needed.
+     */
+    public static final int RECOVERY_THRESHOLD = 40;
+
+    /**
+     * Health percentage required before optional weaving begins.
+     */
+    public static final int RECOVERED_THRESHOLD = 80;
 
     /**
      * Creates an unplaced Spider with a natural weapon and web immunity.
-     * Its states must be registered before the initial state is activated.
      *
-     * @param hitPoints the Spider's starting and maximum health
-     * @param intrinsicWeapon the weapon used for its natural attacks
+     * @param hitPoints the starting and maximum health
+     * @param intrinsicWeapon the Spider's natural weapon
      */
-    public NestSpider(int hitPoints, IntrinsicWeapon intrinsicWeapon) {
+    public NestSpider(
+            int hitPoints,
+            IntrinsicWeapon intrinsicWeapon
+    ) {
         super("Nest Spider", 's', hitPoints, CreatureStateType.NESTING);
-
         setIntrinsicWeapon(intrinsicWeapon);
         enableAbility(WebAbility.IMMUNE_TO_WEBS);
     }
 
     /**
-     * Provides the reaction required by the shared combat interface.
-     * State transitions are evaluated during the Spider's own turn.
+     * Provides the existing combat capability without an immediate reaction.
+     * State changes are evaluated during the Spider's own turn.
      *
-     * @param attacker the actor that attacked this Spider
-     * @param map the map containing the Spider
-     * @return an empty string because no immediate reaction is performed
+     * @param attacker the attacking actor
+     * @param map the map containing this Spider
+     * @return an empty string
      */
     @Override
     public String respondToAttack(Actor attacker, GameMap map) {
