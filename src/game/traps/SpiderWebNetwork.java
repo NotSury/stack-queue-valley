@@ -26,7 +26,7 @@ import java.util.Comparator;
  *
  * @author Surya Muni Peragas 35651628
  * @author Lee Le Si 34599223
- * @version 1.1.0
+ * @version 1.2.0
  */
 public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
 
@@ -287,33 +287,45 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
     }
 
     /**
-     * Keeps the given number of guard webs on the tiles directly next to
-     * the nest. Tiles are tried in a fixed order (top row first, then left
-     * to right), so the result is deterministic.
+     * Restores existing guard webs to their maximum lifetime and places
+     * missing guards in coordinate order. Existing guards are preserved.
      *
-     * @param guardWebs how many guard webs the nest should have
-     * @return the number of guard webs placed
+     * @param guardWebs the desired minimum number of guard webs
+     * @return the number of existing guards reinforced plus new guards placed
      */
     @Override
-    public int maintainGuardWebs(int guardWebs){
+    public int maintainGuardWebs(int guardWebs) {
         removeInactiveRecords();
 
-        int guards = countGuardWebs();
-        int placed = 0;
+        int maintained = 0;
 
-        List <Location> sites = new ArrayList<>(nestLocation.getNearbyLocations(GUARD_RADIUS));
-        sites.sort(Comparator.comparing(Location::y).thenComparing(Location::x));
-
-        for (Location site : sites) {
-            if (guards + placed >= guardWebs){
-                break;
-            }
-            if (GridDistance.between(site, nestLocation) == GUARD_RADIUS
-                && placeEntryWeb(site)){
-                placed++;
+        for (Web web : webs) {
+            if (isGuardWeb(web)
+                    && web.reinforce(WEB_LIFETIME_TURNS) > 0) {
+                maintained++;
             }
         }
-        return placed;
+
+        List<Location> sites = new ArrayList<>(
+                nestLocation.getNearbyLocations(GUARD_RADIUS)
+        );
+
+        sites.sort(
+                Comparator.comparingInt(Location::y)
+                        .thenComparingInt(Location::x)
+        );
+
+        for (Location site : sites) {
+            if (countGuardWebs() >= guardWebs) {
+                break;
+            }
+
+            if (placeEntryWeb(site)) {
+                maintained++;
+            }
+        }
+
+        return maintained;
     }
 
     /**
@@ -342,59 +354,137 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
 
 
     /**
-     * Reveals every owned web through the Farmer's next turn and extends
-     * each lifespan, up to eight turns.
+     * Reveals and reinforces owned webs. If none remain, first attempts
+     * to establish two nest guards, then webs around the target.
+     * If every placement is blocked, releases a silk pulse around the
+     * target using the existing non-stacking one-turn binding mechanism.
      *
-     * @param target the Farmer the webs are revealed to
-     * @param turns the turns added to each web
-     * @return a description of the reveal
+     * @param target the valid engaged Farmer
+     * @param turns the lifetime increase for existing webs
+     * @return a description of defensive placement, reveal or binding
      */
     @Override
     public String revealAndReinforceAll(Actor target, int turns) {
         removeInactiveRecords();
 
-        for (Web web : webs) {
-            web.revealTemporarily(TEMPORARY_REVEAL_TICKS);
-            web.reinforce(turns);
+        if (target == null
+                || !target.isConscious()
+                || !nestLocation.map().contains(target)) {
+            return owner
+                    + " has no valid target for its defensive web effect.";
         }
 
-        return owner + " reveals " + webs.size() + " web(s) to " + target
-                + " and reinforces them by " + turns + " turn(s).";
+        int placed = 0;
+
+        if (webs.isEmpty()) {
+            placed += maintainGuardWebs(2);
+
+            if (webs.isEmpty()) {
+                placed += placeEntryWebs(
+                        nestLocation.map().locationOf(target),
+                        2,
+                        null
+                );
+            }
+        }
+
+        if (webs.isEmpty()) {
+            Location centre = nestLocation.map().locationOf(target);
+
+            List<Location> area = new ArrayList<>();
+            area.add(centre);
+            area.addAll(centre.getNearbyLocations(1));
+
+            int caught = 0;
+
+            for (Location tile : area) {
+                if (tile.containsAnActor()
+                        && WebTrapHandler.tryBind(tile.getActor())) {
+                    caught++;
+                }
+            }
+
+            return owner
+                    + " releases a defensive silk pulse, binding "
+                    + caught
+                    + " Farmer(s) for one pending turn.";
+        }
+
+        int reinforced = 0;
+
+        for (Web web : webs) {
+            web.revealTemporarily(TEMPORARY_REVEAL_TICKS);
+
+            if (web.reinforce(turns) > 0) {
+                reinforced++;
+            }
+        }
+
+        return owner
+                + " establishes " + placed + " defensive web(s), reveals "
+                + webs.size() + " web(s) and reinforces "
+                + reinforced + ".";
     }
 
     /**
-     * Places up to a number of entry webs next to a location, trying the
-     * tiles closest to the focus first when one is given.
+     * Places adjacent entry webs in a deterministic order.
+     * A focus prefers tiles behind the direction from origin to focus.
+     * Without a focus, uses row then column order, as the weaving planner does.
      *
-     * @param origin the location the webs are placed around
-     * @param count the maximum number of entry webs to place
-     * @param focus the location to place webs towards, or null
+     * @param origin the placement centre
+     * @param count the maximum number of entry webs
+     * @param focus the alert destination, or null for coordinate ordering
      * @return the number of entry webs placed
      */
     @Override
-    public int placeEntryWebs(Location origin, int count, Location focus) {
+    public int placeEntryWebs(
+            Location origin,
+            int count,
+            Location focus
+    ) {
         if (origin.map() != nestLocation.map()) {
             return 0;
         }
 
-        List<Location> sites = new ArrayList<>(origin.getNearbyLocations(GUARD_RADIUS));
-        Comparator<Location> order = Comparator.comparingInt(Location::y)
-                .thenComparingInt(Location::x);
+        List<Location> sites = new ArrayList<>(
+                origin.getNearbyLocations(1)
+        );
+
+        Comparator<Location> order =
+                Comparator.comparingInt(Location::y)
+                        .thenComparingInt(Location::x);
+
         if (focus != null && focus.map() == origin.map()) {
-            order = Comparator.comparingInt((Location site) -> GridDistance.between(site, focus))
-                    .thenComparing(order);
+            int directionX = Integer.compare(
+                    focus.x(),
+                    origin.x()
+            );
+
+            int directionY = Integer.compare(
+                    focus.y(),
+                    origin.y()
+            );
+
+            order = Comparator.comparingInt((Location site) ->
+                    (site.x() - origin.x()) * directionX
+                            + (site.y() - origin.y()) * directionY
+            ).thenComparing(order);
         }
+
         sites.sort(order);
 
         int placed = 0;
+
         for (Location site : sites) {
             if (placed >= count) {
                 break;
             }
-            if (site != origin && placeEntryWeb(site)) {
+
+            if (placeEntryWeb(site)) {
                 placed++;
             }
         }
+
         return placed;
     }
 
@@ -454,22 +544,27 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
         return count;
     }
 
-    /**
-     * Finds the active non-guard web with the fewest turns left.
-     * Ties go to the web placed first.
-     *
-     * @return the web to replace, or null if every active web is a guard
-     */
-    private Web findShortestLivedReplaceable(){
+    private Web findShortestLivedReplaceable() {
+        Comparator<Web> order =
+                Comparator.comparingInt(Web::getRemainingTurns)
+                        .thenComparingInt(
+                                web -> web.getLocation().y()
+                        )
+                        .thenComparingInt(
+                                web -> web.getLocation().x()
+                        );
+
         Web shortest = null;
+
         for (Web web : webs) {
-            if (!web.isActive() || isGuardWeb(web)) {
-                continue;
-            }
-            if (shortest == null || web.getRemainingTurns() <shortest.getRemainingTurns()) {
+            if (web.isActive()
+                    && !isGuardWeb(web)
+                    && (shortest == null
+                    || order.compare(web, shortest) < 0)) {
                 shortest = web;
             }
         }
+
         return shortest;
     }
 
