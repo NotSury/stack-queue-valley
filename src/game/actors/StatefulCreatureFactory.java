@@ -90,23 +90,21 @@ public class StatefulCreatureFactory implements DecoyFactory, SpiderlingFactory 
     }
 
     /**
-     * Creates an unplaced Nest Spider with four distinct states.
-     * Shares one web network and target tracker across those states.
-     * Initial entry effects run after placement through initialiseState.
+     * Creates an unplaced Nest Spider with all four states registered.
+     * Shares one web network and one target tracker between its states.
+     * Hunting follows the validated engaged Farmer using safe walking.
      *
      * @param hitPoints the Spider's starting and maximum health
      * @param nestLocation the fixed nest location
-     * @param webPlanner the safe walking and strategic placement planner
-     * @param jumpPlanner the legal two-tile jump planner
-     * @param attackBehaviour the existing adjacent attack behaviour
-     * @return the assembled Nest Spider
+     * @param webPlanner the safe walking and web-placement planner
+     * @param jumpPlanner the tactical jump planner
+     * @return the configured Nest Spider
      */
     public NestSpider createNestSpider(
             int hitPoints,
             Location nestLocation,
             WebPlanner webPlanner,
-            JumpPlanner jumpPlanner,
-            Behaviour<Actor, Action> attackBehaviour
+            JumpPlanner jumpPlanner
     ) {
         NestSpider spider = new NestSpider(
                 hitPoints,
@@ -136,23 +134,13 @@ public class StatefulCreatureFactory implements DecoyFactory, SpiderlingFactory 
         Behaviour<Actor, Action> weavingBehaviour =
                 new WeaveWebBehaviour(webPlanner, network);
 
-        Behaviour<Actor, Action> huntingBehaviour = new SpiderHuntBehaviour(
-                  targetTracker,
-                  new AmbushBehaviour(
-                          scanner,
-                          new HazardAwareMovementPlanner(movementPlanner,webPlanner),
-                          attackBehaviour,
-                          NestSpider.DETECTION_RADIUS
-                  )
-          );
+        Behaviour<Actor, Action> huntingBehaviour =
+                new SpiderHuntBehaviour(targetTracker, webPlanner);
 
-       Behaviour<Actor, Action> pounceBehaviour = new PounceBehaviour(
-              network,
-              jumpPlanner,
-              webPlanner
-       );
+        Behaviour<Actor, Action> pounceBehaviour =
+                new PounceBehaviour(network, jumpPlanner, webPlanner);
 
-       spider.registerState(new NestingState(
+        spider.registerState(new NestingState(
                 spider,
                 scanner,
                 network,

@@ -79,63 +79,54 @@ public class MapSpiderAwareness implements SpiderTargetTracker {
     }
 
     /**
-     * Finds the nearest conscious Farmer within the detection radius.
-     * Requires both the Spider and Farmer to be within the configured
-     * pursuit distance from the fixed nest.
-     * Accepts the Farmer when adjacent, approachable through safe walking,
-     * or approachable through a useful tactical jump.
+     * Returns the valid engaged Farmer, even beyond local detection range.
+     * When no engagement exists, searches locally for an eligible Farmer.
      *
-     * A Farmer already engaged keeps being tracked while he stays inside
-     * the pursuit boundary, even beyond the detection radius.
-     *
-     * @param origin the owning Spider's current location
-     * @return the detected approachable Farmer, or null when none qualifies
+     * @param origin the Spider's current location
+     * @return an eligible Farmer, or null when none is found
      */
     @Override
     public Actor findActiveFarmer(Location origin) {
-        Location nest = network.getNestLocation();
-
-        if (origin.map() != nest.map()
-                || GridDistance.between(origin, nest) > leashRadius) {
+        if (origin.map() != network.getNestLocation().map()) {
             return null;
         }
 
-        if (isPursuable(origin, engagedFarmer)){
-            return engagedFarmer;
+        Actor engaged = getEngagedTarget();
+
+        if (engaged != null) {
+            return engaged;
         }
 
-        Actor farmer = scanner.findNearestActorWith(
+        Actor detected = scanner.findNearestActorWith(
                 origin,
                 detectionRadius,
                 ActorRole.FARMER
         );
 
-        engagedFarmer = isPursuable(origin, farmer) ? farmer : null;
+        if (isValidHuntingTarget(detected)) {
+            engagedFarmer = detected;
+        }
+
         return engagedFarmer;
     }
 
     /**
-     * Checks whether a Farmer can be pursued from the Spider's location:
-     * conscious, on the nest's map, inside the pursuit boundary, and
-     * adjacent or approachable by a safe walk or a useful jump.
+     * Checks shared Hunting eligibility without requiring a local scan
+     * or a currently available route.
      *
-     * @param origin the Spider's current location
-     * @param farmer the Farmer being checked, or null
-     * @return true if the Farmer can be pursued
+     * @param farmer the proposed target, or null
+     * @return true when the target is a conscious Farmer inside the territory
      */
-    private boolean isPursuable(Location origin, Actor farmer) {
+    @Override
+    public boolean isValidHuntingTarget(Actor farmer) {
         Location nest = network.getNestLocation();
 
-        if (farmer == null || ! farmer.isConscious() || ! nest.map().contains((farmer))){
-            return false;
-        }
-        Location target = nest.map().locationOf(farmer);
-
-        if (GridDistance.between(target, nest) > leashRadius) {
-            return false;
-        }
-
-        return canWalkToTarget(origin, target) || findUsefulLanding(origin, target) != null;
+        return farmer != null
+                && farmer.isConscious()
+                && farmer.hasAbility(ActorRole.FARMER)
+                && nest.map().contains(creature)
+                && nest.map().contains(farmer)
+                && GridDistance.between(nest, nest.map().locationOf(farmer)) <= leashRadius;
     }
 
     /**
@@ -297,33 +288,29 @@ public class MapSpiderAwareness implements SpiderTargetTracker {
     }
 
     /**
-     * Marks a Farmer as the Spider's current target.
+     * Stores an eligible Farmer as the engaged target.
+     * Clears the engagement when the supplied actor is ineligible.
      *
-     * @param farmer the Farmer to pursue
+     * @param farmer the proposed target, or null
      */
     @Override
     public void engage(Actor farmer) {
-        engagedFarmer = farmer;
+        engagedFarmer = isValidHuntingTarget(farmer) ? farmer : null;
     }
 
     /**
-     * Returns the engaged Farmer while he can still be pursued from the
-     * Spider's current location; otherwise drops the engagement.
+     * Keeps the engaged Farmer while conscious, on the nest's map
+     * and inside the pursuit boundary. A blocked route causes ordinary
+     * Hunting to wait and retry instead of forgetting the target.
      *
-     * @return the engaged Farmer, or null if there is none
+     * @return the valid engaged Farmer, or null
      */
     @Override
     public Actor getEngagedTarget() {
-        if (engagedFarmer == null || !network.getNestLocation().map().contains(creature)) {
-            engagedFarmer = null;
-            return null;
-        }
-
-        Location origin = network.getNestLocation().map().locationOf(creature);
-
-        if (!isPursuable(origin, engagedFarmer)) {
+        if (!isValidHuntingTarget(engagedFarmer)) {
             engagedFarmer = null;
         }
+
         return engagedFarmer;
     }
 

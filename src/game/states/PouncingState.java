@@ -19,7 +19,8 @@ import game.perception.SpiderTargetTracker;
  * once when entered.
  *
  * @author Khoo Lynn 34598901
- * @version 1.0.0
+ * @author Surya Muni Peragas 35651628
+ * @version 1.1.0
  */
 public class PouncingState extends BehaviourDrivenState {
     private static final int ENTRY_WEB_COUNT = 2;
@@ -64,16 +65,9 @@ public class PouncingState extends BehaviourDrivenState {
     }
 
     /**
-     * <p>Returns to Hunting when walking can approach the Farmer and no useful jump
-     * remains. Without an active target, selects Weaving when a web gap exists amd
-     * Nesting otherwise.</p>
-     *
-     * @param location the creature's current location
-     * @return the selected state identifier.
-     */
-    /**
      * Redirects newer alerts, investigates after arrival, and concludes
      * alerts that cannot be approached safely.
+     * Only eligible Farmers inside the pursuit boundary start Hunting.
      *
      * @param location the Spider's current location
      * @return Pouncing, Hunting, Weaving or Nesting
@@ -109,7 +103,7 @@ public class PouncingState extends BehaviourDrivenState {
 
             clearInvestigation();
 
-            if (farmer != null) {
+            if (targetTracker.isValidHuntingTarget(farmer)) {
                 targetTracker.engage(farmer);
                 return CreatureStateType.HUNTING;
             }

@@ -78,11 +78,11 @@ public interface SpiderTargetTracker extends SpiderAwareness {
     void engage(Actor farmer);
 
     /**
-     * Returns the engaged Farmer while he can still be pursued.
-     * The engagement is dropped once he leaves the pursuit boundary,
-     * becomes unreachable or is no longer conscious.
+     * Returns the engaged Farmer while conscious, on the nest's map
+     * and inside the pursuit boundary.
+     * Temporary route blockage does not clear the engagement.
      *
-     * @return the engaged Farmer, or null if there is none
+     * @return the valid engaged Farmer, or null
      */
     Actor getEngagedTarget();
 
@@ -113,4 +113,14 @@ public interface SpiderTargetTracker extends SpiderAwareness {
      * @return true if there is an alert and it can be approached
      */
     boolean canInvestigateAlert(Location origin);
+
+    /**
+     * Checks whether a conscious Farmer is on the nest's map and
+     * within the pursuit boundary. Temporary route blockage does not end an otherwise
+     * valid engagement.
+     *
+     * @param farmer the proposed target, or null
+     * @return true when the Farmer is eligible for Hunting
+     */
+    boolean isValidHuntingTarget(Actor farmer);
 }

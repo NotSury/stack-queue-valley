@@ -179,8 +179,7 @@ public class StackQueueValleyWorld extends World {
                 80,
                 spiderNest,
                 spiderWebPlanner,
-                spiderJumpPlanner,
-                new AttackBehaviour()
+                spiderJumpPlanner
         );
 
         minesMap.addActor(spider, spiderNest);
