@@ -19,6 +19,7 @@ import java.util.List;
 public class Web extends Item {
 
     private static final char VISIBLE_DISPLAY_CHAR = ':';
+    private static final int MAXIMUM_LIFETIME = 8;
 
     private final Actor owner;
     private final Location location;
@@ -26,6 +27,7 @@ public class Web extends Item {
 
     private int remainingTurns;
     private boolean hidden;
+    private int temporaryRevealTicks;
 
     /**
      * Creates a web for placement at a fixed location.
@@ -40,7 +42,7 @@ public class Web extends Item {
 
         this.owner = owner;
         this.location = location;
-        this.remainingTurns = lifetimeTurns;
+        this.remainingTurns = Math.min(lifetimeTurns, MAXIMUM_LIFETIME);
         this.hidden = hidden;
         this.recorder = recorder;
 
@@ -76,7 +78,7 @@ public class Web extends Item {
      * @return true if the web is hidden
      */
     public boolean isHidden() {
-        return hidden;
+        return hidden && remainingTurns == 0;
     }
 
     /**
@@ -84,6 +86,27 @@ public class Web extends Item {
      */
     public void reveal() {
         hidden = false;
+    }
+
+    public int getRemainingTurns() {
+        return remainingTurns;
+    }
+
+    public int reinforce(int turns){
+        if (!isActive() || turns <= 0){
+            return 0;
+        }
+        int before = remainingTurns;
+        remainingTurns = Math.min(MAXIMUM_LIFETIME, remainingTurns + turns);
+        return remainingTurns -  before;
+    }
+
+    public void revealTemporarily(int ticks){
+        temporaryRevealTicks = Math.min(temporaryRevealTicks, ticks);
+    }
+
+    public void dismantle(){
+        removeFromMap();
     }
 
     /**
@@ -129,6 +152,9 @@ public class Web extends Item {
             return;
         }
 
+        if (temporaryRevealTicks > 0) {
+            temporaryRevealTicks--;
+        }
         remainingTurns--;
 
         if (remainingTurns <= 0) {
@@ -145,7 +171,7 @@ public class Web extends Item {
      */
     @Override
     public char getDisplayChar() {
-        if (!hidden) {
+        if (!isHidden()) {
             return VISIBLE_DISPLAY_CHAR;
         }
 
