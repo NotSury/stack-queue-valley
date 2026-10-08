@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Location;
 import game.traps.WebTrapHandler;
 import game.capabilities.WebAbility;
+import game.interfaces.WebTriggerRecorder;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class Web extends Item {
 
     private final Actor owner;
     private final Location location;
+    private final WebTriggerRecorder recorder;
 
     private int remainingTurns;
     private boolean hidden;
@@ -33,13 +35,14 @@ public class Web extends Item {
      * @param lifetimeTurns the number of map ticks before expiry
      * @param hidden whether the web starts hidden
      */
-    public Web(Actor owner, Location location, int lifetimeTurns, boolean hidden) {
+    public Web(Actor owner, Location location, int lifetimeTurns, boolean hidden, WebTriggerRecorder recorder) {
         super("Spider Web", VISIBLE_DISPLAY_CHAR);
 
         this.owner = owner;
         this.location = location;
         this.remainingTurns = lifetimeTurns;
         this.hidden = hidden;
+        this.recorder = recorder;
 
         enableAbility(WebAbility.WEB_TRAP);
     }
@@ -101,6 +104,7 @@ public class Web extends Item {
             return "";
         }
 
+        recorder.recordTrigger(location);
         removeFromMap();
 
         return target + " is caught in a web at ("
