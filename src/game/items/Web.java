@@ -19,7 +19,7 @@ import java.util.List;
 public class Web extends Item {
 
     private static final char VISIBLE_DISPLAY_CHAR = ':';
-    private static final int MAXIMUM_LIFETIME = 8;
+    public static final int MAXIMUM_LIFETIME = 8;
 
     private final Actor owner;
     private final Location location;
