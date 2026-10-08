@@ -13,6 +13,7 @@ import game.interfaces.WebTriggerRecorder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Comparator;
 
 /**
  * Manages a creature's limited network of web traps.
@@ -24,7 +25,10 @@ import java.util.Random;
 public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
 
     private static final int MAXIMUM_ACTIVE_WEBS = 6;
-    private static final int WEB_LIFETIME_TURNS = 10;
+    private static final int WEB_LIFETIME_TURNS = Web.MAXIMUM_LIFETIME;
+    private static final int GUARD_WEBS = 2;
+    private static final int GUARD_RADIUS = 1;
+    private static final int TEMPORARY_REVEAL_TICKS = 2;
 
     private final Actor owner;
     private final Location nestLocation;
@@ -83,12 +87,16 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
      * @param location the proposed placement location
      * @return true if a web can be placed
      */
-    @Override
     public boolean canPlaceAt(Location location) {
+        return countActiveWebs() < MAXIMUM_ACTIVE_WEBS && isValidSite(location);
+    }
+
+
+    public boolean isValidSite(Location location) {
         if (location.map() != nestLocation.map()
+                || location == nestLocation
                 || !owner.isConscious()
                 || !nestLocation.map().contains(owner)
-                || countActiveWebs() >= MAXIMUM_ACTIVE_WEBS
                 || !location.canActorEnter(owner)
                 || !MovementSafety.isSafe(location)
                 || location.getGround()
@@ -123,6 +131,12 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
             return false;
         }
 
+        addWeb(location);
+        return true;
+
+    }
+
+    private void addWeb(Location location) {
         boolean hidden = visibilityRandom.nextBoolean();
 
         Web web = new Web(
@@ -135,8 +149,6 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
 
         location.addItem(web);
         webs.add(web);
-
-        return true;
     }
 
     /**
@@ -200,6 +212,107 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
         }
 
         return message;
+    }
+
+    @Override
+    public int getRemainingCapacity(){
+        return Math.max(0, MAXIMUM_ACTIVE_WEBS - countActiveWebs());
+    }
+
+    @Override
+    public boolean placeEntryWeb(Location location){
+        removeInactiveRecords();
+
+        if(!isValidSite(location)) {
+            return false;
+        }
+
+        if (countActiveWebs() >= MAXIMUM_ACTIVE_WEBS) {
+            Web oldest = findShortestLivedReplaceable();
+            if (oldest == null) {
+                return false;
+            }
+            oldest.dismantle();
+            removeInactiveRecords();
+        }
+        addWeb(location);
+        return true;
+    }
+
+    @Override
+    public int maintainGuardWebs(){
+        removeInactiveRecords();
+
+        int guards = countGuardWebs();
+        int placed = 0;
+
+        List <Location> sites = new ArrayList<>(nestLocation.getNearbyLocations(GUARD_RADIUS));
+        sites.sort(Comparator.comparing(Location::y).thenComparing(Location::x));
+
+        for (Location site : sites) {
+            if (guards + placed >= GUARD_WEBS){
+                break;
+            }
+            if (GridDistance.between(site, nestLocation) == GUARD_RADIUS
+                && placeEntryWeb(site)){
+                placed++;
+            }
+        }
+        return placed;
+    }
+
+    @Override
+    public int reinforceNearby(Location origin, int radius, int turns){
+        if (origin.map() != nestLocation.map()) {
+            return 0;
+        }
+        removeInactiveRecords();
+
+        int reinforced = 0;
+        for (Web web : webs) {
+            if (GridDistance.between(origin, web.getLocation()) <= radius && web.reinforce(turns)>0){
+                reinforced++;
+            }
+        }
+        return reinforced;
+    }
+
+    @Override
+    public int revealAndReinforceAll(int turns) {
+        removeInactiveRecords();
+
+        for (Web web : webs) {
+            web.revealTemporarily(TEMPORARY_REVEAL_TICKS);
+            web.reinforce(turns);
+        }
+        return webs.size();
+    }
+
+    private boolean isGuardWeb(Web web){
+        return GridDistance.between(web.getLocation(), nestLocation) == GUARD_RADIUS;
+    }
+
+    private int countGuardWebs(){
+        int count = 0;
+        for (Web web : webs) {
+            if (web.isActive() && isGuardWeb(web)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private Web findShortestLivedReplaceable(){
+        Web shortest = null;
+        for (Web web : webs) {
+            if (!web.isActive() || isGuardWeb(web)) {
+                continue;
+            }
+            if (shortest == null || web.getRemainingTurns() <shortest.getRemainingTurns()) {
+                shortest = web;
+            }
+        }
+        return shortest;
     }
 
     @Override
