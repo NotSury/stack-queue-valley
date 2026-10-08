@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-// TEMPORARY STONE ITEM for REQ 3 integration
 
 /**
  * This represents a Stone item

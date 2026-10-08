@@ -10,7 +10,6 @@ import game.interfaces.Sellable;
 import java.util.List;
 import java.util.Random;
 
-// TEMPORARY Diamond ITEM for REQ 3 integration
 
 /**
  * This represents a Diamond item
