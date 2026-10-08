@@ -165,17 +165,61 @@ public class MapWebPlanner implements WebPlanner {
     }
 
     /**
-     * Checks whether a reachable eligible web site exists.
+     * Checks for the exact adjacent entry site selected by the network
+     * and a distinct reachable ordinary site remaining afterwards.
+     * New webs do not block the Spider's walking routes.
      *
      * @param creature the Spider placing webs
      * @param origin the Spider's current location
-     * @param network the Spider's web network
-     * @return true if reachable weaving work exists
+     * @param network the owning web network
+     * @return true when entry and ordinary placement both have usable sites
      */
-   @Override
-   public boolean hasReachableWeavingWork(Actor creature, Location origin, WebNetwork network) {
-        return findPlacementTarget(creature, origin, network) != null;
-   }
+    @Override
+    public boolean hasReachableWeavingWork(
+            Actor creature,
+            Location origin,
+            WebNetwork network
+    ) {
+        if (origin.map() != network.getNestLocation().map()
+                || !network.hasCapacityFor(2)) {
+            return false;
+        }
+
+        List<Location> adjacent = new ArrayList<>(
+                origin.getNearbyLocations(1)
+        );
+
+        adjacent.sort(
+                Comparator.comparingInt(Location::y)
+                        .thenComparingInt(Location::x)
+        );
+
+        Location entrySite = null;
+
+        for (Location site : adjacent) {
+            if (network.canPlaceAt(site)) {
+                entrySite = site;
+                break;
+            }
+        }
+
+        if (entrySite == null) {
+            return false;
+        }
+
+        Routes routes = buildRoutes(creature, origin);
+
+        for (Location site : network.getNestLocation()
+                .getNearbyLocations(placementRadius)) {
+            if (site != entrySite
+                    && isEligible(site, origin, network)
+                    && closestApproach(site, routes) != null) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Checks for free slots for all entry webs plus one ordinary web.
