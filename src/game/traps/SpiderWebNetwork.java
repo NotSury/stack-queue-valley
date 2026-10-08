@@ -30,6 +30,7 @@ import java.util.Comparator;
  */
 public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
 
+    private static final int HIDDEN_WEB_CHANCE_PERCENT = 20;
     private static final int MAXIMUM_ACTIVE_WEBS = 6;
     private static final int WEB_LIFETIME_TURNS = Web.MAXIMUM_LIFETIME;
 
@@ -166,12 +167,12 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
 
     /**
      * Creates an owned web at a location and records it in this network.
-     * Each new web has a fifty-percent chance of starting hidden.
+     * Each new web has a twenty-percent chance of starting hidden.
      *
      * @param location the location to place the web on
      */
     private void addWeb(Location location) {
-        boolean hidden = visibilityRandom.nextBoolean();
+        boolean hidden = visibilityRandom.nextInt(100) < HIDDEN_WEB_CHANCE_PERCENT;
 
         Web web = new Web(
                 owner,
