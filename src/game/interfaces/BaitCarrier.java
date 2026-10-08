@@ -4,6 +4,9 @@ import edu.monash.fit2099.engine.positions.Location;
 
 /**
  * Provides operations for scattering and reclaiming portable bait.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.1
  */
 public interface BaitCarrier {
 
@@ -18,11 +21,11 @@ public interface BaitCarrier {
     int scatterBait(Location origin, int maximumItems);
 
     /**
-     * Transfers adjacent portable ground items into the inventory.
-     * Excludes the creature's current tile.
+     * Transfers portable ground items from the creature's current
+     * tile and adjacent tiles into its inventory.
      *
      * @param origin the creature's current location
      * @return the number of items transferred into the inventory
      */
-    int reclaimAdjacentItems(Location origin);
+    int reclaimNearbyItems(Location origin);
 }

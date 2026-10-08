@@ -85,21 +85,22 @@ public class CaveMimic extends StatefulCreature implements Hostile, Disguisable,
     }
 
     /**
-     * Reclaims portable ground items from adjacent tiles.
-     * Transfers all adjacent portable items, including previously
-     * scattered bait, into the Mimic's inventory. This immediate
-     * area effect does not require movement onto the item locations.
-     * Excludes the Mimic's current tile and leaves non-portable items
-     * on the ground.
+     * Reclaims portable ground items from the current and adjacent tiles.
+     * Transfers the existing item instances into the Mimic's inventory.
+     * Non-portable items remain on the ground.
      *
      * @param origin the Mimic's current location
      * @return the number of items transferred into the inventory
      */
     @Override
-    public int reclaimAdjacentItems(Location origin) {
+    public int reclaimNearbyItems(Location origin) {
+        List<Location> locations = new ArrayList<>();
+        locations.add(origin);
+        locations.addAll(origin.getNearbyLocations(ADJACENT_RADIUS));
+
         int reclaimedItems = 0;
 
-        for (Location location : origin.getNearbyLocations(ADJACENT_RADIUS)) {
+        for (Location location : locations) {
             for (Item item : getPortableItems(location.getItems())) {
                 location.removeItem(item);
                 getInventory().add(item);
