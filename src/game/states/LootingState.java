@@ -19,12 +19,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * A state in which a Cave Mimic reclaims adjacent items, pulls distant
- * loot towards itself and seeks items during its ordinary turns.
- * Records its inventory size after entry-time reclamation so reclaimed
- * items do not count towards the collection goal.
+ * A state in which a Cave Mimic reclaims current and adjacent items,
+ * pulls distant loot towards itself and seeks items during ordinary turns.
+ * Records its inventory size after entry-time reclamation so those
+ * acquisitions do not count towards the ordinary collection goal.
  * Progress tracking assumes ordinary pickups are the only operations
- * changing the Mimic's inventory while it remains in this state.
+ * changing the inventory while the Mimic remains in this state.
  */
 public class LootingState extends BehaviourDrivenState {
 
@@ -79,8 +79,9 @@ public class LootingState extends BehaviourDrivenState {
     }
 
     /**
-     * Reveals the creature, reclaims adjacent items, pulls distant loot
-     * and records the inventory baseline for this visit.
+     * Reveals the creature, reclaims current and adjacent portable items,
+     * pulls distant loot and records the inventory baseline afterwards.
+     * Entry-time reclamation does not count towards ordinary collection.
      *
      * @param location the creature's current location
      * @return a description of reclaimed and pulled items
@@ -88,12 +89,15 @@ public class LootingState extends BehaviourDrivenState {
     @Override
     public String onEnter(Location location) {
         disguisable.reveal();
-        int reclaimedItems = baitCarrier.reclaimAdjacentItems(location);
+        int reclaimedItems = baitCarrier.reclaimNearbyItems(location);
         String pullMessage = pullNearbyItems(location);
 
         initialInventorySize = getCreature().getInventory().getItems().size();
 
-        String message = getCreature() + " reveals itself and reclaims " + reclaimedItems + " adjacent items.";
+        String message = getCreature()
+                + " reveals itself and reclaims "
+                + reclaimedItems
+                + " portable item(s) from its current and adjacent tiles.";
 
         if (!pullMessage.isEmpty()) {
             message += System.lineSeparator() + pullMessage;

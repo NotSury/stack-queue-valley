@@ -3,8 +3,9 @@ package game.items;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actions.traps.WebTrapHandler;
+import game.traps.WebTrapHandler;
 import game.capabilities.WebAbility;
+import game.interfaces.WebTriggerRecorder;
 
 import java.util.List;
 
@@ -14,16 +15,29 @@ import java.util.List;
  * Catches one eligible actor and is consumed when triggered.
  * Unused webs expire after their configured lifetime.
  * Hidden webs display the item or ground beneath them.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @author Lee Le Si 34599223
+ * @version 1.1.0
  */
 public class Web extends Item {
 
     private static final char VISIBLE_DISPLAY_CHAR = ':';
+    /**
+     * The longest a web can last, in turns; reinforcement never goes above it.
+     */
+    public static final int MAXIMUM_LIFETIME = 8;
 
     private final Actor owner;
     private final Location location;
+    private final WebTriggerRecorder recorder;
 
     private int remainingTurns;
     private boolean hidden;
+    /**
+     * Map ticks left in a temporary reveal; 0 means no temporary reveal.
+     */
+    private int temporaryRevealTicks;
 
     /**
      * Creates a web for placement at a fixed location.
@@ -33,13 +47,14 @@ public class Web extends Item {
      * @param lifetimeTurns the number of map ticks before expiry
      * @param hidden whether the web starts hidden
      */
-    public Web(Actor owner, Location location, int lifetimeTurns, boolean hidden) {
+    public Web(Actor owner, Location location, int lifetimeTurns, boolean hidden, WebTriggerRecorder recorder) {
         super("Spider Web", VISIBLE_DISPLAY_CHAR);
 
         this.owner = owner;
         this.location = location;
-        this.remainingTurns = lifetimeTurns;
+        this.remainingTurns = Math.min(lifetimeTurns, MAXIMUM_LIFETIME);
         this.hidden = hidden;
+        this.recorder = recorder;
 
         enableAbility(WebAbility.WEB_TRAP);
     }
@@ -73,7 +88,7 @@ public class Web extends Item {
      * @return true if the web is hidden
      */
     public boolean isHidden() {
-        return hidden;
+        return hidden && remainingTurns == 0;
     }
 
     /**
@@ -81,6 +96,51 @@ public class Web extends Item {
      */
     public void reveal() {
         hidden = false;
+    }
+
+    /**
+     * Returns how many turns the web has left before it expires.
+     *
+     * @return the remaining lifespan in turns
+     */
+    public int getRemainingTurns() {
+        return remainingTurns;
+    }
+
+
+    /**
+     * Extends the web's lifespan, never above eight turns.
+     *
+     * @param turns the turns to add
+     * @return the turns actually gained (0 if inactive or already full)
+     */
+    public int reinforce(int turns){
+        if (!isActive() || turns <= 0){
+            return 0;
+        }
+        int before = remainingTurns;
+        remainingTurns = Math.min(MAXIMUM_LIFETIME, remainingTurns + turns);
+        return remainingTurns -  before;
+    }
+
+
+    /**
+     * Shows the web for a number of map ticks, then restores its
+     * original hidden or visible appearance.
+     *
+     * @param ticks the number of map ticks the web stays visible
+     */
+    public void revealTemporarily(int ticks){
+        temporaryRevealTicks = Math.min(temporaryRevealTicks, ticks);
+    }
+
+
+    /**
+     * Removes this web from the map without recording a trigger.
+     * Used when an entry web replaces an older web.
+     */
+    public void dismantle(){
+        removeFromMap();
     }
 
     /**
@@ -101,6 +161,7 @@ public class Web extends Item {
             return "";
         }
 
+        recorder.recordTrigger(location);
         removeFromMap();
 
         return target + " is caught in a web at ("
@@ -125,6 +186,9 @@ public class Web extends Item {
             return;
         }
 
+        if (temporaryRevealTicks > 0) {
+            temporaryRevealTicks--;
+        }
         remainingTurns--;
 
         if (remainingTurns <= 0) {
@@ -141,7 +205,7 @@ public class Web extends Item {
      */
     @Override
     public char getDisplayChar() {
-        if (!hidden) {
+        if (!isHidden()) {
             return VISIBLE_DISPLAY_CHAR;
         }
 
@@ -159,6 +223,9 @@ public class Web extends Item {
         return location.getGround().getDisplayChar();
     }
 
+    /**
+     * Removes the web from its location and marks it as expired.
+     */
     private void removeFromMap() {
         remainingTurns = 0;
         location.removeItem(this);
