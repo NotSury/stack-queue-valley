@@ -16,8 +16,7 @@ import game.behaviours.AttackBehaviour;
 import game.grounds.*;
 import game.items.Parsnip;
 import game.items.Tomato;
-import game.navigation.MapMovementPlanner;
-import game.navigation.MovementPlanner;
+import game.navigation.*;
 import game.perception.EnvironmentScanner;
 import game.perception.MapEnvironmentScanner;
 import game.items.AlienDevice;
@@ -167,6 +166,21 @@ public class StackQueueValleyWorld extends World {
 
         StatefulCreatureFactory creatureFactory =
                 new StatefulCreatureFactory(scanner, movementPlanner);
+
+        WebPlanner spiderWebPlanner = new MapWebPlanner(NestSpider.WEB_PLACEMENT_RADIUS);
+        JumpPlanner spiderJumpPlanner = new MapJumpPlanner();
+        Location spiderNest = minesMap.at(5, 3);
+
+        NestSpider spider = creatureFactory.createNestSpider(
+                80,
+                spiderNest,
+                spiderWebPlanner,
+                spiderJumpPlanner,
+                new AttackBehaviour()
+        );
+
+        minesMap.addActor(spider, spiderNest);
+        spider.initialiseState(minesMap);
 
         Behaviour<Actor, Action> ambushBehaviour = new AmbushBehaviour(scanner, movementPlanner, new AttackBehaviour(), CaveMimic.DETECTION_RADIUS);
 

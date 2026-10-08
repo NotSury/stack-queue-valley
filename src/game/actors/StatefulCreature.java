@@ -105,6 +105,8 @@ public abstract class StatefulCreature extends Actor {
         changeState(nextStateType, location);
         printEntryMessage(display);
 
+        display.println(this + " state: " + currentState.getType());
+
         return currentState.getAction(map.locationOf(this));
     }
 
