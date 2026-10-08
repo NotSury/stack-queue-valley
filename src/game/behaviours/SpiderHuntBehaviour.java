@@ -15,61 +15,38 @@ import game.perception.SpiderTargetTracker;
  * Delegates adjacent attacks to an injected combat behaviour.
  *
  * @author Surya Muni Peragas
- * @version 1.0.0
+ * @author Lee Le Si
+ * @version 1.1.0
  */
 public class SpiderHuntBehaviour implements Behaviour<Actor, Action> {
 
     private final SpiderTargetTracker targetTracker;
-    private final WebPlanner planner;
-    private final Behaviour<Actor, Action> attackBehaviour;
+    private final Behaviour<Actor, Action> pursuitBehaviour;
 
     /**
-     * Creates a hunting behaviour using shared target assessment.
+     * Creates a hunting behaviour.
      *
      * @param targetTracker the owning Spider's target assessment
-     * @param planner the planner used for safe walking routes
-     * @param attackBehaviour the behaviour used for adjacent attacks
+     * @param pursuitBehaviour the behaviour that chases and attacks,
+     *                         e.g. an AmbushBehaviour with safe walking
      */
-    public SpiderHuntBehaviour(SpiderTargetTracker targetTracker, WebPlanner planner, Behaviour<Actor, Action> attackBehaviour) {
+    public SpiderHuntBehaviour(SpiderTargetTracker targetTracker, Behaviour<Actor, Action> pursuitBehaviour) {
         this.targetTracker = targetTracker;
-        this.planner = planner;
-        this.attackBehaviour = attackBehaviour;
+        this.pursuitBehaviour = pursuitBehaviour;
     }
 
     /**
-     * Selects an adjacent attack or one safe step towards the active Farmer.
-     * Returns no action when no target or useful walking step is available.
+     * Chases the Farmer only while he is a valid target for the Spider.
      *
      * @param actor the Spider operating this behaviour
      * @param location the Spider's current location
-     * @return an attack or movement action, or null
+     * @return an attack or movement action, or null if there is no target
      */
     @Override
     public Action operate(Actor actor, Location location) {
-        Actor target = targetTracker.findActiveTarget(location);
-
-        if (target == null) {
-            return null;
-        }
-        Location targetLocation = location.map().locationOf(target);
-
-        if (GridDistance.between(location, targetLocation) == 1) {
-            return attackBehaviour.operate(actor, location);
-        }
-
-        Exit step = planner.findStepTowards(
-                actor,
-                location,
-                targetLocation
-        );
-
-        if (step == null) {
-            return null;
-        }
-
-        return new MoveActorAction(
-                step.getDestination(),
-                step.getName()
-        );
+    if (targetTracker.findActiveTarget(location) == null) {
+        return null;
+    }
+    return pursuitBehaviour.operate(actor, location);
     }
 }
