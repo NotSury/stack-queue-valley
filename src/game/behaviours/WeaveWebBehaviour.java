@@ -10,11 +10,16 @@ import game.actions.PlaceWebAction;
 import game.interfaces.WebNetwork;
 import game.navigation.GridDistance;
 import game.navigation.WebPlanner;
-
 /**
- * Retains a selected trap site, approaches it and places a web on a later turn.
- * Replans when a site becomes occupied, unsafe or otherwise unavailable.
- */
+* Replans when a site becomes occupied, unsafe or otherwise unavailable.
+* Uses only ordinary placement, so it stops when the six-web limit is
+* reached instead of replacing webs.
+*
+* @author Surya Muni Peragas 35651628
+* @author Lee Le Si 34599223
+* @version 1.1.0
+*/
+
 public class WeaveWebBehaviour implements Behaviour<Actor, Action> {
 
     private final WebPlanner planner;
@@ -42,6 +47,13 @@ public class WeaveWebBehaviour implements Behaviour<Actor, Action> {
      */
     @Override
     public Action operate(Actor actor, Location location) {
+
+        // ordinary placement never replaces webs: stop once the network is full
+        if (network.getRemainingCapacity() == 0) {
+            placementTarget = null;
+            return null;
+        }
+
         if (!planner.isPlacementTargetValid(
                 actor, location, placementTarget, network)) {
             placementTarget = planner.findPlacementTarget(
@@ -65,8 +77,26 @@ public class WeaveWebBehaviour implements Behaviour<Actor, Action> {
         );
 
         if (step == null) {
-            placementTarget = null;
-            return null;
+            // the route closed this turn: replan once straight away
+            placementTarget = planner.findPlacementTarget(actor, location, network);
+
+            if (placementTarget == null) {
+                return null;
+            }
+
+            if (GridDistance.between(location, placementTarget) == 1) {
+                Location destination = placementTarget;
+                placementTarget = null;
+
+                return new PlaceWebAction(destination, network);
+            }
+
+            step = planner.findStepToPlacement(actor, location, placementTarget);
+
+            if (step == null) {
+                placementTarget = null;
+                return null;
+            }
         }
 
         return new MoveActorAction(
