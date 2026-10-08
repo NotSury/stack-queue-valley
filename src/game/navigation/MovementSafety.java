@@ -8,6 +8,9 @@ import game.statuses.ChargedStatus;
 /**
  * Checks environmental hazards independently of occupancy
  * and terrain movement restrictions.
+ *
+ * @author Surya Muni Peragas
+ * @version 1.0.0
  */
 public class MovementSafety {
 
