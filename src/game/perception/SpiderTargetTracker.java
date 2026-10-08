@@ -19,7 +19,8 @@ import game.navigation.MovementPlanner;
  *
  * @author Khoo Lynn 34598901
  * @author Surya Muni Peragas 35651628
- * @version 1.1.0
+ * @author Lee Le Si 34599223
+ * @version 1.2.0
  */
 public interface SpiderTargetTracker extends SpiderAwareness {
 
@@ -59,4 +60,57 @@ public interface SpiderTargetTracker extends SpiderAwareness {
      * @return true when a reachable web-placement opportunity exists
      */
     boolean hasWebGap(Location origin);
+
+
+    /**
+     * Finds a conscious Farmer close to the nest, wherever the Spider is.
+     *
+     * @return the intruding Farmer, or null if the nest is undisturbed
+     */
+    Actor findNestIntruder();
+
+    /**
+     * Marks a Farmer as the Spider's current target, so he keeps being
+     * tracked inside the pursuit boundary.
+     *
+     * @param farmer the Farmer to pursue
+     */
+    void engage(Actor farmer);
+
+    /**
+     * Returns the engaged Farmer while he can still be pursued.
+     * The engagement is dropped once he leaves the pursuit boundary,
+     * becomes unreachable or is no longer conscious.
+     *
+     * @return the engaged Farmer, or null if there is none
+     */
+    Actor getEngagedTarget();
+
+    /**
+     * Checks whether Weaving makes sense from a location: a reachable
+     * web site exists and there is room for an entry web plus an
+     * ordinary web.
+     *
+     * @param origin the Spider's current location
+     * @return true if the Spider can start weaving
+     */
+    boolean canStartWeaving(Location origin);
+
+    /**
+     * Finds a conscious Farmer on or near a location.
+     *
+     * @param centre the location to search around
+     * @param radius how far from the centre to search
+     * @return the nearest Farmer found, or null if none
+     */
+    Actor findFarmerNear(Location centre, int radius);
+
+    /**
+     * Checks whether the latest web alert can still be approached by
+     * a useful jump or a safe walk.
+     *
+     * @param origin the Spider's current location
+     * @return true if there is an alert and it can be approached
+     */
+    boolean canInvestigateAlert(Location origin);
 }

@@ -7,6 +7,10 @@ import game.interfaces.WebNetwork;
 
 /**
  * Selects reachable web sites and safe walking steps without changing the map.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @author Lee Le Si 34599223
+ * @version 1.1.0
  */
 public interface WebPlanner {
 
@@ -51,4 +55,26 @@ public interface WebPlanner {
      * @return the first step, or null when already there or unreachable
      */
     Exit findStepTowards(Actor creature, Location origin, Location target);
+
+
+    /**
+     * Checks whether there is an eligible web site the Spider can safely
+     * reach right now.
+     *
+     * @param creature the Spider placing webs
+     * @param origin the Spider's current location
+     * @param network the Spider's web network
+     * @return true if reachable weaving work exists
+     */
+    boolean hasReachableWeavingWork(Actor creature, Location origin, WebNetwork network);
+
+    /**
+     * Checks whether the network has room for the entry webs placed when
+     * Weaving starts plus at least one ordinary web afterwards.
+     *
+     * @param network the Spider's web network
+     * @param entryWebs the number of entry webs Weaving places on entry
+     * @return true if there is capacity for entry and ordinary placement
+     */
+    boolean hasCapacityForWeaving(WebNetwork network, int entryWebs);
 }

@@ -1,7 +1,6 @@
 package game;
 
 import edu.monash.fit2099.engine.actions.Action;
-import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
@@ -20,7 +19,6 @@ import game.navigation.*;
 import game.perception.EnvironmentScanner;
 import game.perception.MapEnvironmentScanner;
 import game.items.AlienDevice;
-import game.items.Fire;
 import game.items.Geode;
 import game.items.Melon;
 import game.teleportation.TeleportDestination;
@@ -40,7 +38,8 @@ import java.util.List;
  * @author <Lee Le Si> <34599223>
  * @author <Chin Kai Xuan> <35730374>
  * @author <Khoo Lynn> <34598901>
- * @version 1.4.0
+ * @author <Vanessa Liau Jia Yee> <34599398>
+ * @version 1.5.0
  */
 public class StackQueueValleyWorld extends World {
 
@@ -102,9 +101,9 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.at(7, 3).setGround(new CauliflowerCrop());
         inheritedFarmMap.at(5, 1).setGround(new MelonCrop());
 
-        inheritedFarmMap.at(9,0).addActor(new Bat());
-        inheritedFarmMap.at(0,6).addActor(new Slime());
-        inheritedFarmMap.at(9,6).addActor(new CaveGhost());
+        minesMap.at(4,1).addActor(new Bat());
+        minesMap.at(2,4).addActor(new Slime());
+        minesMap.at(8,3).addActor(new CaveGhost());
         inheritedFarmMap.at(5,4).addItem(new Melon());
 
         minesMap.at(2,1).setGround(new Rock());

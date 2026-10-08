@@ -9,6 +9,7 @@ import game.behaviours.*;
 import game.interfaces.DecoyFactory;
 import game.interfaces.SpiderlingFactory;
 import game.interfaces.WebNetwork;
+import game.navigation.HazardAwareMovementPlanner;
 import game.navigation.JumpPlanner;
 import game.navigation.MovementPlanner;
 import game.navigation.WebPlanner;
@@ -21,13 +22,20 @@ import game.weapons.CreatureWeapon;
 
 import java.util.List;
 
+
 /**
  * Constructs creatures and assembles their states and behaviours.
  * The supplied scanner and movement planner are shared by the states and
  * behaviours created by this factory.
  * Combat behaviour is supplied by the caller so that creature assembly
  * does not depend on a particular combat implementation.
+ *
+ * @author Surya Muni Peragas
+ * @author Lee Le Si 34599223
+ * @version 1.1.0
  */
+
+
 public class StatefulCreatureFactory implements DecoyFactory, SpiderlingFactory {
 
     private final EnvironmentScanner scanner;
@@ -128,21 +136,23 @@ public class StatefulCreatureFactory implements DecoyFactory, SpiderlingFactory 
         Behaviour<Actor, Action> weavingBehaviour =
                 new WeaveWebBehaviour(webPlanner, network);
 
-        Behaviour<Actor, Action> huntingBehaviour =
-                new SpiderHuntBehaviour(
-                        targetTracker,
-                        webPlanner,
-                        attackBehaviour
-                );
+        Behaviour<Actor, Action> huntingBehaviour = new SpiderHuntBehaviour(
+                  targetTracker,
+                  new AmbushBehaviour(
+                          scanner,
+                          new HazardAwareMovementPlanner(movementPlanner,webPlanner),
+                          attackBehaviour,
+                          NestSpider.DETECTION_RADIUS
+                  )
+          );
 
-        Behaviour<Actor, Action> pounceBehaviour =
-                new PounceBehaviour(
-                        network,
-                        jumpPlanner,
-                        webPlanner
-                );
+       Behaviour<Actor, Action> pounceBehaviour = new PounceBehaviour(
+              network,
+              jumpPlanner,
+              webPlanner
+       );
 
-        spider.registerState(new NestingState(
+       spider.registerState(new NestingState(
                 spider,
                 scanner,
                 network,
