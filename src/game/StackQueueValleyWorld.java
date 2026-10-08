@@ -167,9 +167,14 @@ public class StackQueueValleyWorld extends World {
         StatefulCreatureFactory creatureFactory =
                 new StatefulCreatureFactory(scanner, movementPlanner);
 
-        WebPlanner spiderWebPlanner = new MapWebPlanner(NestSpider.WEB_PLACEMENT_RADIUS);
+        WebPlanner spiderWebPlanner = new MapWebPlanner(
+                NestSpider.WEB_PLACEMENT_RADIUS
+        );
+
         JumpPlanner spiderJumpPlanner = new MapJumpPlanner();
+
         Location spiderNest = minesMap.at(5, 3);
+        spiderNest.setGround(new SpiderNest());
 
         NestSpider spider = creatureFactory.createNestSpider(
                 80,
