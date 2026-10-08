@@ -31,7 +31,7 @@ public class WebBoundAction extends Action {
      */
     @Override
     public String execute(Actor actor, GameMap map) {
-        return actor + " is caught is a web and spends this turn breaking free.";
+        return actor + " is caught in a web and spends this turn breaking free.";
     }
 
     /**
