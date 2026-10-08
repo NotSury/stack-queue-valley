@@ -52,11 +52,11 @@ public interface WebNetwork extends WebAlertSource {
 
     int getRemainingCapacity();
 
-    boolean playEntryWeb(Location location);
+    boolean placeEntryWeb(Location location);
 
     int maintainGuardWebs();
 
-    int reinforcedNearby(Location origin, int radius, int turns);
+    int reinforceNearby(Location origin, int radius, int turns);
 
     int revealAndReinforceAll(int turns);
 }
