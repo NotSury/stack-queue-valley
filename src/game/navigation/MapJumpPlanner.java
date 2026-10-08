@@ -13,6 +13,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 
+/**
+ * Plans legal two-tile jumps and safe approaches on a single map.
+ *
+ * <p>A jump moves exactly two tiles in a straight or diagonal line and
+ * must land on an enterable, hazard-free tile. A landing is useful only
+ * if it reaches the target in fewer actions than walking. Arrival and
+ * approach checks let a creature tell when it has reached a location,
+ * or that the location cannot be reached for now.</p>
+ *
+ * @author Khoo Lynn 34598901
+ * @author Lee Le Si 34599223
+ * @version 1.1.0
+ */
+
 public class MapJumpPlanner implements JumpPlanner{
     private static final int JUMP_DISTANCE = 2;
     private static final int UNREACHABLE = Integer.MAX_VALUE;
@@ -96,6 +110,23 @@ public class MapJumpPlanner implements JumpPlanner{
         }
 
         return landing.canActorEnter(creature) && isSafe(landing);
+    }
+
+    @Override
+    public boolean hasArrived(Location origin, Location target){
+        return origin.map() == target.map() && GridDistance.between(origin, target) <=1;
+    }
+
+    @Override
+    public boolean canApproach(Actor creature, Location origin, Location target){
+        if (origin.map() != target.map()) {
+            return false;
+        }
+        if (hasArrived(origin, target)){
+            return true;
+        }
+        return findBestLanding(creature, origin, target) != null
+                || walkingDistanceToTarget(creature,origin, target, origin) != UNREACHABLE;
     }
 
     private int walkingDistanceToTarget(Actor creature, Location start, Location target, Location vacatedOrigin){
