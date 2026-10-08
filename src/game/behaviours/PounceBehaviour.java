@@ -27,8 +27,17 @@ import game.traps.WebAlert;
  */
 
 public class PounceBehaviour implements Behaviour<Actor, Action> {
+    /**
+     * Source of the latest web-trigger alert.
+     */
     private final WebAlertSource alerts;
+    /**
+     * Plans legal and useful two-tile jumps.
+     */
     private final JumpPlanner jumpPlanner;
+    /**
+     * Plans safe walking steps that avoid hazards.
+     */
     private final WebPlanner walkingPlanner;
 
     /**
@@ -44,6 +53,19 @@ public class PounceBehaviour implements Behaviour<Actor, Action> {
         this.walkingPlanner = walkingPlanner;
     }
 
+    /**
+     * Selects a jump or a safe step towards the latest alert location.
+     *
+     * <p>Order: (1) no alert or alert on another map: nothing;
+     * (2) already on or next to the alert: nothing, the state decides
+     * what happens next; (3) a useful jump exists: jump;
+     * (4) otherwise one safe walking step towards a tile next to the
+     * alert, if any.</p>
+     *
+     * @param actor the creature operating this behaviour
+     * @param location the creature's current location
+     * @return a jump or movement action, or null
+     */
     @Override
     public Action operate(Actor actor, Location location){
         WebAlert alert = alerts.getLatestAlert();

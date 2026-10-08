@@ -22,6 +22,9 @@ import game.traps.WebAlert;
 public class MapSpiderAwareness implements SpiderTargetTracker {
 
     private static final int NEST_THREAT_RADIUS = 3;
+    /**
+     * How far from an alert location a Farmer is still noticed.
+     */
     private static final int ALERT_SEARCH_RADIUS = 2;
 
     private final Actor creature;
@@ -32,6 +35,11 @@ public class MapSpiderAwareness implements SpiderTargetTracker {
 
     private final int detectionRadius;
     private final int leashRadius;
+    /**
+     * The Farmer currently being pursued, or null.
+     * Kept so the Spider keeps tracking him inside the pursuit boundary
+     * even after he moves beyond the normal detection radius.
+     */
     private Actor engagedFarmer;
 
     /**

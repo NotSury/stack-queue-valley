@@ -112,11 +112,27 @@ public class MapJumpPlanner implements JumpPlanner{
         return landing.canActorEnter(creature) && isSafe(landing);
     }
 
+    /**
+     * Checks whether the creature is on or next to a location on the same map.
+     *
+     * @param origin the creature's current location
+     * @param target the location being approached
+     * @return true if the creature has arrived
+     */
     @Override
     public boolean hasArrived(Location origin, Location target){
         return origin.map() == target.map() && GridDistance.between(origin, target) <=1;
     }
 
+    /**
+     * Checks whether a location can be approached by a useful jump or by
+     * a safe walking route to a tile next to it.
+     *
+     * @param creature the creature approaching
+     * @param origin the creature's current location
+     * @param target the location to approach
+     * @return true if the target can be approached
+     */
     @Override
     public boolean canApproach(Actor creature, Location origin, Location target){
         if (origin.map() != target.map()) {

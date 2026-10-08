@@ -20,7 +20,13 @@ import game.perception.SpiderTargetTracker;
  */
 public class SpiderHuntBehaviour implements Behaviour<Actor, Action> {
 
+    /**
+     * Decides whether the Spider currently has a valid target.
+     */
     private final SpiderTargetTracker targetTracker;
+    /**
+     * Performs the actual chase and attack.
+     */
     private final Behaviour<Actor, Action> pursuitBehaviour;
 
     /**

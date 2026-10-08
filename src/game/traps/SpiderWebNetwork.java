@@ -21,13 +21,31 @@ import java.util.Comparator;
  * activates nearby owned webs.
  * Randomness controls only the initial visibility of a web.
  * Placement eligibility and active counts ignore visibility.
+ * Records the latest web trigger as an alert with an increasing
+ * event id; the alert outlives the web that raised it.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @author Lee Le Si 34599223
+ * @version 1.1.0
  */
 public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
 
     private static final int MAXIMUM_ACTIVE_WEBS = 6;
     private static final int WEB_LIFETIME_TURNS = Web.MAXIMUM_LIFETIME;
+    /**
+     * Number of guard webs kept next to the nest.
+     */
     private static final int GUARD_WEBS = 2;
+
+    /**
+     * Distance from the nest at which guard webs sit.
+     */
     private static final int GUARD_RADIUS = 1;
+
+    /**
+     * Map ticks a temporary reveal lasts: covers the Farmer's next turn
+     * whether the spider acts before or after him in a round.
+     */
     private static final int TEMPORARY_REVEAL_TICKS = 2;
 
     private final Actor owner;
@@ -35,7 +53,14 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
     private final List<Web> webs = new ArrayList<>();
     private final Random visibilityRandom = new Random();
 
+    /**
+     * Most recent trigger that has not been cleared, or null.
+     */
     private WebAlert latestAlert;
+
+    /**
+     * Identifier given to the next trigger event; only ever increases.
+     */
     private long nextEventId = 1;
 
     /**
@@ -91,8 +116,15 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
         return countActiveWebs() < MAXIMUM_ACTIVE_WEBS && isValidSite(location);
     }
 
-
-    public boolean isValidSite(Location location) {
+    /**
+     * Checks every placement rule except the active web limit.
+     * Requires safe, unoccupied, plantable ground on the nest's map,
+     * not the nest tile itself, and no existing web on the tile.
+     *
+     * @param location the proposed placement location
+     * @return true if the site itself is valid
+     */
+    private boolean isValidSite(Location location) {
         if (location.map() != nestLocation.map()
                 || location == nestLocation
                 || !owner.isConscious()
@@ -136,6 +168,12 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
 
     }
 
+    /**
+     * Creates an owned web at a location and records it in this network.
+     * Each new web has a fifty-percent chance of starting hidden.
+     *
+     * @param location the location to place the web on
+     */
     private void addWeb(Location location) {
         boolean hidden = visibilityRandom.nextBoolean();
 
@@ -214,11 +252,24 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
         return message;
     }
 
+    /**
+     * Returns how many more webs can be placed before the limit.
+     *
+     * @return the number of free web slots, never below zero
+     */
     @Override
     public int getRemainingCapacity(){
         return Math.max(0, MAXIMUM_ACTIVE_WEBS - countActiveWebs());
     }
 
+    /**
+     * Places an entry web, replacing the shortest-lived web at the limit.
+     * The site is validated first, so nothing is removed for an invalid
+     * site. Guard webs are never replaced.
+     *
+     * @param location the proposed placement location
+     * @return true if a web was placed
+     */
     @Override
     public boolean placeEntryWeb(Location location){
         removeInactiveRecords();
@@ -239,6 +290,13 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
         return true;
     }
 
+    /**
+     * Keeps two guard webs on the tiles directly next to the nest.
+     * Tiles are tried in a fixed order (top row first, then left to
+     * right), so the result is deterministic.
+     *
+     * @return the number of guard webs placed
+     */
     @Override
     public int maintainGuardWebs(){
         removeInactiveRecords();
@@ -261,6 +319,14 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
         return placed;
     }
 
+    /**
+     * Extends the lifespan of owned webs near a location, up to eight turns.
+     *
+     * @param origin the centre of the reinforcement area
+     * @param radius how far from the origin webs are reinforced
+     * @param turns the turns added to each web
+     * @return the number of webs whose lifespan increased
+     */
     @Override
     public int reinforceNearby(Location origin, int radius, int turns){
         if (origin.map() != nestLocation.map()) {
@@ -277,6 +343,14 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
         return reinforced;
     }
 
+
+    /**
+     * Reveals every owned web through the Farmer's next turn and extends
+     * each lifespan, up to eight turns.
+     *
+     * @param turns the turns added to each web
+     * @return the number of webs revealed
+     */
     @Override
     public int revealAndReinforceAll(int turns) {
         removeInactiveRecords();
@@ -288,10 +362,21 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
         return webs.size();
     }
 
+    /**
+     * Checks whether a web is a guard web, i.e. directly next to the nest.
+     *
+     * @param web the web to check
+     * @return true if the web is next to the nest
+     */
     private boolean isGuardWeb(Web web){
         return GridDistance.between(web.getLocation(), nestLocation) == GUARD_RADIUS;
     }
 
+    /**
+     * Counts active guard webs.
+     *
+     * @return the number of active webs next to the nest
+     */
     private int countGuardWebs(){
         int count = 0;
         for (Web web : webs) {
@@ -302,6 +387,12 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
         return count;
     }
 
+    /**
+     * Finds the active non-guard web with the fewest turns left.
+     * Ties go to the web placed first.
+     *
+     * @return the web to replace, or null if every active web is a guard
+     */
     private Web findShortestLivedReplaceable(){
         Web shortest = null;
         for (Web web : webs) {
@@ -315,17 +406,35 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
         return shortest;
     }
 
+    /**
+     * Stores a new alert for a web that has just caught an actor.
+     * Each call gets a larger event id than the one before.
+     *
+     * @param location the location of the triggered web
+     */
     @Override
     public void recordTrigger(Location location) {
         latestAlert = new WebAlert(nextEventId, location);
         nextEventId++;
     }
 
+    /**
+     * Returns the most recent alert that has not been cleared.
+     *
+     * @return the latest alert, or null if there is none
+     */
     @Override
     public WebAlert getLatestAlert() {
         return latestAlert;
     }
 
+    /**
+     * Clears the latest alert only if it is still the given event, so a
+     * state finishing an old alert cannot erase a newer one.
+     *
+     * @param eventId the identifier of the investigated alert
+     * @return true if the alert was cleared
+     */
     @Override
     public boolean clearAlert(long eventId) {
         if  (latestAlert == null || latestAlert.getEventId() != eventId) {
@@ -335,6 +444,9 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
         return true;
     }
 
+    /**
+     * Forgets webs that are no longer active.
+     */
     private void removeInactiveRecords() {
         webs.removeIf(web -> !web.isActive());
     }

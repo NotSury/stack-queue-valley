@@ -16,13 +16,16 @@ import java.util.List;
  * Unused webs expire after their configured lifetime.
  * Hidden webs display the item or ground beneath them.
  *
- * @author Surya Muni Peragas
+ * @author Surya Muni Peragas 35651628
  * @author Lee Le Si 34599223
- * version 1.1.0
+ * @version 1.1.0
  */
 public class Web extends Item {
 
     private static final char VISIBLE_DISPLAY_CHAR = ':';
+    /**
+     * The longest a web can last, in turns; reinforcement never goes above it.
+     */
     public static final int MAXIMUM_LIFETIME = 8;
 
     private final Actor owner;
@@ -31,6 +34,9 @@ public class Web extends Item {
 
     private int remainingTurns;
     private boolean hidden;
+    /**
+     * Map ticks left in a temporary reveal; 0 means no temporary reveal.
+     */
     private int temporaryRevealTicks;
 
     /**
@@ -92,10 +98,22 @@ public class Web extends Item {
         hidden = false;
     }
 
+    /**
+     * Returns how many turns the web has left before it expires.
+     *
+     * @return the remaining lifespan in turns
+     */
     public int getRemainingTurns() {
         return remainingTurns;
     }
 
+
+    /**
+     * Extends the web's lifespan, never above eight turns.
+     *
+     * @param turns the turns to add
+     * @return the turns actually gained (0 if inactive or already full)
+     */
     public int reinforce(int turns){
         if (!isActive() || turns <= 0){
             return 0;
@@ -105,10 +123,22 @@ public class Web extends Item {
         return remainingTurns -  before;
     }
 
+
+    /**
+     * Shows the web for a number of map ticks, then restores its
+     * original hidden or visible appearance.
+     *
+     * @param ticks the number of map ticks the web stays visible
+     */
     public void revealTemporarily(int ticks){
         temporaryRevealTicks = Math.min(temporaryRevealTicks, ticks);
     }
 
+
+    /**
+     * Removes this web from the map without recording a trigger.
+     * Used when an entry web replaces an older web.
+     */
     public void dismantle(){
         removeFromMap();
     }
@@ -193,6 +223,9 @@ public class Web extends Item {
         return location.getGround().getDisplayChar();
     }
 
+    /**
+     * Removes the web from its location and marks it as expired.
+     */
     private void removeFromMap() {
         remainingTurns = 0;
         location.removeItem(this);

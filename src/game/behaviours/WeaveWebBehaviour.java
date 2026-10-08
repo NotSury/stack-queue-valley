@@ -21,10 +21,18 @@ import game.navigation.WebPlanner;
 */
 
 public class WeaveWebBehaviour implements Behaviour<Actor, Action> {
-
+    /**
+     * Selects web sites and safe walking steps.
+     */
     private final WebPlanner planner;
+    /**
+     * The owning Spider's web network.
+     */
     private final WebNetwork network;
-
+    /**
+     * The web site currently being approached, or null.
+     * Kept between turns so the Spider finishes one site before choosing another.
+     */
     private Location placementTarget;
 
     /**

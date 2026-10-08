@@ -4,6 +4,13 @@ import edu.monash.fit2099.engine.positions.Location;
 
 /**
  * Manages the webs belonging to one creature.
+ *
+ * <p>Also exposes the latest web-trigger alert through
+ * {@link WebAlertSource}.</p>
+ *
+ * @author Surya Muni Peragas 35651628
+ * @author Lee Le Si 34599223
+ * @version 1.1.0
  */
 public interface WebNetwork extends WebAlertSource {
 
