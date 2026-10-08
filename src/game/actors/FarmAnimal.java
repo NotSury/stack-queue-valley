@@ -105,6 +105,11 @@ public abstract class FarmAnimal extends Actor implements Feedable {
             GameMap map,
             Display display) {
 
+        if (!isConscious()){
+            display.println(unconscious(map));
+            return new DoNothingAction();
+        }
+
         Action action = behaviour.operate(this, map.locationOf(this));
 
         if (action != null) {
