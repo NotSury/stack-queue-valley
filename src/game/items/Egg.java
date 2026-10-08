@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author Lee Le Si <34599223>
  * @author Vanessa Liau Jia Yee <34599398>
- * @version 1.1.0
+ * @version 1.2.0
  */
 public class Egg extends Item implements Sellable
 {
@@ -54,6 +54,12 @@ public class Egg extends Item implements Sellable
     /**
      * Sells the Egg to the Merchant.
      *
+     * <p>The Egg is removed from the seller and the seller gains 40 coins.
+     * Then, with a 50% chance, a Chicken appears on a random tile next to the
+     * Merchant. Only tiles the Chicken is allowed to enter are used (no actor
+     * on it, and not a blocking ground such as a Rock or a Wall). If there is
+     * no such tile, no Chicken appears.</p>
+     *
      * @param seller the actor selling the Egg
      * @param merchant the Merchant buying the Egg
      * @param map the current game map
@@ -66,7 +72,8 @@ public class Egg extends Item implements Sellable
         seller.modifyStatistic(FarmerStatistic.COINS,
                 StatisticOperations.INCREASE, SELL_PRICE);
 
-        if (Math.random() > CHICKEN_CHANCE) {
+        if (Math.random() < CHICKEN_CHANCE) {
+            Chicken chicken = new Chicken();
             Location merchantLocation = map.locationOf(merchant);
 
             List<Location> availableLocations = new ArrayList<>();
@@ -74,7 +81,7 @@ public class Egg extends Item implements Sellable
             for (Exit exit : merchantLocation.getExits()) {
                 Location location = exit.getDestination();
 
-                if (!location.containsAnActor()) {
+                if (location.canActorEnter(chicken)) {
                     availableLocations.add(location);
                 }
             }
@@ -88,7 +95,7 @@ public class Egg extends Item implements Sellable
                 Location chickenLocation = availableLocations.get(randomIndex);
 
                 try {
-                    chickenLocation.addActor(new Chicken());
+                    chickenLocation.addActor(chicken);
 
                     return seller + " sold Egg for " + SELL_PRICE +
                             " coins and a Chicken appeared.";
