@@ -196,11 +196,9 @@ public class StackQueueValleyWorld extends World {
         CaveMimic mimic = creatureFactory.createCaveMimic(
                 100,
                 startingBait,
-                '?',
+                new Geode().getDisplayChar(),
                 ambushBehaviour
         );
-
-        mimic.hurt(70);
 
         inheritedFarmMap.addActor(mimic, inheritedFarmMap.at(1, 4));
         mimic.initialiseState(inheritedFarmMap);
