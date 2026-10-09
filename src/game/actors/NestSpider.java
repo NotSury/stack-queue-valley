@@ -12,16 +12,10 @@ import game.states.CreatureStateType;
  * Investigates web alerts through Pouncing and walks during Hunting.
  * The factory assembles its states, behaviours and collaborators.
  *
- * @author Surya Muni Peragas
+ * @author Surya Muni Peragas 35651628
  * @version 1.1.0
  */
 public class NestSpider extends StatefulCreature implements Hostile {
-
-    /**
-     * General detection range supplied to Spider assessment.
-     * Nest intrusion and alert investigation use their own centres.
-     */
-    public static final int DETECTION_RADIUS = 4;
 
     /**
      * Maximum ordinary web-placement distance from the nest.
@@ -36,17 +30,7 @@ public class NestSpider extends StatefulCreature implements Hostile {
     /**
      * Distance from the nest that counts as direct intrusion.
      */
-    public static final int NEST_THREAT_RADIUS = 3;
-
-    /**
-     * Maximum number of active webs owned by this Spider.
-     */
-    public static final int MAXIMUM_ACTIVE_WEBS = 6;
-
-    /**
-     * Starting and maximum reinforced lifetime of a web.
-     */
-    public static final int WEB_LIFETIME_TURNS = 8;
+    public static final int NEST_THREAT_RADIUS = 1;
 
     /**
      * Health percentage at or below which recovery is needed.

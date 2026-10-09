@@ -13,6 +13,9 @@ import java.util.List;
  * Applies and consumes one-turn web bindings.
  * Immune actors cannot be bound, and additional webs cannot
  * stack more pending lost turns onto an already bound actor.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public final class WebTrapHandler {
 

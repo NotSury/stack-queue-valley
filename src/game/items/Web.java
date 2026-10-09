@@ -83,12 +83,13 @@ public class Web extends Item {
     }
 
     /**
-     * Checks whether the web is hidden.
+     * Checks whether the web currently uses its hidden appearance.
+     * Temporary reveals preserve the web's original visibility.
      *
-     * @return true if the web is hidden
+     * @return true when the web is originally hidden and not temporarily revealed
      */
     public boolean isHidden() {
-        return hidden && remainingTurns == 0;
+        return hidden && temporaryRevealTicks == 0;
     }
 
     /**
@@ -125,13 +126,13 @@ public class Web extends Item {
 
 
     /**
-     * Shows the web for a number of map ticks, then restores its
-     * original hidden or visible appearance.
+     * Reveals the web for at least the requested number of map ticks.
+     * A shorter reveal never cancels an existing longer reveal.
      *
-     * @param ticks the number of map ticks the web stays visible
+     * @param ticks the requested number of visible map ticks
      */
     public void revealTemporarily(int ticks){
-        temporaryRevealTicks = Math.min(temporaryRevealTicks, ticks);
+        temporaryRevealTicks = Math.max(temporaryRevealTicks, ticks);
     }
 
 

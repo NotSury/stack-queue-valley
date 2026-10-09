@@ -4,16 +4,18 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.interfaces.WebNetwork;
+import game.interfaces.WebPlacement;
 import game.navigation.GridDistance;
 
 /**
  * Places one web on an adjacent eligible tile without moving the Spider.
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class PlaceWebAction extends Action {
 
     private final Location destination;
-    private final WebNetwork network;
+    private final WebPlacement network;
 
     /**
      * Creates an action for the owning Spider's web network.
@@ -21,7 +23,7 @@ public class PlaceWebAction extends Action {
      * @param destination the intended adjacent web site
      * @param network the acting Spider's web network
      */
-    public PlaceWebAction(Location destination, WebNetwork network) {
+    public PlaceWebAction(Location destination, WebPlacement network) {
         this.destination = destination;
         this.network = network;
     }

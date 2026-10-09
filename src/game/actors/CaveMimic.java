@@ -19,6 +19,9 @@ import java.util.List;
  * A stateful creature that disguises itself and uses portable items as bait.
  * Provides inventory operations used by its state-entry effects.
  * State implementations control when these operations are performed.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class CaveMimic extends StatefulCreature implements Hostile, Disguisable, BaitCarrier {
 
@@ -47,6 +50,29 @@ public class CaveMimic extends StatefulCreature implements Hostile, Disguisable,
         for (Item item : startingBait) {
             getInventory().add(item);
         }
+    }
+
+    /**
+     * Checks that the Disguised entry effect can scatter an item.
+     * Requires a portable inventory item and an unoccupied adjacent tile
+     * that this Mimic can enter.
+     *
+     * @param origin the Mimic's current location
+     * @return true when scattering at least one item is possible
+     */
+    @Override
+    public boolean canScatterBait(Location origin) {
+        if (getPortableItems(getInventory().getItems()).isEmpty()) {
+            return false;
+        }
+
+        for (Location destination : origin.getNearbyLocations(ADJACENT_RADIUS)) {
+            if (destination.canActorEnter(this)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

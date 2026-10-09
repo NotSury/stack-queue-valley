@@ -24,7 +24,8 @@ import java.util.Queue;
  *
  * @author Khoo Lynn 34598901
  * @author Lee Le Si 34599223
- * @version 1.1.0
+ * @author Surya Muni Peragas 35651628
+ * @version 1.1.1
  */
 
 public class MapJumpPlanner implements JumpPlanner{
@@ -203,17 +204,7 @@ public class MapJumpPlanner implements JumpPlanner{
     }
 
     private boolean isSafe(Location location){
-        if (location.getGround().hasStatus(ChargedStatus.class) || location.getGround().asCapability(MovementHazard.class).isPresent()){
-            return false;
-        }
-
-        for (Item item: location.getItems()){
-            if (item.asCapability(MovementHazard.class).isPresent()){
-                return false;
-            }
-        }
-
-        return true;
+        return MovementSafety.isSafe(location);
     }
 
     private boolean isLocalStep(Location origin, Location destination){

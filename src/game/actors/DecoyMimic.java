@@ -15,6 +15,9 @@ import game.interfaces.Hostile;
  * Copies the original Mimic's visible appearance at creation.
  * Its ordinary behaviour is supplied by the creature factory, and
  * it expires after the configured number of executed turns.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class DecoyMimic extends Actor implements Hostile {
 

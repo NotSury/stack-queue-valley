@@ -68,7 +68,9 @@ public class HuntingState extends BehaviourDrivenState {
     @Override
     public CreatureStateType determineNextState(Location location) {
         if (network.getAlertLocation() != null) {
-            return CreatureStateType.POUNCING;
+            return network.canPlaceEntryWebs(location)
+                    ? CreatureStateType.POUNCING
+                    : CreatureStateType.HUNTING;
         }
 
         if (targetTracker.getEngagedTarget() != null) {

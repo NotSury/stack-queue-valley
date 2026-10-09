@@ -144,7 +144,7 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.at(2,6).addItem(alienDevice);
 
         Farmer farmer = new Farmer("Bob");
-        this.addPlayer(farmer, minesMap.at(0, 3));
+        this.addPlayer(farmer, inheritedFarmMap.at(0, 3));
 
         Cow cow = new Cow();
         Chicken chicken = new Chicken();
@@ -179,8 +179,7 @@ public class StackQueueValleyWorld extends World {
                 80,
                 spiderNest,
                 spiderWebPlanner,
-                spiderJumpPlanner,
-                new AttackBehaviour()
+                spiderJumpPlanner
         );
 
         minesMap.addActor(spider, spiderNest);
@@ -197,17 +196,12 @@ public class StackQueueValleyWorld extends World {
         CaveMimic mimic = creatureFactory.createCaveMimic(
                 100,
                 startingBait,
-                '?',
+                new Geode().getDisplayChar(),
                 ambushBehaviour
         );
 
-        mimic.hurt(70);
-
-        inheritedFarmMap.addActor(mimic, inheritedFarmMap.at(1, 4));
+        inheritedFarmMap.addActor(mimic, minesMap.at(1, 4));
         mimic.initialiseState(inheritedFarmMap);
-
-        inheritedFarmMap.at(3, 4).addItem(new Parsnip());
-        inheritedFarmMap.at(3, 5).addItem(new Tomato());
 
     }
 }

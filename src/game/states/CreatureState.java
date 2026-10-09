@@ -5,6 +5,9 @@ import edu.monash.fit2099.engine.positions.Location;
 
 /**
  * Each concrete state receives its owning creature through its constructor.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public interface CreatureState{
 

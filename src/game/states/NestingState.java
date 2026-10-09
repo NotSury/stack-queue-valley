@@ -15,7 +15,6 @@ import game.interfaces.WebNetwork;
 import game.navigation.MovementSafety;
 import game.navigation.WebPlanner;
 import game.perception.EnvironmentScanner;
-import game.perception.SpiderAwareness;
 import game.perception.SpiderTargetTracker;
 
 import java.util.ArrayList;
@@ -108,7 +107,10 @@ public class NestingState extends EnvironmentAwareState {
     public CreatureStateType determineNextState(Location location) {
         if (network.getAlertLocation() != null) {
             quietTurns = 0;
-            return CreatureStateType.POUNCING;
+
+            return network.canPlaceEntryWebs(location)
+                    ? CreatureStateType.POUNCING
+                    : CreatureStateType.NESTING;
         }
 
         Actor intruder = targetTracker.findNestIntruder();

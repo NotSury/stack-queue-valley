@@ -9,7 +9,7 @@ import game.actors.Spiderling;
  * Executes a Spiderling's ordinary action and advances its lifetime.
  * Removes the Spiderling after its eighth completed turn.
  *
- * @author Surya Muni Peragas
+ * @author Surya Muni Peragas 35651628
  * @version 1.0.0
  */
 public class SpiderlingTurnAction extends Action {

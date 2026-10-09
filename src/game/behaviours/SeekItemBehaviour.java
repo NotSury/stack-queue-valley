@@ -15,6 +15,9 @@ import game.perception.EnvironmentScanner;
  * Delegates item detection to an environmental scanner and navigation
  * to a movement planner. Uses engine actions to perform movement
  * and pickup.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class SeekItemBehaviour extends EnvironmentAwareBehaviour {
 

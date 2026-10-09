@@ -5,6 +5,9 @@ import edu.monash.fit2099.engine.positions.Exit;
 /**
  * Holds separate movement steps for a Cave Mimic and its decoy.
  * The exits are selected before the Mimic enters Escape.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public final class EscapePlan {
 

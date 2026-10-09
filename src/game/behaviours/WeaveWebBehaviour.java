@@ -7,7 +7,7 @@ import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.PlaceWebAction;
-import game.interfaces.WebNetwork;
+import game.interfaces.WebPlacement;
 import game.navigation.GridDistance;
 import game.navigation.WebPlanner;
 /**
@@ -28,7 +28,7 @@ public class WeaveWebBehaviour implements Behaviour<Actor, Action> {
     /**
      * The owning Spider's web network.
      */
-    private final WebNetwork network;
+    private final WebPlacement network;
     /**
      * The web site currently being approached, or null.
      * Kept between turns so the Spider finishes one site before choosing another.
@@ -41,7 +41,7 @@ public class WeaveWebBehaviour implements Behaviour<Actor, Action> {
      * @param planner the planner used to select sites and safe walking steps
      * @param network the owning Spider's web network
      */
-    public WeaveWebBehaviour(WebPlanner planner, WebNetwork network) {
+    public WeaveWebBehaviour(WebPlanner planner, WebPlacement network) {
         this.planner = planner;
         this.network = network;
     }

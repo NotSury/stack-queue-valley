@@ -12,143 +12,87 @@ import edu.monash.fit2099.engine.actors.Actor;
  * @author Lee Le Si 34599223
  * @version 1.1.0
  */
-public interface WebNetwork extends WebAlertSource {
+public interface WebNetwork extends WebPlacement, WebAlertSource {
 
     /**
-     * Returns the creature's fixed nest location.
+     * Counts active owned webs.
      *
-     * @return the nest location
-     */
-    Location getNestLocation();
-
-    /**
-     * Counts the creature's active webs.
-     *
-     * @return the number of active webs
+     * @return the number of active owned webs
      */
     int countActiveWebs();
 
     /**
-     * Checks whether a web can be placed at a location.
-     * Includes terrain, occupancy, hazards, existing webs
-     * and the active web limit.
+     * Places an entry web at an eligible site.
+     * At capacity, replaces the shortest-lived eligible owned web.
+     * Guard webs are protected from replacement.
      *
      * @param location the proposed placement location
-     * @return true if placement is allowed
-     */
-    boolean canPlaceAt(Location location);
-
-    /**
-     * Places an owned web if the location is eligible.
-     *
-     * @param location the proposed placement location
-     * @return true if a web was placed
-     */
-    boolean placeAt(Location location);
-
-    /**
-     * Reveals nearby owned webs and triggers eligible occupied webs.
-     *
-     * Repeated trapping must not stack pending lost turns.
-     *
-     * @param origin the centre of the activation area
-     * @param radius the activation radius
-     * @return a description of the effects, or an empty string
-     */
-    String activeNearbyWebs(Location origin, int radius);
-
-    /**
-     * Returns how many more webs can be placed before the active web
-     * limit is reached.
-     *
-     * @return the number of free web slots, never below zero
-     */
-    int getRemainingCapacity();
-
-    /**
-     * Places an entry web, replacing an old web if the limit is reached.
-     *
-     * <p>The site is checked first; if it is not valid, nothing is
-     * replaced. At the limit, the owned web with the fewest turns left
-     * is removed to make room. Guard webs next to the nest are never
-     * replaced. Ground and other items on the tile are unchanged.</p>
-     *
-     * @param location the proposed placement location
-     * @return true if a web was placed
+     * @return true when a web was placed
      */
     boolean placeEntryWeb(Location location);
 
     /**
-     * Keeps the given number of guard webs on the tiles directly next
-     * to the nest.
+     * Checks whether at least one adjacent entry web can be placed.
+     * Includes replacement eligibility without changing any webs.
      *
-     * <p>Missing guard webs are placed as entry webs, checking the
-     * adjacent tiles in a fixed order, so the result is deterministic.</p>
+     * @param origin the centre of the proposed entry effect
+     * @return true when an adjacent entry placement can succeed
+     */
+    boolean canPlaceEntryWebs(Location origin);
+
+    /**
+     * Reinforces existing guards and places missing guards where possible.
+     * Existing guards are preserved even when their count exceeds the target.
      *
-     * @param guardWebs how many guard webs the nest should have
-     * @return the number of guard webs placed
+     * @param guardWebs the desired minimum number of guard webs
+     * @return the number of guards reinforced or placed
      */
     int maintainGuardWebs(int guardWebs);
 
     /**
-     * Extends the lifespan of owned webs near a location, never above
-     * the maximum lifespan of eight turns.
+     * Reinforces nearby owned webs up to their maximum lifetime.
      *
      * @param origin the centre of the reinforcement area
-     * @param radius how far from the origin webs are reinforced
-     * @param turns the turns added to each web
-     * @return the number of webs whose lifespan increased
+     * @param radius the maximum reinforcement distance
+     * @param turns the additional lifetime ticks
+     * @return the number of webs whose lifetime increased
      */
     int reinforceNearby(Location origin, int radius, int turns);
 
     /**
-     * Reveals every owned web until after the Farmer's next turn and
-     * extends each web's lifespan, never above eight turns.
+     * Temporarily reveals and reinforces owned webs.
+     * When no webs remain, attempts defensive placement, followed
+     * by the existing non-stacking binding fallback if placement fails.
      *
-     * <p>When the reveal ends, each web returns to its original hidden
-     * or visible appearance.</p>
-     *
-     * @param target the Farmer the webs are revealed to
-     * @param turns the turns added to each web
-     * @return a description of the reveal
+     * @param target the engaged Farmer
+     * @param turns the additional lifetime ticks
+     * @return a description of the effects
      */
     String revealAndReinforceAll(Actor target, int turns);
 
     /**
-     * Places up to a number of entry webs on tiles next to a location,
-     * replacing the shortest-lived web whenever the limit is reached.
+     * Places adjacent entry webs in deterministic order.
+     * A focus prefers sites behind the direction towards that location.
+     * Without a focus, sites use row then column ordering.
      *
-     * <p>When a focus location is given, tiles closest to it are tried
-     * first (e.g. webs on the way towards an alert); otherwise tiles are
-     * tried top row first, then left to right.</p>
-     *
-     * @param origin the location the webs are placed around
-     * @param count the maximum number of entry webs to place
-     * @param focus the location to place webs towards, or null
-     * @return the number of entry webs placed
+     * @param origin the placement centre
+     * @param count the maximum number of webs to place
+     * @param focus the alert destination, or null
+     * @return the number of webs placed
      */
     int placeEntryWebs(Location origin, int count, Location focus);
 
     /**
-     * Checks whether a number of ordinary webs can still be placed.
+     * Returns the latest uncleared alert location.
      *
-     * @param webs the number of webs needed
-     * @return true if there are at least that many free slots
-     */
-    boolean hasCapacityFor(int webs);
-
-    /**
-     * Returns where the latest uncleared alert was raised.
-     *
-     * @return the alert location, or null if there is no alert
+     * @return the alert location, or null
      */
     Location getAlertLocation();
 
     /**
-     * Returns the event id of the latest uncleared alert.
-     * A changed value means a newer web was triggered.
+     * Returns the latest uncleared alert version.
      *
-     * @return the alert's event id, or 0 if there is no alert
+     * @return the event version, or zero when no alert exists
      */
     long getAlertVersion();
 }
