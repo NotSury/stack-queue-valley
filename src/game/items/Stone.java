@@ -8,6 +8,7 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.capabilities.FarmerStatistic;
 import game.grounds.Rock;
+import game.interfaces.PlantableGround;
 import game.interfaces.Sellable;
 
 import java.util.ArrayList;
@@ -74,7 +75,8 @@ public class Stone extends Item implements Sellable
         {
             Location location = exit.getDestination();
 
-            if (!location.containsAnActor())
+            if (!location.containsAnActor() &&
+                    location.getGroundAs(PlantableGround.class) != null)
             {
                 availableLocations.add(location);
             }
