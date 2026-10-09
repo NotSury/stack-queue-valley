@@ -1,12 +1,10 @@
 package game.states;
 
 import edu.monash.fit2099.engine.actions.Action;
-import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
-import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.NestSpider;
 import game.interfaces.WebNetwork;

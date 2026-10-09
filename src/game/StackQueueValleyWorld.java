@@ -39,6 +39,7 @@ import java.util.List;
  * @author <Chin Kai Xuan> <35730374>
  * @author <Khoo Lynn> <34598901>
  * @author <Vanessa Liau Jia Yee> <34599398>
+ * @author Surya Muni Peragas 35651628
  * @version 1.5.0
  */
 public class StackQueueValleyWorld extends World {

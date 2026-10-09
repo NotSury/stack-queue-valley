@@ -3,7 +3,6 @@ package game.actors;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.items.Egg;
-import game.items.Milk;
 
 import java.util.ArrayList;
 import java.util.List;

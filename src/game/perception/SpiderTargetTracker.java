@@ -1,14 +1,8 @@
 package game.perception;
 
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.positions.Exit;
-import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.capabilities.ActorRole;
-import game.interfaces.WebNetwork;
-import game.navigation.GridDistance;
-import game.navigation.JumpPlanner;
-import game.navigation.MovementPlanner;
+
 
 /**
  * Provides the target and navigation assessment used by Spider states.

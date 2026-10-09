@@ -9,7 +9,6 @@ import game.behaviours.*;
 import game.interfaces.DecoyFactory;
 import game.interfaces.SpiderlingFactory;
 import game.interfaces.WebNetwork;
-import game.navigation.HazardAwareMovementPlanner;
 import game.navigation.JumpPlanner;
 import game.navigation.MovementPlanner;
 import game.navigation.WebPlanner;

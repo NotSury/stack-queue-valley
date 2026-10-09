@@ -14,7 +14,6 @@ import game.interfaces.BaitCarrier;
 import game.interfaces.DecoyFactory;
 import game.interfaces.Disguisable;
 import game.navigation.EscapePlan;
-import game.navigation.GridDistance;
 import game.navigation.MovementPlanner;
 import game.perception.EnvironmentScanner;
 
