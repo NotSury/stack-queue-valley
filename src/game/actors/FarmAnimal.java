@@ -22,7 +22,8 @@ import game.interfaces.Feedable;
  * to define their own result after being fed.</p>
  *
  * @author Lee Le Si 34599223
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.1.0
  */
 public abstract class FarmAnimal extends Actor implements Feedable {
 
@@ -73,7 +74,7 @@ public abstract class FarmAnimal extends Actor implements Feedable {
                 feedingHealthRestore
         );
 
-        produceAfterFeeding(location);
+        produceAfterFeeding(location.map().locationOf(farmer));
 
         return farmer + " feeds the " + name + ".";
     }
