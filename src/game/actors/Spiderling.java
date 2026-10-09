@@ -16,7 +16,7 @@ import game.interfaces.Hostile;
  * Disappears after eight completed ordinary turns.
  * Spiderlings are immune to web bindings.
  *
- * @author Surya Muni Peragas
+ * @author Surya Muni Peragas 35651628
  * @version 1.0.0
  */
 public class Spiderling extends Actor implements Hostile {

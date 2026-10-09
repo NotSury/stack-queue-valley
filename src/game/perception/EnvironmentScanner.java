@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.positions.Location;
  * Provides environmental information and navigation queries for creatures.
  * Implementation inspect the map without moving actors,
  * transferring items or changing creature states.
+ *
  */
 public interface EnvironmentScanner {
 

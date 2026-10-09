@@ -17,6 +17,9 @@ import java.util.Map;
  * An actor whose turn is controlled by its current state.
  * Manages state registration, initial activation and transitions.
  * Concrete states provide transition conditions, entry effects and ordinary-turn actions.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public abstract class StatefulCreature extends Actor {
 

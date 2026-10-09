@@ -12,7 +12,7 @@ import game.states.CreatureStateType;
  * Investigates web alerts through Pouncing and walks during Hunting.
  * The factory assembles its states, behaviours and collaborators.
  *
- * @author Surya Muni Peragas
+ * @author Surya Muni Peragas 35651628
  * @version 1.1.0
  */
 public class NestSpider extends StatefulCreature implements Hostile {

@@ -19,6 +19,9 @@ import java.util.List;
  * A stateful creature that disguises itself and uses portable items as bait.
  * Provides inventory operations used by its state-entry effects.
  * State implementations control when these operations are performed.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class CaveMimic extends StatefulCreature implements Hostile, Disguisable, BaitCarrier {
 

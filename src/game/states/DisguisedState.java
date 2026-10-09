@@ -16,6 +16,9 @@ import game.perception.EnvironmentScanner;
  * Transitions to Ambush when an adjacent Farmer carries a portable
  * item, or to Looting after a quiet period when external loot
  * is reachable.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class DisguisedState extends EnvironmentAwareState {
 

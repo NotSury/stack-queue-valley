@@ -13,6 +13,9 @@ import java.util.Queue;
  * Plans creature movement using the map's exits.
  * Respects terrain restrictions and occupied tiles. Only adjacent
  * exits on the current map are considered.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class MapMovementPlanner implements MovementPlanner {
 

@@ -7,6 +7,9 @@ import edu.monash.fit2099.engine.positions.GameMap;
 /**
  * Uses an actor's turn to escape a web.
  * Preserves any pending continuation of a multi-turn action.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class WebBoundAction extends Action {
 

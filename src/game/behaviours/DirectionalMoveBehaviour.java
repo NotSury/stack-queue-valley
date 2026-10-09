@@ -12,6 +12,9 @@ import game.navigation.MovementPlanner;
  * Selects one-tile movement in a fixed grid direction.
  * Delegates movement validation to a planner and remains idle
  * when the selected direction is blocked.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class DirectionalMoveBehaviour implements Behaviour<Actor, Action> {
 

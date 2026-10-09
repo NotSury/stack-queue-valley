@@ -15,7 +15,7 @@ import game.perception.SpiderTargetTracker;
  * Walks towards and attacks the Spider's validated engaged Farmer.
  * Reuses the existing attack action and safe walking planner.
  *
- * @author Surya Muni Peragas
+ * @author Surya Muni Peragas 35651628
  * @author Lee Le Si
  * @version 1.2.0
  */

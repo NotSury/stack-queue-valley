@@ -12,6 +12,9 @@ import game.perception.EnvironmentScanner;
  * Concrete behaviours select an action through the engine's operate
  * method. Scanning and movement planning are delegated to injected
  * collaborators.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public abstract class EnvironmentAwareBehaviour implements Behaviour<Actor, Action> {
 

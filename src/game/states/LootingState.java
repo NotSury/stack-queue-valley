@@ -25,6 +25,9 @@ import java.util.Map;
  * acquisitions do not count towards the ordinary collection goal.
  * Progress tracking assumes ordinary pickups are the only operations
  * changing the inventory while the Mimic remains in this state.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class LootingState extends BehaviourDrivenState {
 

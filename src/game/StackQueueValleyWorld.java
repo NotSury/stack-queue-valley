@@ -144,7 +144,7 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.at(2,6).addItem(alienDevice);
 
         Farmer farmer = new Farmer("Bob");
-        this.addPlayer(farmer, minesMap.at(6, 6));
+        this.addPlayer(farmer, inheritedFarmMap.at(0, 3));
 
         Cow cow = new Cow();
         Chicken chicken = new Chicken();
@@ -200,11 +200,8 @@ public class StackQueueValleyWorld extends World {
                 ambushBehaviour
         );
 
-        inheritedFarmMap.addActor(mimic, inheritedFarmMap.at(1, 4));
+        inheritedFarmMap.addActor(mimic, minesMap.at(1, 4));
         mimic.initialiseState(inheritedFarmMap);
-
-        inheritedFarmMap.at(3, 4).addItem(new Parsnip());
-        inheritedFarmMap.at(3, 5).addItem(new Tomato());
 
     }
 }

@@ -9,6 +9,8 @@ import game.navigation.GridDistance;
 
 /**
  * Places one web on an adjacent eligible tile without moving the Spider.
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class PlaceWebAction extends Action {
 

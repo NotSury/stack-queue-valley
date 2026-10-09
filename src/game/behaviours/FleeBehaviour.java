@@ -14,6 +14,9 @@ import game.perception.EnvironmentScanner;
  * Uses an environmental scanner to detect the threat and an injected
  * movement planner to select the first step of an escape route.
  * Supports distance-preserving movement when no improving route exists.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class FleeBehaviour extends EnvironmentAwareBehaviour {
 

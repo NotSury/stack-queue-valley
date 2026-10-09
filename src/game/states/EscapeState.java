@@ -25,6 +25,9 @@ import game.perception.EnvironmentScanner;
  * during this selection.
  * The Mimic returns to ambushing when cornered by an adjacent Farmer,
  * or starts looting when no Farmer is detected and reachable loot exists.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class EscapeState extends BehaviourDrivenState {
 

@@ -10,6 +10,9 @@ import game.perception.EnvironmentScanner;
  * Base class for creature states that delegate ordinary action
  * selection to an injected behaviour.
  * Concrete states define their transition conditions and entry effects.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public abstract class BehaviourDrivenState extends EnvironmentAwareState {
 

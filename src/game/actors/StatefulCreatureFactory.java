@@ -30,7 +30,7 @@ import java.util.List;
  * Combat behaviour is supplied by the caller so that creature assembly
  * does not depend on a particular combat implementation.
  *
- * @author Surya Muni Peragas
+ * @author Surya Muni Peragas 35651628
  * @author Lee Le Si 34599223
  * @version 1.1.0
  */

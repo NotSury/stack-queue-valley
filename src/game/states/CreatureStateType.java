@@ -2,10 +2,12 @@ package game.states;
 
 /**
  * Identifies the states available to stateful creatures.
- *
- * <p>These identifiers are used to register and select state objects.
+ * These identifiers are used to register and select state objects.
  * Each concrete state class defines its own transition conditions,
- * entry effects and ordinary-turn behaviour.</p>
+ * entry effects and ordinary-turn behaviour.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public enum CreatureStateType {
 

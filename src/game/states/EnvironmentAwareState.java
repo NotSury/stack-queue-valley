@@ -13,6 +13,9 @@ import game.perception.EnvironmentScanner;
  * Base class for creature states that inspect their surroundings.
  * Receives an environmental scanner through its constructor.
  * States remain stationary unless they override ordinary action selection.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public abstract class EnvironmentAwareState implements CreatureState {
 

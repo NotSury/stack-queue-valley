@@ -6,6 +6,9 @@ import game.actors.DecoyMimic;
 /**
  * Creates temporary decoys with a supplied appearance and movement direction.
  * The caller is responsible for placing the decoy on a map.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public interface DecoyFactory {
 

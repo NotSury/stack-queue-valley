@@ -7,6 +7,9 @@ import edu.monash.fit2099.engine.positions.Location;
 /**
  * Plans movement steps for creatures.
  * Queries inspect the current map without moving actors or changing the environment.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public interface MovementPlanner {
 

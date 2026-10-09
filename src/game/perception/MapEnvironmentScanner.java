@@ -11,6 +11,9 @@ import game.navigation.MovementPlanner;
  * Inspects map locations for actors with requested abilities and portable items.
  * Uses an injected movement planner to check item reachability.
  * Detection distance includes diagonal neighbors.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class MapEnvironmentScanner implements EnvironmentScanner {
 

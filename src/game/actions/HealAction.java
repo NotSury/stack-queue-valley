@@ -8,6 +8,9 @@ import edu.monash.fit2099.engine.positions.GameMap;
 /**
  * An ordinary action that restores an actor's health.
  * The engine limits healing to the actor's maximum health.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class HealAction extends Action {
 
