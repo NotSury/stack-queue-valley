@@ -10,7 +10,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
  * one that misses", so the extra damage is applied even when the sword misses.</p>
  *
  * @author <Lee Le Si> <34599223>
- * @version 1.0.0
+ * @version 1.1.0
  */
 public class ChargedCoating implements Coating {
 
@@ -31,6 +31,16 @@ public class ChargedCoating implements Coating {
         target.hurt(EXTRA_DAMAGE);
         return "The charge shocks " + target + " for " + EXTRA_DAMAGE + "extra damage.";
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CoatingKind getKind(){
+        return CoatingKind.CHARGED;      // CHARGED in ChargedCoating, MELON in MelonCoating
+    }
+
+
     /**
      * Name shown in menus and in the sword's name, e.g. "Sword (Charged Coating)".
      *
