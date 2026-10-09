@@ -77,9 +77,9 @@ Conditions are evaluated in the order shown. An eligible theft target is an adja
 | Current state | Conditions and destinations |
 |---|---|
 | DISGUISED | An eligible theft target → AMBUSH. Otherwise, if no Farmer has been detected for at least five consecutive turns and reachable portable loot exists at distance 2–3 → LOOTING. Otherwise remain DISGUISED. Detecting any Farmer resets the quiet counter. |
-| LOOTING | An eligible theft target → AMBUSH. If another Farmer is detected without a theft opportunity, remain LOOTING. With no detected Farmer, collecting two additional items or finding no reachable portable loot → DISGUISED. Otherwise remain LOOTING. |
-| AMBUSH | No Farmer detected within three tiles → DISGUISED. Otherwise, health at or below 30% and a valid escape plan with separate Mimic and decoy steps → ESCAPE. Otherwise remain AMBUSH. |
-| ESCAPE | An adjacent Farmer and no valid escape movement → AMBUSH. Otherwise, while a Farmer remains detected, stay in ESCAPE. With no detected Farmer, reachable portable loot within three tiles → LOOTING; otherwise → DISGUISED. |
+| LOOTING | Eligible adjacent theft target → AMBUSH. Otherwise, with no detected Farmer, collection goal reached or no reachable loot and bait can be scattered → DISGUISED. Otherwise remain LOOTING. |
+| AMBUSH | No detected Farmer and bait can be scattered → DISGUISED. With a detected Farmer, low health and a valid two-destination escape plan → ESCAPE. Otherwise remain AMBUSH. |
+| ESCAPE | Eligible adjacent theft target and no escape movement → AMBUSH. Otherwise, while a Farmer is detected, remain ESCAPE. With no detected Farmer, reachable loot → LOOTING; otherwise, if bait can be scattered → DISGUISED; otherwise remain ESCAPE. |
 
 Every state can lead to at least two other states and can remain active. State selection uses environmental checks, inventory conditions, health and route availability; it does not use random state selection.
 
