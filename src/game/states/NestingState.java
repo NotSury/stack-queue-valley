@@ -15,7 +15,6 @@ import game.interfaces.WebNetwork;
 import game.navigation.MovementSafety;
 import game.navigation.WebPlanner;
 import game.perception.EnvironmentScanner;
-import game.perception.SpiderAwareness;
 import game.perception.SpiderTargetTracker;
 
 import java.util.ArrayList;

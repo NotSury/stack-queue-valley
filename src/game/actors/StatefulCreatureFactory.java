@@ -127,7 +127,7 @@ public class StatefulCreatureFactory implements DecoyFactory, SpiderlingFactory 
                 webPlanner,
                 jumpPlanner,
                 network,
-                NestSpider.DETECTION_RADIUS,
+                NestSpider.NEST_THREAT_RADIUS,
                 NestSpider.PURSUIT_RADIUS
         );
 

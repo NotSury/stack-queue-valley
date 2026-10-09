@@ -7,9 +7,7 @@ import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.NestSpider;
 import game.interfaces.WebNetwork;
-import game.navigation.WebPlanner;
 import game.perception.EnvironmentScanner;
-import game.perception.SpiderAwareness;
 import game.perception.SpiderTargetTracker;
 
 /**

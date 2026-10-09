@@ -144,7 +144,7 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.at(2,6).addItem(alienDevice);
 
         Farmer farmer = new Farmer("Bob");
-        this.addPlayer(farmer, minesMap.at(0, 3));
+        this.addPlayer(farmer, minesMap.at(6, 6));
 
         Cow cow = new Cow();
         Chicken chicken = new Chicken();
