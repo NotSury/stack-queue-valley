@@ -9,7 +9,7 @@ import game.effects.Explosion;
  * target. The attacker is standing next to the target, so the blast hits them too.
  *
  * @author <Lee Le Si> <34599223>
- * @version 1.0.0
+ * @version 1.1.0
  */
 public class MelonCoating implements Coating {
     /**
@@ -34,6 +34,16 @@ public class MelonCoating implements Coating {
                 + BLAST_DAMAGE + " damage";
 
     }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CoatingKind getKind(){
+        return CoatingKind.MELON;      // CHARGED in ChargedCoating, MELON in MelonCoating
+    }
+
     /**
      * Name shown in menus and in the sword's name, e.g. "Sword (Melon Coating)".
      *
