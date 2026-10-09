@@ -1,7 +1,13 @@
 package game.actors;
 
+import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.items.Egg;
+import game.items.Milk;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Chicken represents a farm animal that can wander and be fed by the Farmer.
@@ -11,7 +17,8 @@ import game.items.Egg;
  * Egg is produced.</p>
  *
  * @author Lee Le Si 34599223
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.1.0
  */
 public class Chicken extends FarmAnimal {
 
@@ -28,18 +35,36 @@ public class Chicken extends FarmAnimal {
     /**
      * Produces the Chicken-specific result after feeding.
      *
-     * <p>One Egg is always produced, with a 50 percent chance of
-     * producing one additional Egg.</p>
+     * <p>One Egg is always produced at a random adjacent Location,
+     * with a 50 percent chance of producing one additional Egg
+     * at a randomly selected adjacent location.</p>
      *
      * @param location the current location of the Chicken
      */
     @Override
-    protected void produceAfterFeeding(Location location) {
+    protected void produceAfterFeeding(Location location)
+    {
+        List<Location> availableLocations = new ArrayList<>();
 
-        location.addItem(new Egg());
+        for (Exit exit : location.getExits())
+        {
+            availableLocations.add(exit.getDestination());
+        }
 
-        if (Math.random() < 0.5) {
-            location.addItem(new Egg());
+        if (!availableLocations.isEmpty())
+        {
+            Random random = new Random();
+            int randomIndex = random.nextInt(availableLocations.size());
+
+            Location eggLocation = availableLocations.get(randomIndex);
+            eggLocation.addItem(new Egg());
+
+            if (Math.random() < 0.5)
+            {
+                randomIndex = random.nextInt(availableLocations.size());
+                eggLocation = availableLocations.get(randomIndex);
+                eggLocation.addItem(new Egg());
+            }
         }
     }
 }
