@@ -50,6 +50,29 @@ public class CaveMimic extends StatefulCreature implements Hostile, Disguisable,
     }
 
     /**
+     * Checks that the Disguised entry effect can scatter an item.
+     * Requires a portable inventory item and an unoccupied adjacent tile
+     * that this Mimic can enter.
+     *
+     * @param origin the Mimic's current location
+     * @return true when scattering at least one item is possible
+     */
+    @Override
+    public boolean canScatterBait(Location origin) {
+        if (getPortableItems(getInventory().getItems()).isEmpty()) {
+            return false;
+        }
+
+        for (Location destination : origin.getNearbyLocations(ADJACENT_RADIUS)) {
+            if (destination.canActorEnter(this)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Scatters portable inventory items onto adjacent tiles.
      * Places at most one item on ech unoccupied tile that the Mimic can enter.
      * Uses the engine's nearby-location ordering and the inventory's item ordering.

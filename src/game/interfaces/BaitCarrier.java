@@ -6,9 +6,17 @@ import edu.monash.fit2099.engine.positions.Location;
  * Provides operations for scattering and reclaiming portable bait.
  *
  * @author Surya Muni Peragas 35651628
- * @version 1.0.1
+ * @version 1.1.1
  */
 public interface BaitCarrier {
+
+    /**
+     * Checks for a portable inventory item and an eligible adjacent tile.
+     * Does not transfer items or change environment.
+     * @param origin the creature's current location
+     * @return true when at least one bait item can be scattered
+     */
+    boolean canScatterBait(Location origin);
 
     /**
      * Scatters portable inventory items onto eligible adjacent tiles.
