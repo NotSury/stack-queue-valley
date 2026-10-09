@@ -8,6 +8,8 @@ import edu.monash.fit2099.engine.positions.Location;
  * Implementation inspect the map without moving actors,
  * transferring items or changing creature states.
  *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public interface EnvironmentScanner {
 

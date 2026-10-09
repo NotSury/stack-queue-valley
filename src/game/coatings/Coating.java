@@ -10,7 +10,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
  * attack logic do not change (Open-Closed Principle).</p>
  *
  * @author <Lee Le Si> <34599223>
- * @version 1.0.0
+ * @version 1.1.0
  */
 public interface Coating {
     /**
@@ -22,4 +22,12 @@ public interface Coating {
      * @return a description of what the coating did
      */
     String applyEffect(Actor attacker, Actor target, GameMap map);
+
+    /**
+     * Returns the kind of this coating, used to avoid offering the same
+     * kind of coating twice.
+     *
+     * @return the kind of this coating
+     */
+    CoatingKind getKind();
 }

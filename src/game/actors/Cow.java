@@ -33,9 +33,9 @@ public class Cow extends FarmAnimal {
     /**
      * Produces the Cow-specific result after feeding.
      *
-     * <p>A Milk item is placed at a random location adjacent to the Cow.</p>
+     * <p>A Milk item is placed at a random location adjacent to the Farmer.</p>
      *
-     * @param location the current location of the Cow
+     * @param location the current location of the Farmer
      */
     @Override
     protected void produceAfterFeeding(Location location)
@@ -55,7 +55,5 @@ public class Cow extends FarmAnimal {
             Location milkLocation = availableLocations.get(randomIndex);
             milkLocation.addItem(new Milk());
         }
-
-        location.addItem(new Milk());
     }
 }

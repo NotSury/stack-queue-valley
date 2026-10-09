@@ -21,7 +21,7 @@ import java.util.Set;
  * {@link Coatable} reuses the same rules (SRP, DRY).</p>
  *
  * @author <Lee Le Si> <34599223>
- * @version 1.0.0
+ * @version 1.1.0
  */
 public class CoatingSourceScanner {
     /**
@@ -45,7 +45,7 @@ public class CoatingSourceScanner {
      */
     public static ActionList coatActions(Coatable coatable, Actor actor, GameMap map){
         ActionList actions = new ActionList();
-        Set<String> offered = new HashSet<>();
+        Set<CoatingKind> offered = new HashSet<>();
 
         // 1. sources the actor is carrying (source location = null)
         for (CoatingSource source : actor.getInventory().getItemsAs(CoatingSource.class)){
@@ -75,12 +75,12 @@ public class CoatingSourceScanner {
      * its kind of coating has not been offered yet.
      *
      * @param actions        the list the action is added to
-     * @param offered        names of coatings already offered
+     * @param offered        kinds of coating already offered
      * @param coatable       the thing that would be coated
      * @param source         the coating source being considered
      * @param sourceLocation where the source lies, or null if it is carried
      */
-    private static void offer(ActionList actions, Set<String> offered, Coatable coatable,
+    private static void offer(ActionList actions, Set<CoatingKind> offered, Coatable coatable,
                               CoatingSource source, Location sourceLocation){
         // e.g. ground that is not charged at the moment
         if (!source.canProvideCoating()){
@@ -88,8 +88,7 @@ public class CoatingSourceScanner {
         }
 
         // two fires next to the farmer should only give one "coat with fire" option
-        String coatingName = source.getCoating().toString();
-        if (offered.add(coatingName)){
+        if (offered.add(source.getCoating().getKind())){
             actions.add(new CoatAction(coatable, source, sourceLocation));
         }
     }

@@ -15,7 +15,7 @@ import game.interfaces.Waterable;
  * <p>The target determines the stamina cost required for watering
  * and the effect that occurs when it is watered.</p>
  *
- * @author <Chin Kai Xuan> <35730374>
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public class WateringAction extends Action {

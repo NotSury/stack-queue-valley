@@ -21,6 +21,7 @@ import game.interfaces.CoatingSource;
  * @author <Chin Kai Xuan> <35730374>
  * @author <Lee Le Si> <34599223>
  * @version 1.1.0
+>>>>>>> origin/main
  */
 public class Melon extends ConsumableItem implements CoatingSource {
 

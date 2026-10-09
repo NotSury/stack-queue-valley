@@ -1,6 +1,13 @@
 package game;
 
+/**
+ * Stores decorative text messages used by the game.
+ */
 public class FancyMessage {
+
+    /**
+     * The ASCII-art title displayed when the game starts.
+     */
     public static String GAME_TITLE = "   ,-,--.  ,--.--------.   ,---.       _,.----.  ,--.-.,-.                \n" +
             " ,-.'-  _\\/==/,  -   , -\\.--.'  \\    .' .' -   \\/==/- |\\  \\               \n" +
             "/==/_ ,_.'\\==\\.-.  - ,-./\\==\\-/\\ \\  /==/  ,  ,-'|==|_ `/_ /,--.--------.  \n" +

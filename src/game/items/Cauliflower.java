@@ -9,7 +9,7 @@ import edu.monash.fit2099.engine.actors.Actor;
  * There is also a 50 percent chance that a new Cauliflower is added
  * to the actor's inventory.</p>
  *
- * @author <Chin Kai Xuan> <35730374>
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public class Cauliflower extends ConsumableItem {

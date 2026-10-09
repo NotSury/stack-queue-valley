@@ -18,7 +18,7 @@ import game.items.Melon;
  * receives a Melon. Explosion damage is reduced by the number of times
  * the crop has been watered.</p>
  *
- * @author <Chin Kai Xuan> <35730374>
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public class MelonCrop extends WaterableCrop {

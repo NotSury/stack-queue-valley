@@ -8,7 +8,7 @@ import game.statuses.HealthOverTimeStatus;
  * Sets the target burning: 5 damage per turn for 3 turns.
  *
  * @author <Lee Le Si> <34599223>
- * @version 1.0.0
+ * @version 1.1.0
  */
 public class FireCoating implements Coating{
     /**
@@ -35,6 +35,15 @@ public class FireCoating implements Coating{
         target.addStatus(new HealthOverTimeStatus(-BURN_DAMAGE_PER_TURN, BURN_DURATION));
         return target + " is set burning for " + BURN_DURATION + " turns. ";
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CoatingKind getKind(){
+        return CoatingKind.FIRE;      // CHARGED in ChargedCoating, MELON in MelonCoating
+    }
+
     /**
      * Name shown in menus and in the sword's name, e.g. "Sword (Fire Coating)".
      *

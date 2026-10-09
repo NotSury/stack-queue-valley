@@ -9,6 +9,9 @@ import game.actors.DecoyMimic;
  * Executes a decoy's ordinary action and advances its lifetime.
  * Delegates movement or idling to an existing action. Removes the
  * decoy after its final turn has executed.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class DecoyTurnAction extends Action {
 

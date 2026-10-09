@@ -15,7 +15,7 @@ import game.interfaces.Waterable;
  * <p>Concrete subclasses define their own watering cost and watering
  * effects.</p>
  *
- * @author <Chin Kai Xuan> <35730374>
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public abstract class WaterableCrop extends Crop implements Waterable {

@@ -10,7 +10,7 @@ import edu.monash.fit2099.engine.positions.Location;
  * harvesting behaviour. A harvestable object may also define whether
  * it is currently ready to be harvested.</p>
  *
- * @author <Chin Kai Xuan> <35730374>
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public interface Harvestable {

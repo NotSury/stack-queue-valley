@@ -14,7 +14,7 @@ import game.interfaces.Harvestable;
  * <p>The target determines whether it is currently ready to be harvested,
  * the stamina cost of harvesting, and the effect of the harvest.</p>
  *
- * @author <Chin Kai Xuan> <35730374>
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public class HarvestAction extends Action {

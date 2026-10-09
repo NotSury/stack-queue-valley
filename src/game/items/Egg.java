@@ -99,7 +99,10 @@ public class Egg extends Item implements Sellable
 
                     return seller + " sold Egg for " + SELL_PRICE +
                             " coins and a Chicken appeared.";
-                } catch (GameEngineException e) {
+                } catch (GameEngineException e)
+                {
+                    return seller + " sold Egg for " + SELL_PRICE +
+                            " coins.";
                 }
             }
         }

@@ -14,8 +14,8 @@ import game.interfaces.ProcessableProduct;
  * <p>Concrete subclasses define their own product names and specific
  * consumption effects.</p>
  *
- * @author <Lee Le Si> <34599223>
- * @author <Chin Kai Xuan> <35730374>
+ * @author Lee Le Si 34599223
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public abstract class ProcessableItem
