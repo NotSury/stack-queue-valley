@@ -55,7 +55,5 @@ public class Cow extends FarmAnimal {
             Location milkLocation = availableLocations.get(randomIndex);
             milkLocation.addItem(new Milk());
         }
-
-        location.addItem(new Milk());
     }
 }
