@@ -30,7 +30,7 @@
    `--`--'   `--`        `--`-----'`--`-----'`--`-----``   `--`-`         
 ```
 ## Contribution Log
-**[Contribution Log Link]** (https://docs.google.com/spreadsheets/d/1VfutnfXfJ8pkZfCXGZGbKtAEHKDqI-Xkg6gcwM73iw8/edit?usp=sharing)
+[Contribution Log Link](https://docs.google.com/spreadsheets/d/1VfutnfXfJ8pkZfCXGZGbKtAEHKDqI-Xkg6gcwM73iw8/edit?usp=sharing)
 
 ## REQ5 — Cave Mimic
 
