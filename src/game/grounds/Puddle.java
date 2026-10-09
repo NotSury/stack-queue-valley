@@ -10,7 +10,7 @@ import game.statuses.ChargedStatus;
  * Puddle represents a wet ground created when Dirt is watered.
  *
  * @author Lee Le Si 34599223
- * @author Khoo Lynn
+ * @author Khoo Lynn 34598901
  * @version 1.2.0
  */
 public class Puddle extends Ground implements Chargeable, CoatingSource {
