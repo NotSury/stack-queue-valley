@@ -4,8 +4,6 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.items.Fire;
 
-// TODO: UPDATE UML FOR REQ 2 FOR FIRE SPREAD
-
 /**
  * Handles the creation of fire around a location.
  *
