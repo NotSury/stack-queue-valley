@@ -10,7 +10,20 @@ import edu.monash.fit2099.engine.positions.GameMap;
  */
 public interface Sellable
 {
+    /**
+     * Returns the number of coins normally awarded for selling this object.
+     *
+     * @return the selling price in coins.
+     */
     int getSellPrice();
 
+    /**
+     * Performs the product-specific selling behaviour.
+     *
+     * @param seller the actor selling the object.
+     * @param merchant the Merchant involved in the transaction.
+     * @param map the map where the transaction occurs.
+     * @return a message describing the result of the sale.
+     */
     String sell(Actor seller, Actor merchant, GameMap map);
 }

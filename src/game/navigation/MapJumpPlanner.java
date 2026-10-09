@@ -29,6 +29,15 @@ public class MapJumpPlanner implements JumpPlanner{
     private static final int JUMP_DISTANCE = 2;
     private static final int UNREACHABLE = Integer.MAX_VALUE;
 
+    /**
+     * Finds a legal two-tile landing that improves the creature's approach to the
+     * target compared with walking alone.
+     *
+     * @param creature the creature performing the jump.
+     * @param origin   the creature's current location.
+     * @param target   the location to approach.
+     * @return the best useful landing or null if no useful jump exists.
+     */
     @Override
     public Location findBestLanding(Actor creature, Location origin, Location target){
         if (origin.map() != target.map() || origin == target){
@@ -85,6 +94,15 @@ public class MapJumpPlanner implements JumpPlanner{
         return bestLanding;
     }
 
+    /**
+     * Checks whether a proposed two-tile jump is legal and lands on a safe, enterable location
+     * on the same map.
+     *
+     * @param creature the creature performing the jump.
+     * @param origin   the jump's starting location.
+     * @param landing  the proposed destination.
+     * @return true if the jump is legal otherwise false.
+     */
     @Override
     public boolean isLegalJump(Actor creature, Location origin, Location landing){
         if (origin.map() != landing.map()){

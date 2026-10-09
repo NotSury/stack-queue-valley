@@ -25,6 +25,13 @@ public class Fire extends Item implements MovementHazard, CoatingSource {
     private final int damagePerTurn;
     private final int burnDuration;
 
+    /**
+     * Creates a temporary Fire effect.
+     *
+     * @param remainingTurns the number of turns the Fire remains on the ground.
+     * @param damagePerTurn the damage applied by each burn status per turn.
+     * @param burnDuration the number of turns each applied burn status lasts.
+     */
     public Fire(int remainingTurns, int damagePerTurn, int burnDuration){
         super("Fire", 'f');
         this.remainingTurns = remainingTurns;
@@ -32,6 +39,12 @@ public class Fire extends Item implements MovementHazard, CoatingSource {
         this.burnDuration = burnDuration;
     }
 
+    /**
+     *<p>Advances the Fire by one turn. Actors standing on the Fire receive a new damage-over-time
+     * status and the Fire is removed when its duration ends.</p>
+     *
+     * @param currentLocation The location of the ground on which we lie.
+     */
     @Override
     public void tick(Location currentLocation){
         if (currentLocation.containsAnActor()){

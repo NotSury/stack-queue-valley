@@ -19,10 +19,23 @@ import java.util.List;
  * @version 1.0.0
  */
 public class Rock extends BreakableGround{
+
+    /**
+     * Creates a Rock using its display character and name.
+     */
     public Rock(){
         super('#', "Rock");
     }
 
+    /**
+     * <p>Breaks the Rock, drops a Stone and replaces the Rock with Dirt. There is
+     * a 50% chance that the actor is moved to a random valid adjacent location by
+     * a shockwave.</p>
+     *
+     * @param actor actor breaking the object.
+     * @param location location of the object being broken.
+     * @return a message describing the result of breaking the Rock.
+     */
     @Override
     public String breakBy(Actor actor, Location location){
         location.addItem(new Stone());

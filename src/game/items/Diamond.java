@@ -41,6 +41,15 @@ public class Diamond extends Item implements Sellable {
         return SELL_PRICE;
     }
 
+    /**
+     * Sells the Diamond for coins. After the sale, the Merchant has a chance to remove
+     * another random item from the seller's inventory.
+     *
+     * @param seller the actor selling the Diamond.
+     * @param merchant the Merchant involved in the transaction.
+     * @param map the map where the transaction occurs.
+     * @return a message describing the sale and any stolen item.
+     */
     @Override
     public String sell(Actor seller, Actor merchant, GameMap map) {
         seller.getInventory().remove(this);
