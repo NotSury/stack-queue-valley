@@ -12,11 +12,9 @@ import edu.monash.fit2099.engine.positions.Location;
  * supplied when the Explosion is created, allowing the class to be
  * reused by other explosive features in the future.</p>
  *
-=======
  * @author <Chin Kai Xuan> <35730374>
  * @author <Lee Le Si> <34599223>
  * @version 1.1.0
->>>>>>> origin/main
  */
 public class Explosion {
 
