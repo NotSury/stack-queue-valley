@@ -46,6 +46,7 @@ public class Web extends Item {
      * @param location the location where the web will be placed
      * @param lifetimeTurns the number of map ticks before expiry
      * @param hidden whether the web starts hidden
+     * @param recorder the collaborator used to record successful web triggers.
      */
     public Web(Actor owner, Location location, int lifetimeTurns, boolean hidden, WebTriggerRecorder recorder) {
         super("Spider Web", VISIBLE_DISPLAY_CHAR);

@@ -10,7 +10,20 @@ import edu.monash.fit2099.engine.positions.GameMap;
  */
 public interface Buyable
 {
+    /**
+     * Returns the price required to purchase this object.
+     *
+     * @return the purchase price in coins.
+     */
     int getBuyPrice();
 
+    /**
+     * Performs the product-specific purchase behaviour.
+     *
+     * @param buyer the actor buying the object.
+     * @param merchant the Merchant involved in the transaction.
+     * @param map the map where the transaction occurs.
+     * @return a message describing the result of the purchase.
+     */
     String buy(Actor buyer, Actor merchant, GameMap map);
 }
