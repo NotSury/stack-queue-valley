@@ -29,7 +29,7 @@ public class ChargedCoating implements Coating {
     @Override
     public String applyEffect(Actor attacker, Actor target, GameMap map){
         target.hurt(EXTRA_DAMAGE);
-        return "The charge shocks " + target + " for " + EXTRA_DAMAGE + "extra damage.";
+        return "The charge shocks " + target + " for " + EXTRA_DAMAGE + " extra damage.";
     }
 
     /**
