@@ -3,7 +3,7 @@ package game.actors;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.items.Egg;
-import game.items.Milk;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,11 +35,11 @@ public class Chicken extends FarmAnimal {
     /**
      * Produces the Chicken-specific result after feeding.
      *
-     * <p>One Egg is always produced at a random adjacent Location,
-     * with a 50 percent chance of producing one additional Egg
-     * at a randomly selected adjacent location.</p>
+     * <p>One Egg is always produced at a random adjacent Location
+     * adjacent to the Farme, with a 50 percent chance of producing one additional Egg
+     * at a randomly selected location adjacent to the Farmer.</p>
      *
-     * @param location the current location of the Chicken
+     * @param location the current location of the Farmer
      */
     @Override
     protected void produceAfterFeeding(Location location)
