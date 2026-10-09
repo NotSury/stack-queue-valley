@@ -10,6 +10,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.DecoyMimic;
 import game.capabilities.ActorRole;
+import game.interfaces.BaitCarrier;
 import game.interfaces.DecoyFactory;
 import game.interfaces.Disguisable;
 import game.navigation.EscapePlan;
@@ -31,6 +32,7 @@ public class EscapeState extends BehaviourDrivenState {
 
     private final Disguisable disguisable;
     private final int detectionRadius;
+    private final BaitCarrier baitCarrier;
 
     private final MovementPlanner movementPlanner;
     private final DecoyFactory decoyFactory;
@@ -40,23 +42,24 @@ public class EscapeState extends BehaviourDrivenState {
     private Action firstEscapeAction;
 
     /**
-     * Creates an escape state with appearance, movement and decoy support.
-     * The supplied appearance operations must operate on the owning creature.
-     * The fleeing behaviour should use the same planner and detection radius.
+     * Creates an Escape state.
+     * The supplied role interfaces must operate on the owning creature.
      *
-     * @param creature the actor that owns this state
-     * @param scanner the scanner used to detect Farmers and portable items
-     * @param movementPlanner the planner used to select escape steps
-     * @param disguisable the owning creature's appearance operations
-     * @param decoyFactory the collaborator used to construct decoys
-     * @param fleeingBehaviour the behaviour used during ordinary escape turns
-     * @param detectionRadius the maximum distance used for environmental scans
+     * @param creature the owning creature
+     * @param scanner the environmental scanner
+     * @param movementPlanner the escape-route planner
+     * @param disguisable the creature's appearance operations
+     * @param baitCarrier the creature's bait operations
+     * @param decoyFactory the collaborator used to create decoys
+     * @param fleeingBehaviour the ordinary fleeing behaviour
+     * @param detectionRadius the maximum environmental scan distance
      */
     public EscapeState(
             Actor creature,
             EnvironmentScanner scanner,
             MovementPlanner movementPlanner,
             Disguisable disguisable,
+            BaitCarrier baitCarrier,
             DecoyFactory decoyFactory,
             Behaviour<Actor, Action> fleeingBehaviour,
             int detectionRadius
@@ -64,6 +67,7 @@ public class EscapeState extends BehaviourDrivenState {
         super(creature, scanner, fleeingBehaviour);
         this.movementPlanner = movementPlanner;
         this.disguisable = disguisable;
+        this.baitCarrier = baitCarrier;
         this.decoyFactory = decoyFactory;
         this.detectionRadius = detectionRadius;
     }
@@ -160,7 +164,7 @@ public class EscapeState extends BehaviourDrivenState {
         if (farmer != null) {
             Location threatLocation = location.map().locationOf(farmer);
 
-            if (GridDistance.between(location, threatLocation) == ADJACENT_RADIUS
+            if (canStealFrom(farmer, location)
                     && movementPlanner.findStepAway(
                     getCreature(),
                     location,
@@ -183,7 +187,9 @@ public class EscapeState extends BehaviourDrivenState {
             return CreatureStateType.LOOTING;
         }
 
-        return CreatureStateType.DISGUISED;
+        return baitCarrier.canScatterBait(location)
+                ? CreatureStateType.DISGUISED
+                : CreatureStateType.ESCAPE;
     }
 
     /**

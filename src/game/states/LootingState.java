@@ -117,8 +117,7 @@ public class LootingState extends BehaviourDrivenState {
      */
     @Override
     public CreatureStateType determineNextState(Location location) {
-        Actor farmer = getScanner().findNearestActorWith(
-                location, detectionRadius, ActorRole.FARMER);
+        Actor farmer = getScanner().findNearestActorWith(location, detectionRadius, ActorRole.FARMER);
 
         if (farmer != null) {
             if (canStealFrom(farmer, location)) {
@@ -128,17 +127,11 @@ public class LootingState extends BehaviourDrivenState {
             return CreatureStateType.LOOTING;
         }
 
-        int newItemsCollected =
-                getCreature().getInventory().getItems().size() - initialInventorySize;
+        int newItemsCollected = getCreature().getInventory().getItems().size() - initialInventorySize;
 
-        if (newItemsCollected >= COLLECTION_GOAL) {
-            return CreatureStateType.DISGUISED;
-        }
+        Location loot = getScanner().findNearestPortableItemLocation(getCreature(), location, 0, detectionRadius);
 
-        Location loot = getScanner().findNearestPortableItemLocation(
-                getCreature(), location, 0, detectionRadius);
-
-        if (loot == null) {
+        if ((newItemsCollected >= COLLECTION_GOAL || loot == null) && baitCarrier.canScatterBait(location)) {
             return CreatureStateType.DISGUISED;
         }
 

@@ -82,9 +82,9 @@ public class StatefulCreatureFactory implements DecoyFactory, SpiderlingFactory 
 
         mimic.registerState(new LootingState(mimic, scanner, movementPlanner, mimic, mimic, itemSeekingBehaviour, CaveMimic.DETECTION_RADIUS));
 
-        mimic.registerState(new AmbushState(mimic, scanner, movementPlanner, mimic, ambushBehaviour, CaveMimic.DETECTION_RADIUS));
+        mimic.registerState(new AmbushState(mimic, scanner, movementPlanner, mimic, mimic, ambushBehaviour, CaveMimic.DETECTION_RADIUS));
 
-        mimic.registerState(new EscapeState(mimic, scanner, movementPlanner, mimic, this, fleeingBehaviour, CaveMimic.DETECTION_RADIUS));
+        mimic.registerState(new EscapeState(mimic, scanner, movementPlanner, mimic, mimic, this, fleeingBehaviour, CaveMimic.DETECTION_RADIUS));
 
         return mimic;
     }

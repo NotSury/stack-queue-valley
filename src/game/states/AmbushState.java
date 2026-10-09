@@ -8,46 +8,54 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.capabilities.ActorRole;
+import game.interfaces.BaitCarrier;
 import game.interfaces.Disguisable;
 import game.navigation.MovementPlanner;
 import game.perception.EnvironmentScanner;
 
 /**
- A state in which a Cave Mimic reveals itself and confronts a Farmer.
+ * A state in which a Cave Mimic reveals itself and confronts a Farmer.
  * Forces an adjacent Farmer to drop an eligible item on entry.
  * Delegates ordinary pursuit and attacks to an injected combat behaviour.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class AmbushState extends BehaviourDrivenState {
 
     private static final double ESCAPE_HEALTH_RATIO = 0.30;
 
     private final Disguisable disguisable;
+    private final BaitCarrier baitCarrier;
+    private final MovementPlanner movementPlanner;
     private final int detectionRadius;
 
-    private final MovementPlanner movementPlanner;
 
     /**
-     * Creates an ambush state with appearance, combat and escape-planning support.
-     * The supplied appearance operations must operate on the owning creature.
+     * Creates an Ambush state.
+     * The supplied role interfaces must operate on the owning creature.
      *
-     * @param creature the actor that owns this state
-     * @param scanner the scanner used to detect Farmers
-     * @param movementPlanner the planner used to check escape opportunities
-     * @param disguisable the owning creature's appearance operations
-     * @param combatBehaviour the behaviour used for ordinary pursuit and attacks
-     * @param detectionRadius the maximum distance used to detect Farmers
+     * @param creature the owning creature
+     * @param scanner the environmental scanner
+     * @param movementPlanner the planner used to assess escape routes
+     * @param disguisable the creature's appearance operations
+     * @param baitCarrier the creature's bait operations
+     * @param combatBehaviour the ordinary pursuit and attack behaviour
+     * @param detectionRadius the maximum Farmer detection distance
      */
     public AmbushState(
             Actor creature,
             EnvironmentScanner scanner,
             MovementPlanner movementPlanner,
             Disguisable disguisable,
+            BaitCarrier baitCarrier,
             Behaviour<Actor, Action> combatBehaviour,
             int detectionRadius
     ) {
         super(creature, scanner, combatBehaviour);
         this.movementPlanner = movementPlanner;
         this.disguisable = disguisable;
+        this.baitCarrier = baitCarrier;
         this.detectionRadius = detectionRadius;
     }
 
@@ -90,19 +98,21 @@ public class AmbushState extends BehaviourDrivenState {
     }
 
     /**
-     * Determines whether to escape, disguise or continue confronting the Farmer.
-     * Escaping requires low health, a detected Farmer and separate valid
-     * escape steps for the Mimic and its decoy.
+     * Returns to Disguised when no Farmer is detected and bait can be scattered.
+     * Escaping requires low health, a detected Farmer and separate
+     * valid initial steps for the Mimic and its decoy.
      *
      * @param location the Mimic's current location
-     * @return the next state according to health and the surroundings
+     * @return Disguised, Escape or Ambush
      */
     @Override
     public CreatureStateType determineNextState(Location location) {
         Actor farmer = getScanner().findNearestActorWith(location, detectionRadius, ActorRole.FARMER);
 
         if (farmer == null) {
-            return CreatureStateType.DISGUISED;
+            return baitCarrier.canScatterBait(location)
+                    ? CreatureStateType.DISGUISED
+                    : CreatureStateType.AMBUSH;
         }
 
         double escapeHealthThreshold =
@@ -111,7 +121,6 @@ public class AmbushState extends BehaviourDrivenState {
 
         if (getCreature().getStatistic(ActorStatistics.HEALTH)
                 <= escapeHealthThreshold) {
-
             Location threatLocation = location.map().locationOf(farmer);
 
             if (movementPlanner.planEscape(getCreature(), location, threatLocation) != null) {
