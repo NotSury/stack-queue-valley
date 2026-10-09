@@ -4,7 +4,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.capabilities.WebAbility;
-import game.interfaces.WebNetwork;
+import game.interfaces.WebPlacement;
 
 import java.util.*;
 
@@ -40,7 +40,7 @@ public class MapWebPlanner implements WebPlanner {
      * @return the selected site, or null when no eligible reachable site exists
      */
     @Override
-    public Location findPlacementTarget(Actor creature, Location origin, WebNetwork network) {
+    public Location findPlacementTarget(Actor creature, Location origin, WebPlacement network) {
         Location nest = network.getNestLocation();
 
         if (origin.map() != nest.map()) {
@@ -88,7 +88,7 @@ public class MapWebPlanner implements WebPlanner {
             Actor creature,
             Location origin,
             Location target,
-            WebNetwork network
+            WebPlacement network
     ) {
         return isEligible(target, origin, network)
                 && closestApproach(target, buildRoutes(creature, origin)) != null;
@@ -152,7 +152,7 @@ public class MapWebPlanner implements WebPlanner {
     private boolean isEligible(
             Location site,
             Location origin,
-            WebNetwork network
+            WebPlacement network
     ) {
         Location nest = network.getNestLocation();
 
@@ -178,7 +178,7 @@ public class MapWebPlanner implements WebPlanner {
     public boolean hasReachableWeavingWork(
             Actor creature,
             Location origin,
-            WebNetwork network
+            WebPlacement network
     ) {
         if (origin.map() != network.getNestLocation().map()
                 || !network.hasCapacityFor(2)) {
@@ -229,7 +229,7 @@ public class MapWebPlanner implements WebPlanner {
      * @return true if there is enough capacity
      */
    @Override
-   public boolean hasCapacityForWeaving(WebNetwork network, int entryWebs){
+   public boolean hasCapacityForWeaving(WebPlacement network, int entryWebs){
        return network.getRemainingCapacity() >= Math.max(0, entryWebs) + 1;
    }
 

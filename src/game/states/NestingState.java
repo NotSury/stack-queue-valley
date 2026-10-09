@@ -107,7 +107,10 @@ public class NestingState extends EnvironmentAwareState {
     public CreatureStateType determineNextState(Location location) {
         if (network.getAlertLocation() != null) {
             quietTurns = 0;
-            return CreatureStateType.POUNCING;
+
+            return network.canPlaceEntryWebs(location)
+                    ? CreatureStateType.POUNCING
+                    : CreatureStateType.NESTING;
         }
 
         Actor intruder = targetTracker.findNestIntruder();

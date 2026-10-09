@@ -3,7 +3,7 @@ package game.navigation;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
-import game.interfaces.WebNetwork;
+import game.interfaces.WebPlacement;
 
 /**
  * Selects reachable web sites and safe walking steps without changing the map.
@@ -22,7 +22,7 @@ public interface WebPlanner {
      * @param network the Spider's web network
      * @return the selected site, or null when no site is available
      */
-    Location findPlacementTarget(Actor creature, Location origin, WebNetwork network);
+    Location findPlacementTarget(Actor creature, Location origin, WebPlacement network);
 
     /**
      * Checks whether an eligible site has a safe reachable adjacent position.
@@ -33,7 +33,7 @@ public interface WebPlanner {
      * @param network the Spider's web network
      * @return true when the site can still be used
      */
-    boolean isPlacementTargetValid(Actor creature, Location origin, Location target, WebNetwork network);
+    boolean isPlacementTargetValid(Actor creature, Location origin, Location target, WebPlacement network);
 
     /**
      * Finds a safe walking step towards a position beside a web site.
@@ -66,7 +66,7 @@ public interface WebPlanner {
      * @param network the Spider's web network
      * @return true if reachable weaving work exists
      */
-    boolean hasReachableWeavingWork(Actor creature, Location origin, WebNetwork network);
+    boolean hasReachableWeavingWork(Actor creature, Location origin, WebPlacement network);
 
     /**
      * Checks whether the network has room for the entry webs placed when
@@ -76,5 +76,5 @@ public interface WebPlanner {
      * @param entryWebs the number of entry webs Weaving places on entry
      * @return true if there is capacity for entry and ordinary placement
      */
-    boolean hasCapacityForWeaving(WebNetwork network, int entryWebs);
+    boolean hasCapacityForWeaving(WebPlacement network, int entryWebs);
 }

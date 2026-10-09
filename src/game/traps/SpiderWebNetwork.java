@@ -26,7 +26,7 @@ import java.util.Comparator;
  *
  * @author Surya Muni Peragas 35651628
  * @author Lee Le Si 34599223
- * @version 1.2.0
+ * @version 1.3.0
  */
 public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
 
@@ -187,69 +187,6 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
     }
 
     /**
-     * Sends a vibration through nearby active owned webs.
-     * Reveals hidden webs and immediately attempts to catch
-     * actors occupying them. Triggered webs are consumed.
-     *
-     * @param origin the centre of the activation area
-     * @param radius the activation radius
-     * @return a description of the effects, or an empty string
-     */
-    @Override
-    public String activeNearbyWebs(Location origin, int radius) {
-        if (origin.map() != nestLocation.map()) {
-            return "";
-        }
-
-        removeInactiveRecords();
-
-        int affectedWebs = 0;
-        int revealedWebs = 0;
-        StringBuilder catches = new StringBuilder();
-
-        for (Web web : List.copyOf(webs)) {
-            if (!web.isActive()
-                    || GridDistance.between(
-                    origin,
-                    web.getLocation()
-            ) > radius) {
-                continue;
-            }
-
-            affectedWebs++;
-
-            if (web.isHidden()) {
-                revealedWebs++;
-            }
-
-            web.reveal();
-
-            String result = web.trigger();
-
-            if (!result.isEmpty()) {
-                catches.append(result).append("\n");
-            }
-        }
-
-        removeInactiveRecords();
-
-        if (affectedWebs == 0) {
-            return "";
-        }
-
-        String message = owner
-                + " sends a vibration through "
-                + affectedWebs + " web(s), revealing "
-                + revealedWebs + " hidden web(s).";
-
-        if (catches.length() > 0) {
-            message += "\n" + catches.toString().stripTrailing();
-        }
-
-        return message;
-    }
-
-    /**
      * Returns how many more webs can be placed before the limit.
      *
      * @return the number of free web slots, never below zero
@@ -257,6 +194,33 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
     @Override
     public int getRemainingCapacity(){
         return Math.max(0, MAXIMUM_ACTIVE_WEBS - countActiveWebs());
+    }
+
+    /**
+     * Checks whether an adjacent entry web can be placed without mutation.
+     * At capacity, an active non-guard web must be available for replacement.
+     *
+     * @param origin the proposed placement centre
+     * @return true when at least one adjacent entry placement can succeed
+     */
+    @Override
+    public boolean canPlaceEntryWebs(Location origin) {
+        if (origin.map() != nestLocation.map()) {
+            return false;
+        }
+
+        if (countActiveWebs() >= MAXIMUM_ACTIVE_WEBS
+                && findShortestLivedReplaceable() == null) {
+            return false;
+        }
+
+        for (Location site : origin.getNearbyLocations(1)) {
+            if (isValidSite(site)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
