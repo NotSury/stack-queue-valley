@@ -17,7 +17,7 @@ import game.capabilities.GroundAbility;
  * five times. Harvesting costs 3 stamina, always removes the crop, and
  * has a 50 percent chance of giving the actor a Cauliflower.</p>
  *
- * @author <Chin Kai Xuan> <35730374>
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public class CauliflowerCrop extends WaterableCrop {

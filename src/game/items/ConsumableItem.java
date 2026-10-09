@@ -16,7 +16,7 @@ import game.interfaces.Consumable;
  * consumption effect, and removing the item from the actor's inventory
  * after it is consumed.</p>
  *
- * @author <Chin Kai Xuan> <35730374>
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public abstract class ConsumableItem extends Item implements Consumable {

@@ -18,8 +18,8 @@ import java.util.List;
  * The crop then has a destruction chance equal to 10 percent plus
  * the number of times it has been watered.</p>
  *
- * @author <Lee Le Si> <34599223>
- * @author <Chin Kai Xuan> <35730374>
+ * @author Lee Le Si 34599223
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public class ParsnipCrop extends WaterableCrop {

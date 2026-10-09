@@ -13,8 +13,8 @@ import game.items.Tomato;
  * Tomatoes. The crop is removed and the actor's maximum stamina
  * is increased by 1.</p>
  *
- * @author <Lee Le Si> <34599223>
- * @author <Chin Kai Xuan> <35730374>
+ * @author Lee Le Si 34599223
+ * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
 public class TomatoCrop extends Crop {
