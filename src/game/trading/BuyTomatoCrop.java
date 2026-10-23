@@ -1,16 +1,14 @@
 package game.trading;
 
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.capabilities.FarmerStatistic;
 import game.grounds.TomatoCrop;
 import game.interfaces.Buyable;
-import game.interfaces.PlantableGround;
+import game.utils.PlantingLocations;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -45,25 +43,15 @@ public class BuyTomatoCrop implements Buyable
      */
     @Override
     public String buy(Actor buyer, Actor merchant, GameMap map) {
-        if (buyer.getStatistic(FarmerStatistic.COINS) < PRICE) {
-            return buyer + " does not have enough coins to buy a Tomato Crop.";
-        }
 
         Location merchantLocation = map.locationOf(merchant);
 
-        List<Location> availableLocations = new ArrayList<>();
-
-        for (Exit exit : merchantLocation.getExits()) {
-            Location location = exit.getDestination();
-
-            if (location.getGroundAs(PlantableGround.class) != null) {
-                availableLocations.add(location);
-            }
-        }
+        List<Location> availableLocations =
+                PlantingLocations.plantableTilesAround(merchantLocation, true);
 
         if (availableLocations.isEmpty())
         {
-            return "There is no available location for a Tomato Crop. " + PRICE + " coins were refunded!";
+            return "There is no available location for a Tomato Crop. No coins were charged!";
         }
 
         Location cropLocation = availableLocations.get(random.nextInt(availableLocations.size()));

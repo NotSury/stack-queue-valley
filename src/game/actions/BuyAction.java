@@ -3,6 +3,7 @@ package game.actions;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
+import game.capabilities.FarmerStatistic;
 import game.interfaces.Buyable;
 
 /**
@@ -40,6 +41,11 @@ public class BuyAction extends Action
     @Override
     public String execute(Actor actor, GameMap map)
     {
+        if (actor.getStatistic(FarmerStatistic.COINS) < target.getBuyPrice())
+        {
+            return actor + " does not have enough coins to buy " +
+                    target + ".";
+        }
         return target.buy(actor, merchant, map);
     }
 

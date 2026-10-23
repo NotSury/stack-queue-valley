@@ -1,17 +1,16 @@
 package game.trading;
 
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.capabilities.FarmerStatistic;
 import game.interfaces.Buyable;
 import game.grounds.ParsnipCrop;
 import game.items.Parsnip;
-import game.interfaces.PlantableGround;
+import game.utils.PlantingLocations;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -46,23 +45,13 @@ public class BuyParsnipCrop implements Buyable {
      */
     @Override
     public String buy(Actor buyer, Actor merchant, GameMap map) {
-        if (buyer.getStatistic(FarmerStatistic.COINS) < PRICE) {
-            return buyer + " does not have enough coins to buy a Parsnip Crop.";
-        }
 
         buyer.modifyStatistic(FarmerStatistic.COINS, StatisticOperations.DECREASE, PRICE);
 
         Location merchantLocation = map.locationOf(merchant);
 
-        List<Location> availableLocations = new ArrayList<>();
-
-        for (Exit exit : merchantLocation.getExits()) {
-            Location location = exit.getDestination();
-
-            if (location.getGroundAs(PlantableGround.class) != null) {
-                availableLocations.add(location);
-            }
-        }
+        List<Location> availableLocations =
+                PlantingLocations.plantableTilesAround(merchantLocation, false);
 
         if (availableLocations.isEmpty()) {
             buyer.modifyStatistic(FarmerStatistic.COINS, StatisticOperations.INCREASE, PRICE);
