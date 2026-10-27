@@ -7,5 +7,10 @@ package game.capabilities;
  * @version 1.0.0
  */
 public enum GroundAbility {
-    CROP
+    CROP,
+
+    /**
+     * Bare Dirt that can be enriched into Soil by cooking Jam
+     */
+    BARE_DIRT
 }

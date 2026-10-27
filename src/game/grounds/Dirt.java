@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.TillingAction;
 import game.actions.WateringAction;
+import game.capabilities.GroundAbility;
 import game.interfaces.PlantableGround;
 import game.interfaces.Tillable;
 import game.interfaces.Waterable;
@@ -29,6 +30,7 @@ public class Dirt extends Ground implements Tillable, Waterable, PlantableGround
      */
     public Dirt() {
         super('.', "Dirt");
+        this.enableAbility(GroundAbility.BARE_DIRT);
     }
 
     /**
