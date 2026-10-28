@@ -8,8 +8,16 @@ import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actions.ConsumeAction;
 import game.actions.FeedAction;
+import game.capabilities.IngredientCategory;
+import game.cooking.CookingContext;
+import game.grounds.ParsnipCrop;
 import game.interfaces.FeedItem;
 import game.interfaces.Feedable;
+import game.interfaces.Ingredient;
+import game.interfaces.PlantableGround;
+
+import java.util.Optional;
+
 /**
  * Parsnip represents a harvested product that can be consumed,
  * fed to farm animals, and processed by processing facilities.
@@ -22,7 +30,7 @@ import game.interfaces.Feedable;
  * @author Lee Le Si 34599223
  * @version 1.0.0
  */
-public class Parsnip extends ProcessableItem implements FeedItem {
+public class Parsnip extends ProcessableItem implements FeedItem, Ingredient {
     /**
      * Constructor for the Parsnip class.
      *
@@ -130,5 +138,40 @@ public class Parsnip extends ProcessableItem implements FeedItem {
     @Override
     public String getProductName() {
         return "Parsnip";
+    }
+
+    /**
+     * Returns the category used when selecting this Parsnip for cooking.
+     *
+     * @return the Vegetable category
+     */
+    @Override
+    public IngredientCategory getCategory() {
+        return IngredientCategory.VEGETABLE;
+    }
+
+    /**
+     * Plants a Parsnip Crop on one random adjacent planting ground.
+     *
+     * <p>If no eligible tile exists, no crop is planted. IngredientEntry
+     * still removes this Parsnip as part of the cooking workflow.
+     *
+     * @param context the context for the cooking attempt
+     * @return a planting description, or an empty string if no tile qualifies
+     */
+    @Override
+    public String applyCookingEffect(CookingContext context) {
+        Optional<Location> destination = context.randomAdjacent(
+                location -> location.getGroundAs(PlantableGround.class) != null
+        );
+
+        if (destination.isEmpty()) {
+            return "";
+        }
+
+        Location plantingLocation = destination.get();
+        plantingLocation.setGround(new ParsnipCrop());
+
+        return "A Parsnip Crop grows at " + plantingLocation + ".";
     }
 }

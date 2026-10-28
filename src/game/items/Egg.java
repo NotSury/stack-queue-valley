@@ -9,7 +9,12 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actors.Chicken;
 import game.capabilities.FarmerStatistic;
+import game.capabilities.IngredientCategory;
+import game.cooking.CookingContext;
+import game.interfaces.Ingredient;
 import game.interfaces.Sellable;
+
+import java.util.Optional;
 import java.util.Random;
 
 import java.util.ArrayList;
@@ -25,10 +30,11 @@ import java.util.List;
  * @author Vanessa Liau Jia Yee <34599398>
  * @version 1.2.0
  */
-public class Egg extends Item implements Sellable
+public class Egg extends Item implements Sellable, Ingredient
 {
     private static final int SELL_PRICE = 40;
     private static final double CHICKEN_CHANCE = 0.5;
+    private static final double COOKING_HATCH_CHANCE = 0.25;
 
     /**
      * Constructor for the Egg class.
@@ -107,5 +113,52 @@ public class Egg extends Item implements Sellable
             }
         }
         return seller + " sold Egg for " + SELL_PRICE + " coins.";
+    }
+
+    /**
+     * Returns the category used when selecting this Egg for cooking.
+     *
+     * @return the Animal Product category
+     */
+    @Override
+    public IngredientCategory getCategory() {
+        return IngredientCategory.ANIMAL_PRODUCT;
+    }
+
+    /**
+     * Attempts to hatch a Chicken beside the cooking station.
+     *
+     * <p>The selected tile must be enterable by the Chicken. IngredientEntry
+     * removes the Egg regardless of whether hatching succeeds.
+     *
+     * @param context the context for the cooking attempt
+     * @return a hatching description, a placement-failure message,
+     *     or an empty string if no hatching occurs
+     */
+    @Override
+    public String applyCookingEffect(CookingContext context) {
+        if (!context.chance(COOKING_HATCH_CHANCE)) {
+            return "";
+        }
+
+        Chicken chicken = new Chicken();
+
+        Optional<Location> destination = context.randomAdjacent(
+                location -> location.canActorEnter(chicken)
+        );
+
+        if (destination.isEmpty()) {
+            return "";
+        }
+
+        Location hatchLocation = destination.get();
+
+        try {
+            hatchLocation.addActor(chicken);
+        } catch (GameEngineException exception) {
+            return "The Egg could not hatch a Chicken";
+        }
+
+        return "A Chicken hatches at " + hatchLocation + ".";
     }
 }

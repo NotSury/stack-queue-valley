@@ -6,7 +6,7 @@ import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.TillingAction;
 import game.actions.WateringAction;
-import game.interfaces.PlantableGround;
+import game.capabilities.GroundAbility;
 import game.interfaces.Tillable;
 import game.interfaces.Waterable;
 
@@ -22,13 +22,15 @@ import game.interfaces.Waterable;
  * @author <Vanessa Liau Jia Yee> <34599398>
  * @version 1.1.0
  */
-public class Dirt extends Ground implements Tillable, Waterable, PlantableGround {
+public class Dirt extends Ground implements Tillable, Waterable {
 
     /**
      * Constructor for the Dirt class.
      */
     public Dirt() {
         super('.', "Dirt");
+        this.enableAbility(GroundAbility.BARE_DIRT);
+        this.enableAbility(GroundAbility.OPEN_GROUND);
     }
 
     /**

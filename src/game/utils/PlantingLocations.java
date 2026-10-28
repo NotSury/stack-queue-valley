@@ -1,10 +1,8 @@
 package game.utils;
 
 import edu.monash.fit2099.engine.positions.Location;
-import edu.monash.fit2099.engine.positions.Exit;
 import game.interfaces.PlantableGround;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,20 +25,12 @@ public class PlantingLocations
      * @return a list of suitable adjacent locations
      */
     public static List<Location> plantableTilesAround(
-            Location center, boolean requireUnoccupied)
-    {
-        List<Location> availableLocations = new ArrayList<>();
-
-        for (Exit exit : center.getExits())
-        {
-            Location location = exit.getDestination();
-
-            if (location.getGroundAs(PlantableGround.class) != null
-            && (!requireUnoccupied || !location.containsAnActor()))
-            {
-                availableLocations.add(location);
-            }
-        }
-        return availableLocations;
+            Location center, boolean requireUnoccupied
+    ) {
+        return AdjacentLocations.matchingAround(
+                center,
+                location -> location.getGroundAs(PlantableGround.class) != null
+                && (!requireUnoccupied || !location.containsAnActor())
+        );
     }
 }

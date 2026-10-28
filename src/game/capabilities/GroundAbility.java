@@ -7,5 +7,16 @@ package game.capabilities;
  * @version 1.0.0
  */
 public enum GroundAbility {
-    CROP
+    CROP,
+
+    /**
+     * Bare Dirt that can be enriched into Soil by cooking Jam
+     */
+    BARE_DIRT,
+
+    /**
+     * Terrain without a crop or built structure.
+     * Actor occupancy and existing items are checked separately.
+     */
+    OPEN_GROUND
 }

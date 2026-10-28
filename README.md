@@ -308,3 +308,17 @@ The Spider's two new ordinary behaviours are strategic web construction in Weavi
 Walking and jumping respect terrain restrictions and Actor occupancy. Safe route planning also avoids recognised hazards, including fire items and electrically charged ground.
 
 Placement and spawning use eligible locations. If no ordinary action is available, the Spider remains stationary.
+
+## Running unit tests
+
+Requirements: JDK 17 or later and Apache Maven 3.6.3 or later.
+
+From the project root, run:
+
+```shell
+mvn test
+```
+
+Test classes are stored in `test/`.
+Test reports are generated in `target/surefire-reports/`.
+The first run requires internet access to download build dependencies.
