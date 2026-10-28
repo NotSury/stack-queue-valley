@@ -1,7 +1,9 @@
 package game.recipes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import edu.monash.fit2099.engine.actors.ActorStatistics;
@@ -18,22 +20,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.random.RandomGenerator;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
- * Tests ingredient selection and dish creation for Jam recipes.
+ * Tests Jam's minimum Fruit requirement, ingredient selection
+ * and dish creation.
  */
 class JamRecipeTest {
 
     /**
-     * Checks that Jam uses every carried Fruit, preserves unrelated
-     * items and restores stamina according to its cooking batch.
+     * Checks failure without Fruit and successful use of every Fruit,
+     * while preserving unrelated items and cooking stamina.
      *
      * @param fruitCount the number of carried Fruit ingredients
+     * @param shouldCook whether the supplied ingredients permit cooking
      */
-    @ParameterizedTest(name = "{0} Fruit should produce one Jam")
-    @ValueSource(ints = {1, 3, 5})
-    void cookingUsesAllFruitAndPreservesOtherItems(int fruitCount) {
+    @ParameterizedTest(
+            name = "{0} Fruit: cooking succeeds = {1}")
+    @CsvSource({
+            "0, false",
+            "1, true",
+            "5, true"
+    })
+    void cookingRequiresFruitAndPreservesOtherItems(
+            int fruitCount, boolean shouldCook) {
 
         // Arrange
         Farmer farmer = new Farmer("Test");
@@ -60,8 +70,10 @@ class JamRecipeTest {
         Location stationLocation = mock(Location.class);
         RandomGenerator random = mock(RandomGenerator.class);
 
-        when(stationLocation.getExits()).thenReturn(List.of());
-        when(random.nextDouble()).thenReturn(0.99);
+        if (shouldCook) {
+            when(stationLocation.getExits()).thenReturn(List.of());
+            when(random.nextDouble()).thenReturn(0.99);
+        }
 
         CookingContext context =
                 new CookingContext(farmer, stationLocation, random);
@@ -69,9 +81,28 @@ class JamRecipeTest {
         JamRecipe recipe = new JamRecipe();
 
         // Act
-        recipe.cook(context);
+        String result = recipe.cook(context);
 
         // Assert
+        assertEquals(
+                initialStamina,
+                farmer.getStatistic(ActorStatistics.STAMINA),
+                "Cooking should not restore or deduct stamina");
+
+        if (!shouldCook) {
+            assertEquals(
+                    preservedItems,
+                    farmer.getInventory().getItems(),
+                    "Cooking without Fruit should preserve all items and create no dish");
+
+            assertTrue(
+                    result.contains("missing required ingredients"),
+                    "The result should explain why cooking failed");
+
+            verifyNoInteractions(random, stationLocation);
+            return;
+        }
+
         List<ConsumableItem> createdDishes =
                 farmer.getInventory().getItemsAs(ConsumableItem.class);
 
@@ -96,11 +127,6 @@ class JamRecipeTest {
                 expectedInventory,
                 farmer.getInventory().getItems(),
                 "Cooking should replace all Fruit with Jam and preserve other items");
-
-        assertEquals(
-                initialStamina,
-                farmer.getStatistic(ActorStatistics.STAMINA),
-                "Cooking should not restore or deduct stamina");
 
         // Consume the created dish to check its stored Fruit count.
         jam.consume(farmer);
