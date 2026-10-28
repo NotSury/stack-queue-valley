@@ -23,7 +23,7 @@ public abstract class FixedAmountRecipe extends Recipe {
      */
     protected FixedAmountRecipe(String name, Map<IngredientCategory, Integer> requirements) {
         super(name);
-        this.requirements = requirements;
+        this.requirements = Map.copyOf(requirements);
     }
 
 
