@@ -38,7 +38,7 @@ class OmeletteRecipeTest {
     @ParameterizedTest(
             name = "{0} Eggs and {1} Parsnips: cooking should fail")
     @CsvSource({
-            "0, 0",
+            "2, 0",
             "1, 0",
             "0, 1"
     })

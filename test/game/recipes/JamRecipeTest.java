@@ -37,10 +37,12 @@ class JamRecipeTest {
 
         // Arrange
         Farmer farmer = new Farmer("Test");
+        int initialStamina = 10;
+
         farmer.modifyStatistic(
                 ActorStatistics.STAMINA,
                 StatisticOperations.UPDATE,
-                0);
+                initialStamina);
 
         farmer.getInventory().add(new Egg());
         farmer.getInventory().add(new Parsnip());
@@ -96,7 +98,7 @@ class JamRecipeTest {
                 "Cooking should replace all Fruit with Jam and preserve other items");
 
         assertEquals(
-                0,
+                initialStamina,
                 farmer.getStatistic(ActorStatistics.STAMINA),
                 "Cooking should not restore or deduct stamina");
 
@@ -104,7 +106,7 @@ class JamRecipeTest {
         jam.consume(farmer);
 
         assertEquals(
-                fruitCount,
+                initialStamina + fruitCount,
                 farmer.getStatistic(ActorStatistics.STAMINA),
                 "The created Jam should restore stamina equal to its Fruit count");
 
