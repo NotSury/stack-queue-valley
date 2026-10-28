@@ -57,6 +57,6 @@ public class CookAction extends Action {
      */
     @Override
     public String menuDescription(Actor actor) {
-        return actor + " cooks" + recipe.getName();
+        return actor + " cooks " + recipe.getName();
     }
 }
