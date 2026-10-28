@@ -1,6 +1,5 @@
 package game.recipes;
 
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.capabilities.GroundAbility;
 import game.capabilities.IngredientCategory;
@@ -10,6 +9,7 @@ import game.cooking.CookingContext;
 import game.interfaces.Tillable;
 import game.items.ConsumableItem;
 import game.items.Jam;
+import game.utils.AdjacentLocations;
 
 /**
  * Cooks Jam using every Fruit ingredient carried by the cook.
@@ -38,16 +38,16 @@ public class JamRecipe extends AllIngredientRecipe {
 
         int enrichedTiles = 0;
 
-        for (Exit exit : context.getStationLocation().getExits()) {
-            Location destination = exit.getDestination();
+        for (Location destination : AdjacentLocations.matchingAround(
+                context.getStationLocation(),
+                location -> location.getGround()
+                        .hasAbility(GroundAbility.BARE_DIRT))) {
 
-            if (destination.getGround().hasAbility(GroundAbility.BARE_DIRT)) {
-                Tillable tillable = destination.getGroundAs(Tillable.class);
+            Tillable tillable = destination.getGroundAs(Tillable.class);
 
-                if (tillable != null) {
-                    tillable.till(destination);
-                    enrichedTiles++;
-                }
+            if (tillable != null) {
+                tillable.till(destination);
+                enrichedTiles++;
             }
         }
 

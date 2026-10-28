@@ -42,6 +42,6 @@ public class HarvestFeast extends ConsumableItem {
 
         return actor + " consumes a Harvest Feast, increasing maximum "
                 + "health and stamina by " + MAXIMUM_INCREASE
-                + " and full restoring both.";
+                + " and fully restoring both.";
     }
 }

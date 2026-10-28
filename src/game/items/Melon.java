@@ -116,6 +116,6 @@ public class Melon extends ConsumableItem implements CoatingSource, Ingredient {
         Explosion explosion = new Explosion(COOKING_BURST_DAMAGE);
         explosion.explodeAround(context.getStationLocation());
 
-        return "Melon brusts, dealing " + COOKING_BURST_DAMAGE + " damage to each actor adjacent to the cooking station.";
+        return "Melon bursts, dealing " + COOKING_BURST_DAMAGE + " damage to each actor adjacent to the cooking station.";
     }
 }

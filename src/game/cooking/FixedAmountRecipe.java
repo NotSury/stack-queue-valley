@@ -2,7 +2,11 @@ package game.cooking;
 
 import game.capabilities.IngredientCategory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * A recipe that requires an exact quantity from each specified category.
