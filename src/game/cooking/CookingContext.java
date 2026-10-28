@@ -1,10 +1,9 @@
 package game.cooking;
 
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
+import game.utils.AdjacentLocations;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -79,17 +78,10 @@ public final class CookingContext {
      * @return a selected location, or empty if no destination qualifies
      */
     public Optional<Location> randomAdjacent(
-            Predicate<Location> eligibility
-    ) {
-        List<Location> candidates = new ArrayList<>();
+            Predicate<Location> eligibility) {
 
-        for (Exit exit : stationLocation.getExits()) {
-            Location destination = exit.getDestination();
-
-            if (!candidates.contains(destination) && eligibility.test(destination)) {
-                candidates.add(destination);
-            }
-        }
+        List<Location> candidates =
+                AdjacentLocations.matchingAround(stationLocation, eligibility);
 
         if (candidates.isEmpty()) {
             return Optional.empty();
@@ -98,5 +90,4 @@ public final class CookingContext {
         int selectedIndex = random.nextInt(candidates.size());
         return Optional.of(candidates.get(selectedIndex));
     }
-
 }
