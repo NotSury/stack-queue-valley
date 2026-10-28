@@ -2,8 +2,10 @@ package game.items;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
+import edu.monash.fit2099.engine.capabilities.Status;
 import edu.monash.fit2099.engine.items.Item;
 import game.actors.Farmer;
 import game.statuses.HealthOverTimeStatus;
@@ -18,21 +20,25 @@ import java.util.List;
 class OmeletteTest {
 
     /**
-     * Checks that consumption removes all statuses and the Omelette,
+     * Checks removal of harmful, beneficial and other status types,
      * while preserving other items and current statistics.
      *
-     * @param harmfulCount the number of harmful statuses
-     * @param beneficialCount the number of beneficial statuses
+     * @param harmfulCount the number of harmful health statuses
+     * @param beneficialCount the number of beneficial health statuses
+     * @param otherStatusCount the number of statuses of another implementation
      */
     @ParameterizedTest(
-            name = "{0} harmful and {1} beneficial statuses"
-    )
+            name = "{0} harmful, {1} beneficial and {2} other statuses")
     @CsvSource({
-            "0, 0",
-            "1, 0",
-            "2, 1"
+            "0, 0, 0",
+            "1, 0, 0",
+            "1, 1, 1"
     })
-    void consumptionRemovesEveryStatus(int harmfulCount, int beneficialCount) {
+    void consumptionRemovesEveryStatus(
+            int harmfulCount,
+            int beneficialCount,
+            int otherStatusCount) {
+
         // Arrange
         Farmer farmer = new Farmer("Test");
 
@@ -42,6 +48,12 @@ class OmeletteTest {
 
         for (int i = 0; i < beneficialCount; i++) {
             farmer.addStatus(new HealthOverTimeStatus(5, 3));
+        }
+
+        for (int i = 0; i < otherStatusCount; i++) {
+            Status otherStatus = mock(Status.class);
+            when(otherStatus.isStatusActive()).thenReturn(true);
+            farmer.addStatus(otherStatus);
         }
 
         int originalHealth = farmer.getStatistic(ActorStatistics.HEALTH);
