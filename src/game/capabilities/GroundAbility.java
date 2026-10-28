@@ -12,5 +12,11 @@ public enum GroundAbility {
     /**
      * Bare Dirt that can be enriched into Soil by cooking Jam
      */
-    BARE_DIRT
+    BARE_DIRT,
+
+    /**
+     * Terrain without a crop or built structure.
+     * Actor occupancy and existing items are checked separately.
+     */
+    OPEN_GROUND
 }

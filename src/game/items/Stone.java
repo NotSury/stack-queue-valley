@@ -6,9 +6,10 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.capabilities.FarmerStatistic;
+import game.capabilities.GroundAbility;
 import game.grounds.Rock;
 import game.interfaces.Sellable;
-import game.utils.PlantingLocations;
+import game.utils.AdjacentLocations;
 
 import java.util.List;
 import java.util.Random;
@@ -68,7 +69,12 @@ public class Stone extends Item implements Sellable
         Location merchantLocation = map.locationOf(merchant);
 
         List<Location> availableLocations =
-                PlantingLocations.plantableTilesAround(merchantLocation, true);
+                AdjacentLocations.matchingAround(
+                        merchantLocation,
+                        location -> location.getGround()
+                                .hasAbility(GroundAbility.OPEN_GROUND)
+                                && !location.containsAnActor()
+                );
 
         if (!availableLocations.isEmpty())
         {
