@@ -34,21 +34,25 @@ import org.mockito.ArgumentCaptor;
 class HarvestFeastRecipeTest {
 
     /**
-     * Checks failed cooking, exact selection and surplus preservation.
-     * Successful cooking must produce two separate Harvest Feasts.
+     * Checks category-specific quantities and separate dish creation.
      *
-     * @param amountPerCategory the number of ingredients in each category
+     * @param fruitCount the number of Fruit ingredients
+     * @param vegetableCount the number of Vegetable ingredients
+     * @param animalProductCount the number of Animal Product ingredients
      * @param shouldCook whether the supplied ingredients permit cooking
      */
     @ParameterizedTest(
-            name = "{0} ingredients per category: cooking succeeds = {1}")
+            name = "{0} Fruit, {1} Vegetables, {2} Animal Products: success = {3}")
     @CsvSource({
-            "4, false",
-            "5, true",
-            "6, true"
+            "6, 5, 4, false",
+            "5, 5, 5, true",
+            "6, 6, 6, true"
     })
     void cookingRespectsQuantitiesAndCreatesSeparateDishes(
-            int amountPerCategory, boolean shouldCook) {
+            int fruitCount,
+            int vegetableCount,
+            int animalProductCount,
+            boolean shouldCook) {
 
         // Arrange
         Farmer farmer = new Farmer("Test");
@@ -62,9 +66,15 @@ class HarvestFeastRecipeTest {
         List<Item> unrelatedItems =
                 List.copyOf(farmer.getInventory().getItems());
 
-        for (int i = 0; i < amountPerCategory; i++) {
+        for (int i = 0; i < fruitCount; i++) {
             farmer.getInventory().add(new Melon());
+        }
+
+        for (int i = 0; i < vegetableCount; i++) {
             farmer.getInventory().add(new Parsnip());
+        }
+
+        for (int i = 0; i < animalProductCount; i++) {
             farmer.getInventory().add(new Egg());
         }
 
@@ -119,12 +129,20 @@ class HarvestFeastRecipeTest {
             return;
         }
 
-        for (IngredientCategory category : IngredientCategory.values()) {
-            assertEquals(
-                    amountPerCategory - 5,
-                    countIngredients(farmer, category),
-                    "Cooking should consume exactly five ingredients from " + category);
-        }
+        assertEquals(
+                fruitCount - 5,
+                countIngredients(farmer, IngredientCategory.FRUIT),
+                "Cooking should consume exactly five Fruit");
+
+        assertEquals(
+                vegetableCount - 5,
+                countIngredients(farmer, IngredientCategory.VEGETABLE),
+                "Cooking should consume exactly five Vegetables");
+
+        assertEquals(
+                animalProductCount - 5,
+                countIngredients(farmer, IngredientCategory.ANIMAL_PRODUCT),
+                "Cooking should consume exactly five Animal Products");
 
         assertTrue(
                 farmer.getInventory().getItems().containsAll(unrelatedItems),
