@@ -32,6 +32,7 @@ public abstract class Crop extends Ground implements Harvestable {
     protected Crop(char displayChar, String name) {
         super(displayChar, name);
         this.enableAbility(GroundAbility.CROP);
+        this.enableAbility(GroundAbility.METEOR_IMPACTABLE);
     }
 
     /**
