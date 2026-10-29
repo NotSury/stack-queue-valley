@@ -21,5 +21,6 @@ public enum GroundAbility {
     OPEN_GROUND,
 
     METEOR_IMPACTABLE,
-    METEOR_IMPACT_SITE
+    METEOR_IMPACT_SITE,
+    COSMIC_CROP
 }
