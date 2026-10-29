@@ -18,5 +18,8 @@ public enum GroundAbility {
      * Terrain without a crop or built structure.
      * Actor occupancy and existing items are checked separately.
      */
-    OPEN_GROUND
+    OPEN_GROUND,
+
+    METEOR_IMPACTABLE,
+    METEOR_IMPACT_SITE
 }

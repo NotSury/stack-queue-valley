@@ -5,6 +5,7 @@ import game.coatings.Coating;
 import game.interfaces.Chargeable;
 import game.interfaces.CoatingSource;
 import game.statuses.ChargedStatus;
+import game.capabilities.GroundAbility;
 
 /**
  * Puddle represents a wet ground created when Dirt is watered.
@@ -21,6 +22,7 @@ public class Puddle extends Ground implements Chargeable, CoatingSource {
      */
     public Puddle() {
         super('~',"Puddle");
+        this.enableAbility(GroundAbility.METEOR_IMPACTABLE);
     }
 
     /**

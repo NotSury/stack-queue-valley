@@ -9,6 +9,7 @@ import game.actions.WateringAction;
 import game.capabilities.GroundAbility;
 import game.interfaces.Tillable;
 import game.interfaces.Waterable;
+import game.capabilities.GroundAbility;
 
 /**
  * Dirt represents a ground that can be tilled or watered by an actor.
@@ -31,6 +32,7 @@ public class Dirt extends Ground implements Tillable, Waterable {
         super('.', "Dirt");
         this.enableAbility(GroundAbility.BARE_DIRT);
         this.enableAbility(GroundAbility.OPEN_GROUND);
+        this.enableAbility(GroundAbility.METEOR_IMPACTABLE);
     }
 
     /**
