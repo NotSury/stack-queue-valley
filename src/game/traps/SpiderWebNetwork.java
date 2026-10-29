@@ -3,8 +3,8 @@ package game.traps;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Location;
+import game.capabilities.GroundAbility;
 import game.capabilities.WebAbility;
-import game.interfaces.PlantableGround;
 import game.interfaces.WebNetwork;
 import game.items.Web;
 import game.navigation.GridDistance;
@@ -102,7 +102,7 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
 
     /**
      * Checks whether a location is eligible for placement.
-     * Requires safe, unoccupied, plantable ground on the nest's
+     * Requires safe, unoccupied, ground with the OPEN_GROUND ability on the nest's
      * map. Rejects locations already containing a web and
      * enforces the active web limit.
      *
@@ -115,7 +115,7 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
 
     /**
      * Checks every placement rule except the active web limit.
-     * Requires safe, unoccupied, plantable ground on the nest's map,
+     * Requires safe, unoccupied, ground with the OPEN_GROUND ability on the nest's map,
      * not the nest tile itself, and no existing web on the tile.
      *
      * @param location the proposed placement location
@@ -128,9 +128,7 @@ public class SpiderWebNetwork implements WebNetwork, WebTriggerRecorder {
                 || !nestLocation.map().contains(owner)
                 || !location.canActorEnter(owner)
                 || !MovementSafety.isSafe(location)
-                || location.getGround()
-                .asCapability(PlantableGround.class)
-                .isEmpty()) {
+                || !location.getGround().hasAbility(GroundAbility.OPEN_GROUND)) {
             return false;
         }
 

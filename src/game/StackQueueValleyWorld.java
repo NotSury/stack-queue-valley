@@ -12,6 +12,7 @@ import edu.monash.fit2099.engine.positions.World;
 import game.actors.*;
 import game.behaviours.AmbushBehaviour;
 import game.behaviours.AttackBehaviour;
+import game.cooking.Recipe;
 import game.grounds.*;
 import game.items.Parsnip;
 import game.items.Tomato;
@@ -21,10 +22,15 @@ import game.perception.MapEnvironmentScanner;
 import game.items.AlienDevice;
 import game.items.Geode;
 import game.items.Melon;
+import game.recipes.HarvestFeastRecipe;
+import game.recipes.JamRecipe;
+import game.recipes.OmeletteRecipe;
 import game.teleportation.TeleportDestination;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+
 /**
  * StackQueueValleyWorld represents the game world for Stack-Queue Valley.
  *
@@ -158,6 +164,16 @@ public class StackQueueValleyWorld extends World {
 
         inheritedFarmMap.at(6,5).setGround(new PreservesJar());
         inheritedFarmMap.at(5,6).setGround(new DryingRack());
+
+        List<Recipe> cookingRecipes = List.of(
+                new JamRecipe(),
+                new OmeletteRecipe(),
+                new HarvestFeastRecipe()
+        );
+
+        inheritedFarmMap.at(2, 4).setGround(
+                new CookingStation(cookingRecipes, new Random())
+        );
 
         MovementPlanner movementPlanner = new MapMovementPlanner();
 

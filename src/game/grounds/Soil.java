@@ -1,5 +1,6 @@
 package game.grounds;
 import edu.monash.fit2099.engine.positions.Ground;
+import game.capabilities.GroundAbility;
 import game.interfaces.PlantableGround;
 
 /**
@@ -17,5 +18,6 @@ public class Soil extends Ground implements PlantableGround{
      */
     public Soil() {
         super(',',"Soil");
+        this.enableAbility(GroundAbility.OPEN_GROUND);
     }
 }

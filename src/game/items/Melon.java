@@ -4,9 +4,13 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.capabilities.IngredientCategory;
 import game.coatings.Coating;
 import game.coatings.MelonCoating;
+import game.cooking.CookingContext;
+import game.effects.Explosion;
 import game.interfaces.CoatingSource;
+import game.interfaces.Ingredient;
 
 /**
  * Represents a Melon that can be consumed by an actor.
@@ -22,7 +26,10 @@ import game.interfaces.CoatingSource;
  * @author <Lee Le Si> <34599223>
  * @version 1.1.0
  */
-public class Melon extends ConsumableItem implements CoatingSource {
+public class Melon extends ConsumableItem implements CoatingSource, Ingredient {
+
+    private static final double COOKING_BURST_CHANCE = 0.5;
+    private static final int COOKING_BURST_DAMAGE = 15;
 
     /**
      * Amount by which maximum health is increased when consumed.
@@ -78,5 +85,37 @@ public class Melon extends ConsumableItem implements CoatingSource {
         }else{
             sourceLocation.removeItem(this);
         }
+    }
+
+    /**
+     * Returns the category used when selecting this Melon for cooking.
+     *
+     * @return the Fruit category
+     */
+    @Override
+    public IngredientCategory getCategory() {
+        return IngredientCategory.FRUIT;
+    }
+
+    /**
+     * Applies this Melon's cooking effect.
+     *
+     * <p>A successful burst damages every actor adjacent to the station.
+     * Inventory removal is handled by IngredientEntry regardless of
+     * whether the burst occurs.
+     *
+     * @param context the context for the cooking attempt
+     * @return a burst description, or an empty string if no burst occurs
+     */
+    @Override
+    public String applyCookingEffect(CookingContext context) {
+        if (!context.chance(COOKING_BURST_CHANCE)) {
+            return "";
+        }
+
+        Explosion explosion = new Explosion(COOKING_BURST_DAMAGE);
+        explosion.explodeAround(context.getStationLocation());
+
+        return "Melon brusts, dealing " + COOKING_BURST_DAMAGE + " damage to each actor adjacent to the cooking station.";
     }
 }
