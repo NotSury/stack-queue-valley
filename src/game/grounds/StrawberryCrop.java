@@ -20,6 +20,9 @@ import java.util.Random;
  * Strawberries. The crop has a chance of being destroyed equal to
  * 50 percent minus the number of times it has been watered.</p>
  *
+ * <p>The crop also produces a Strawberry on a random adjacent tile every 5 turns.
+ * Each Strawberry has a 50% chance of being rotten.</p>
+ *
  * @author Chin Kai Xuan 35730374
  * @author Khoo Lynn 34598901
  * @version 1.1.0
