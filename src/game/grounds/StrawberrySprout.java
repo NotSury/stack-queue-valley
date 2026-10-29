@@ -5,15 +5,30 @@ import game.behaviours.SpreadBehaviour;
 
 import java.util.Random;
 
+/**
+ * Represents a Strawberry Sprout that can grow into a Strawberry Crop or spread
+ * a new Seedling.
+ *
+ * @author Khoo Lynn 34598901
+ * @version 1.0.0
+ */
 public class StrawberrySprout extends Plant{
     private static final int GROWTH_INTERVAL = 10;
     private static final double GROWTH_CHANCE = 0.5;
     private static final int SPREAD_INTERVAL = 5;
 
+    /**
+     * Constructor for StrawberrySprout.
+     */
     public StrawberrySprout(){
         this(new Random());
     }
 
+    /**
+     * Constructor with a random number generator.
+     *
+     * @param random random number generator.
+     */
     public StrawberrySprout(Random random){
         super('v', "Strawberry Sprout");
 
