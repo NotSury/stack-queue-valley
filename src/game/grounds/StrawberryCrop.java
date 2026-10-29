@@ -3,9 +3,11 @@ package game.grounds;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
+import game.behaviours.ProduceBehaviour;
 import game.items.Strawberry;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * Represents a Strawberry crop that can be watered and harvested.
@@ -19,7 +21,8 @@ import java.util.List;
  * 50 percent minus the number of times it has been watered.</p>
  *
  * @author Chin Kai Xuan 35730374
- * @version 1.0.0
+ * @author Khoo Lynn 34598901
+ * @version 1.1.0
  */
 public class StrawberryCrop extends WaterableCrop {
 
@@ -44,10 +47,25 @@ public class StrawberryCrop extends WaterableCrop {
     private static final int BASE_DESTRUCTION_CHANCE = 50;
 
     /**
+     * Number of turn between automatic produce drops.
+     */
+    private static final int PRODUCE_INTERVAL = 5;
+
+    /**
      * Constructor for StrawberryCrop.
      */
-    public StrawberryCrop() {
+    public StrawberryCrop(){
+        this(new Random());
+    }
+
+    /**
+     * Constructor with a random number generator.
+     *
+     * @param random random number generator.
+     */
+    public StrawberryCrop(Random random) {
         super('S', "Strawberry Crop");
+        addPlantBehaviour(new ProduceBehaviour(PRODUCE_INTERVAL, this::createRandomStrawberry, random));
     }
 
     /**
