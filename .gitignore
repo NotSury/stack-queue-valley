@@ -4,3 +4,6 @@ out
 .DS_Store
 docs/javadoc/
 /target/
+
+# Local test kits (not part of the submission)
+src/testkit/
