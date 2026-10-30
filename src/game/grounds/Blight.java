@@ -7,24 +7,39 @@ import game.afflictions.Contagion;
 import game.afflictions.CurseApplier;
 
 /**
- * Ground left behind by Contagion (REQ3). Any actor standing on Blight catches
- * Contagion. Blight wears off after a few turns and the original ground returns.
+ * Ground left behind by Contagion and by a dead Bat (REQ3). Any actor standing
+ * on Blight catches Contagion of the generation stored in the Blight. Blight
+ * wears off after a few turns and the original ground returns.
  *
  * @author Lee Le Si 34599223
- * @version 1.0.0
+ * @version 1.1.0
  */
 public class Blight extends TemporaryGround {
 
     /** How many turns Blight lasts. */
     private static final int DURATION = 4;
 
+    /** The Contagion generation this Blight passes on. */
+    private final int generation;
+
     /**
-     * Creates Blight on top of the existing ground.
+     * Creates Blight from a new outbreak (generation 0), e.g. a dead Bat's bones.
      *
      * @param previous the ground to restore when the Blight wears off
      */
     public Blight(Ground previous) {
-        super(':', "Blight", previous, DURATION);
+        this(previous, 0);
+    }
+
+    /**
+     * Creates Blight that passes on Contagion of the given generation.
+     *
+     * @param previous   the ground to restore when the Blight wears off
+     * @param generation the Contagion generation this Blight passes on
+     */
+    public Blight(Ground previous, int generation) {
+        super(';', "Blight", previous, DURATION);
+        this.generation = generation;
     }
 
     /**
@@ -35,6 +50,6 @@ public class Blight extends TemporaryGround {
      */
     @Override
     protected void affectOccupant(Actor actor, Location location) {
-        CurseApplier.apply(actor, new Contagion());
+        CurseApplier.apply(actor, new Contagion(generation));
     }
 }
