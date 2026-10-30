@@ -5,6 +5,11 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.afflictions.Affliction;
+import game.afflictions.Mire;
+import game.grounds.MireGround;
+import game.grounds.TemporaryGround;
+import game.interfaces.Cursed;
 import game.weapons.CreatureWeapon;
 
 import java.util.ArrayList;
@@ -15,10 +20,13 @@ import java.util.Random;
  * A slime: 150 HP, slams for 15 damage with a 50% chance to hit.
  * Each time it is attacked there is a 50% chance it splits into a new slime nearby.
  *
+ * <p>The Slime carries Mire (REQ3). Its killer inherits Mire, and its body melts
+ * into a swamp around its remains when it dies.</p>
+ *
  * @author <Lee Le Si> <34599223>
- * @version 1.0.0
+ * @version 1.1.0
  */
-public class Slime extends HostileCreature{
+public class Slime extends HostileCreature implements Cursed {
     /**
      * Starting health of a slime.
      */
@@ -91,5 +99,28 @@ public class Slime extends HostileCreature{
             return ""; // spot was taken; no split this time
         }
         return this + " splits into another slime";
+    }
+
+    /**
+     * Creates a fresh Mire to pass to the slime's killer.
+     *
+     * @return a new Mire
+     */
+    @Override
+    public Affliction curse() {
+        return new Mire();
+    }
+
+    /**
+     * The slime's body melts into a swamp: every empty tile next to the remains
+     * turns into Mire.
+     *
+     * @param remains the location where the slime died
+     * @return a description of the swamp forming
+     */
+    @Override
+    public String onDeath(Location remains) {
+        int flooded = TemporaryGround.placeAround(remains, MireGround::new, true);
+        return this + " melts into a swamp, flooding " + flooded + " tile(s) with Mire.";
     }
 }
