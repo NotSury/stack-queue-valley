@@ -6,4 +6,4 @@ docs/javadoc/
 /target/
 
 # Local test kits (not part of the submission)
-src/testkit/
+src/game/testkit/
