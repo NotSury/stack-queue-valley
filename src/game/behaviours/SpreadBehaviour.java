@@ -17,25 +17,40 @@ import java.util.Random;
  * @version 1.0.0
  */
 public class SpreadBehaviour implements PlantBehaviour {
+    private static final double GUARANTEED_CHANCE = 1.0;
     private final int interval;
+    private final double probability;
     private final PlantFactory newPlantFactory;
     private final Random random;
 
     /**
-     * Constructor for SpreadBehaviour.
+     * Constructor for spreading without a probability limit.
      *
-     * @param interval number of turns between spreading attempts.
-     * @param newPlantFactory factory for creating the new plant.
+     * @param interval turns between spreading attempts.
+     * @param newPlantFactory factory for creating a new plant.
      * @param random random number generator.
      */
     public SpreadBehaviour(int interval, PlantFactory newPlantFactory, Random random){
-        if (interval <= 0){
+        this(interval, GUARANTEED_CHANCE, newPlantFactory, random);
+    }
+
+    /**
+     * Constructor with a configurable spreading probability.
+     *
+     * @param interval turns between spreading attempts.
+     * @param probability chance of successful spreading.
+     * @param newPlantFactory factory for creating a new plant.
+     * @param random random number generator.
+     */
+    public SpreadBehaviour(int interval, double probability, PlantFactory newPlantFactory, Random random){
+        if (interval <= 0 || Double.isNaN(probability) || probability < 0 || probability > GUARANTEED_CHANCE){
             throw new IllegalArgumentException(
-                    "Spreading interval must be positive."
+                    "Invalid spreading interval or probability."
             );
         }
 
         this.interval = interval;
+        this.probability = probability;
         this.newPlantFactory = Objects.requireNonNull(newPlantFactory);
         this.random = Objects.requireNonNull(random);
     }
@@ -61,6 +76,10 @@ public class SpreadBehaviour implements PlantBehaviour {
         List<Location> availableLocations = PlantingLocations.plantableTilesAround(location, false);
 
         if (availableLocations.isEmpty()){
+            return false;
+        }
+
+        if (probability < GUARANTEED_CHANCE && random.nextDouble() >= probability){
             return false;
         }
 
