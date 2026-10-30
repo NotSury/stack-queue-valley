@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.GameEntity;
 import edu.monash.fit2099.engine.positions.Location;
 import game.grounds.HauntedGround;
 import game.grounds.TemporaryGround;
+import game.utils.NearbyActors;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ import java.util.List;
  * copied curse is a fresh object applied through {@link CurseApplier}.</p>
  *
  * @author Lee Le Si 34599223
- * @version 1.0.0
+ * @version 1.1.0
  */
 public class SoulTether extends Affliction {
 
@@ -46,7 +47,7 @@ public class SoulTether extends Affliction {
      */
     @Override
     protected void applyCurse(GameEntity host, Location location) {
-        Location partnerLocation = findClosestActor(location);
+        Location partnerLocation = NearbyActors.nearest(location, RADIUS, actor -> true);
         if (partnerLocation == null) {
             return;
         }
@@ -63,30 +64,6 @@ public class SoulTether extends Affliction {
         for (Affliction curse : otherCurses) {
             CurseApplier.apply(partnerLocation.getActor(), curse.copy());
         }
-    }
-
-    /**
-     * Finds the location of the closest other actor within the tether radius.
-     * Ties are broken by the fixed order in which the engine lists nearby
-     * locations, so the result is always predictable.
-     *
-     * @param centre the host's location
-     * @return the location of the closest actor, or null if there is none
-     */
-    private Location findClosestActor(Location centre) {
-        Location closest = null;
-        int closestDistance = Integer.MAX_VALUE;
-        for (Location candidate : centre.getNearbyLocations(RADIUS)) {
-            if (candidate.containsAnActor()) {
-                int distance = Math.max(Math.abs(candidate.x() - centre.x()),
-                        Math.abs(candidate.y() - centre.y()));
-                if (distance < closestDistance) {
-                    closest = candidate;
-                    closestDistance = distance;
-                }
-            }
-        }
-        return closest;
     }
 
     /**
