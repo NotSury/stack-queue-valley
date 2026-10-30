@@ -24,7 +24,7 @@ import java.util.Random;
  * into a swamp around its remains when it dies.</p>
  *
  * @author <Lee Le Si> <34599223>
- * @version 1.1.0
+ * @version 1.2.0
  */
 public class Slime extends HostileCreature implements Cursed {
     /**
@@ -122,5 +122,16 @@ public class Slime extends HostileCreature implements Cursed {
     public String onDeath(Location remains) {
         int flooded = TemporaryGround.placeAround(remains, MireGround::new, true);
         return this + " melts into a swamp, flooding " + flooded + " tile(s) with Mire.";
+    }
+
+    /**
+     * Raises this creature as a Zombie Slime serving the given master.
+     *
+     * @param master the actor raising the remains
+     * @return a new Zombie Slime
+     */
+    @Override
+    public Undead rise(Actor master) {
+        return new ZombieSlime(master);
     }
 }

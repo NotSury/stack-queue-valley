@@ -18,7 +18,7 @@ import game.weapons.CreatureWeapon;
  * and the tiles around its remains become Haunted Ground when it dies.</p>
  *
  * @author <Lee Le Si> <34599223>
- * @version 1.1.0
+ * @version 1.2.0
  */
 public class CaveGhost extends HostileCreature implements Cursed {
     /**
@@ -84,5 +84,16 @@ public class CaveGhost extends HostileCreature implements Cursed {
     public String onDeath(Location remains) {
         int haunted = TemporaryGround.placeAround(remains, HauntedGround::new, false);
         return this + "'s spirit haunts " + haunted + " tile(s) around its remains.";
+    }
+
+    /**
+     * Raises this creature as a Wraith serving the given master.
+     *
+     * @param master the actor raising the remains
+     * @return a new Wraith
+     */
+    @Override
+    public Undead rise(Actor master) {
+        return new Wraith(master);
     }
 }

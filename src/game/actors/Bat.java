@@ -10,8 +10,8 @@ import game.afflictions.CurseApplier;
 import game.grounds.Blight;
 import game.grounds.TemporaryGround;
 import game.interfaces.Cursed;
-import game.interfaces.Hostile;
 import game.items.Strawberry;
+import game.utils.NearbyActors;
 import game.weapons.CreatureWeapon;
 
 import java.util.List;
@@ -22,10 +22,11 @@ import java.util.Random;
  *
  * <p>The Bat carries Contagion (REQ3). Its killer inherits Contagion, and its
  * bones burst when it dies, giving Contagion to every hostile within 2 tiles
- * and turning the nearby ground into Blight.</p>
+ * and turning the nearby ground into Blight. Its remains can be raised as a
+ * Skeleton Bat.</p>
  *
  * @author <Lee Le Si> <34599223>
- * @version 1.1.0
+ * @version 1.2.0
  */
 public class Bat extends HostileCreature implements Cursed {
     /**
@@ -37,7 +38,7 @@ public class Bat extends HostileCreature implements Cursed {
      */
     private static final int BITE_DAMAGE = 35;
     /**
-     * Damage of one bite.
+     * Chance for a bite to hit, as a percentage.
      */
     private static final int HIT_RATE = 90;
     /**
@@ -100,14 +101,23 @@ public class Bat extends HostileCreature implements Cursed {
     @Override
     public String onDeath(Location remains) {
         int infected = 0;
-        for (Location nearby : remains.getNearbyLocations(BONE_BURST_RADIUS)) {
-            if (nearby.containsAnActor()
-                    && nearby.getActor().asCapability(Hostile.class).isPresent()
-                    && CurseApplier.apply(nearby.getActor(), new Contagion())) {
+        for (Actor hostile : NearbyActors.within(remains, BONE_BURST_RADIUS, NearbyActors.HOSTILE)) {
+            if (CurseApplier.apply(hostile, new Contagion())) {
                 infected++;
             }
         }
         TemporaryGround.placeAround(remains, Blight::new, false);
         return this + "'s bones burst, infecting " + infected + " hostile(s) with Contagion and blighting the ground.";
+    }
+
+    /**
+     * Raises this creature as a Skeleton Bat serving the given master.
+     *
+     * @param master the actor raising the remains
+     * @return a new Skeleton Bat
+     */
+    @Override
+    public Undead rise(Actor master) {
+        return new SkeletonBat(master);
     }
 }
