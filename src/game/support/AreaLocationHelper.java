@@ -54,7 +54,7 @@ public final class AreaLocationHelper
 
         for (int x = startX; x <= endX; x++)
         {
-            for (int y = startY; y <= endX; y++)
+            for (int y = startY; y <= endY; y++)
             {
                 if (inBounds(map, x, y))
                 {
