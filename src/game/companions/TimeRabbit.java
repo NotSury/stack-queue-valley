@@ -57,6 +57,11 @@ public class TimeRabbit extends MagicalCompanion
     @Override
     public boolean castOwnAbility(Actor farmer, GameMap map)
     {
+        if (isEffectActive(TemporalFreezeEffect.NAME))
+        {
+            return false;
+        }
+
         startEffect(new TemporalFreezeEffect(map, map.locationOf(this)));
         return true;
     }

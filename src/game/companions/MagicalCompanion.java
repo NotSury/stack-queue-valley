@@ -131,6 +131,25 @@ public abstract class MagicalCompanion extends Actor
     }
 
     /**
+     * Check if a magical effect is currently active.
+     *
+     * @param abilityName the name of the effect
+     * @return true if the effect is still active
+     */
+    public boolean isEffectActive(String abilityName)
+    {
+        for (TimedAreaEffect effect : activeEffects)
+        {
+            if (!effect.isExpired() && effect.getAbilityName().equals(abilityName))
+            {
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+    /**
      * Determines what the magical companion does each turn.
      *
      * @param actions collection of possible Actions for this Actor
