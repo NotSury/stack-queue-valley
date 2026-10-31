@@ -9,6 +9,8 @@ import edu.monash.fit2099.engine.displays.Display;
 import game.effects.TimedAreaEffect;
 import game.magic.FarmMagic;
 import game.behaviours.WanderBehaviour;
+import game.actions.ActivateOwnAbilityAction;
+import game.actions.ActivateMagicAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +57,30 @@ public abstract class MagicalCompanion extends Actor
         {
             remainingCharges--;
         }
+    }
+
+    /**
+     * Returns the magical abilities available when another actor
+     * interacts with this companion.
+     * Both abilities are available as long as the companion has
+     * remaining charges.
+     *
+     * @param otherActor the Actor that might be performing attack
+     * @param direction String representing the direction of the other Actor
+     * @param map current GameMap containing the companion
+     * @return a list of available actions
+     */
+    public ActionList allowableActions(Actor otherActor,
+                                       String direction, GameMap map)
+    {
+        ActionList actions = new ActionList();
+
+        if (hasCharges())
+        {
+            actions.add(new ActivateMagicAction(getFarmMagic(), this));
+            actions.add(new ActivateOwnAbilityAction(this));
+        }
+        return actions;
     }
 
     /**
