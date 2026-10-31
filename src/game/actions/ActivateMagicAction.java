@@ -1,6 +1,5 @@
 package game.actions;
 
-import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 
@@ -8,16 +7,15 @@ import game.companions.MagicalCompanion;
 import game.magic.FarmMagic;
 
 /**
- * An action that allows the Farmer to activate a
+ * An action that activate a
  * magical companion's Farm Magic ability
  *
  * @author Vanessa Liau Jia Yee 34599398
  * @version 1.0.0
  */
-public class ActivateMagicAction extends Action
+public class ActivateMagicAction extends CompanionAction
 {
     private final FarmMagic magic;
-    private final MagicalCompanion companion;
 
     /**
      * Creates an action to activate Farm Magic.
@@ -27,8 +25,8 @@ public class ActivateMagicAction extends Action
      */
     public ActivateMagicAction(FarmMagic magic, MagicalCompanion companion)
     {
+        super(companion);
         this.magic = magic;
-        this.companion = companion;
     }
 
     /**
@@ -36,37 +34,23 @@ public class ActivateMagicAction extends Action
      *
      * @param actor The actor performing the action.
      * @param map The map the actor is on.
-     * @return a description of the result.
+     * @return a true if the activation succeed
      */
     @Override
-    public String execute(Actor actor, GameMap map)
+    public boolean activateAbility(Actor actor, GameMap map)
     {
-        if (!companion.hasCharges())
-        {
-            return companion + " has no magical charges remaining.";
-        }
+        return magic.cast(actor, getCompanion(), map);
 
-        boolean success = magic.cast(actor, companion, map);
-
-        if (success)
-        {
-            companion.consumeCharge();
-            return actor + " activates " + magic.getName()
-                    + " using " + companion + ".";
-        }
-        return magic.getName() + " could not be activated.";
     }
 
     /**
-     * Returns the description displayed in the action menu.
+     * Returns the name of the Farm Magic ability.
      *
-     * @param actor The Farmer performing the action.
-     * @return the menu description
+     * @return the ability name
      */
     @Override
-    public String menuDescription(Actor actor)
+    public String getAbilityName()
     {
-        return actor + " activates " + magic.getName()
-                + " using " + companion;
+        return magic.getName();
     }
 }
