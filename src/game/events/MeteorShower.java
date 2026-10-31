@@ -5,7 +5,6 @@ import game.interfaces.CelestialEvent;
 import java.util.Objects;
 import game.effects.AstralBlessing;
 import game.effects.EnvironmentalField;
-import java.util.Objects;
 
 /**
  * Models multiple small meteor impacts caused by a small, non-hazardous asteroid.
