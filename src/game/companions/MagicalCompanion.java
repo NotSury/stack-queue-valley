@@ -6,8 +6,11 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.displays.Display;
-
+import game.effects.TimedAreaEffect;
 import game.magic.FarmMagic;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Abstract base class for magical farm companions.
@@ -17,6 +20,8 @@ import game.magic.FarmMagic;
  */
 public abstract class MagicalCompanion extends Actor
 {
+    private final List<TimedAreaEffect> activeEffects = new ArrayList<>();
+
     /**
      * Creates a magical companion.
      *
@@ -53,6 +58,17 @@ public abstract class MagicalCompanion extends Actor
     public abstract boolean castOwnAbility(Actor farmer, GameMap map);
 
     /**
+     * Activates a timed magical effect and stores it for future turns.
+     *
+     * @param effect the timed magical effect to activate
+     */
+    protected void startEffect(TimedAreaEffect effect)
+    {
+        activeEffects.add(effect);
+        effect.tick();
+    }
+
+    /**
      * Determines what the magical companion does each turn.
      *
      * @param actions collection of possible Actions for this Actor
@@ -66,7 +82,20 @@ public abstract class MagicalCompanion extends Actor
     public Action playTurn(ActionList actions, Action lastAction,
                            GameMap map, Display display)
     {
+        for (int i = activeEffects.size() - 1; i >= 0; i--)
+        {
+            TimedAreaEffect effect = activeEffects.get(i);
+
+            if (!effect.isExpired())
+            {
+                effect.tick();
+            }
+
+            if (effect.isExpired())
+            {
+                activeEffects.remove(i);
+            }
+        }
         return new DoNothingAction();
     }
-
 }
