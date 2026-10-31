@@ -52,6 +52,12 @@ public abstract class TimedAreaEffect
     protected abstract void applyTick(List<Location> area);
 
     /**
+     * Performs cleanup when the effect expires.
+     * Subclasses may override this method if cleanup is required.
+     */
+    protected void onExpire(){}
+
+    /**
      * Applies one tick of the effect.
      */
     public void tick()
@@ -74,6 +80,17 @@ public abstract class TimedAreaEffect
     public boolean isExpired()
     {
         return remainingTurns <= 0;
+    }
+
+    /**
+     * Performs cleanup after the effect has expired.
+     */
+    public void finish()
+    {
+        if (isExpired())
+        {
+            onExpire();
+        }
     }
 
 }

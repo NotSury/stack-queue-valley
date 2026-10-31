@@ -155,6 +155,7 @@ public abstract class MagicalCompanion extends Actor
 
             if (effect.isExpired())
             {
+                effect.finish();
                 activeEffects.remove(i);
             }
         }

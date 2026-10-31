@@ -12,4 +12,14 @@ public interface Freezable
      * Temporarily freezes the plant's lifecycle.
      */
     void freeze();
+
+    /**
+     * Prevents magical growth while a freeze effect remains active.
+     */
+    void holdFreeze();
+
+    /**
+     * Releases protection when a freeze effect expires.
+     */
+    void releaseFreeze();
 }

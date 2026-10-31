@@ -6,6 +6,8 @@ import game.interfaces.Freezable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Creates a temporary freeze field that suspends plant
@@ -20,6 +22,7 @@ public class TemporalFreezeEffect extends TimedAreaEffect
 
     private static final int RADIUS = 1;
     private static final int DURATION = 3;
+    private final Set<Freezable> heldPlants = new HashSet<>();
 
     /**
      * Creates a Temporal Freeze effect.
@@ -58,8 +61,28 @@ public class TemporalFreezeEffect extends TimedAreaEffect
 
             if (plant.isPresent())
             {
-                plant.get().freeze();
+                Freezable freezable = plant.get();
+
+                freezable.freeze();
+
+                if (!heldPlants.contains(freezable))
+                {
+                    heldPlants.add(freezable);
+                    freezable.holdFreeze();
+                }
             }
         }
+    }
+
+    /**
+     * Releases all plants held by this freeze effect when it expires.
+     */
+    @Override
+    protected void onExpire() {
+        for (Freezable plant : heldPlants)
+        {
+            plant.releaseFreeze();
+        }
+        heldPlants.clear();
     }
 }

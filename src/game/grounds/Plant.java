@@ -17,7 +17,7 @@ import java.util.List;
  * stopping after the first successful behaviour.</p>
  *
  * <p>Supports magical growth acceleration and temporary freezing
- * of automatic plant lifecylce behaviours.</p>
+ * of automatic plant lifecycle behaviours.</p>
  *
  * @author Khoo Lynn 34598901
  * @author Vanessa Liau Jia Yee 34599398
@@ -29,6 +29,7 @@ public abstract class Plant extends Ground implements
     private final List<PlantBehaviour> behaviours;
     private GrowBehaviour growthBehaviour;
     private int frozenTicks = 0;
+    private int freezeHolds = 0;
 
     /**
      * Constructor for Plant.
@@ -80,7 +81,7 @@ public abstract class Plant extends Ground implements
      */
     public boolean advanceGrowth(Location location)
     {
-        if (frozenTicks > 0 || growthBehaviour == null)
+        if (frozenTicks > 0 || freezeHolds > 0 ||growthBehaviour == null)
         {
             return false;
         }
@@ -93,6 +94,26 @@ public abstract class Plant extends Ground implements
     public void freeze()
     {
         frozenTicks = 1;
+    }
+
+    /**
+     * Keeps the plant protected from magical growth while
+     * a freeze effect is active.
+     */
+    public void holdFreeze()
+    {
+        freezeHolds++;
+    }
+
+    /**
+     * Releases one active freeze hold.
+     */
+    public void releaseFreeze()
+    {
+        if (freezeHolds > 0)
+        {
+            freezeHolds--;
+        }
     }
 
     /**
