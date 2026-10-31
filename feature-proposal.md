@@ -106,7 +106,8 @@ one Farmer turn.
         from ageing, growing, spreading and producing. The field is re-applied every tick, so 
         plants that appear inside it later are frozen too. Watering and harvesting still work.
         When the field expires the plants resume from their preserved age, and Growth Magic works
-        on them again.
+        on them again. A TimeRabbit cannot activate another Temporal Freeze while its existing
+        field is active. Failed activation uses the Farmer's turn but no charge.
 - **PrismFox:** *to be added.* 
 - **SanctuaryDeer:** *to be added.* 
 
