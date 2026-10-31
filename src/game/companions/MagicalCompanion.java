@@ -21,6 +21,39 @@ import java.util.List;
 public abstract class MagicalCompanion extends Actor
 {
     private final List<TimedAreaEffect> activeEffects = new ArrayList<>();
+    private static final int MAX_CHARGES = 3;
+    private int remainingCharges = MAX_CHARGES;
+
+    /**
+     * Returns the number of remaining ability charges.
+     *
+     * @return remaining charges
+     */
+    public int getRemainingCharges()
+    {
+        return remainingCharges;
+    }
+
+    /**
+     * Checks if the companion has charges remaining.
+     *
+     * @return true if at least one charge remains
+     */
+    public boolean hasCharges()
+    {
+        return remainingCharges > 0;
+    }
+
+    /**
+     * Consumes one shared ability charge.
+     */
+    public void consumeCharge()
+    {
+        if (hasCharges())
+        {
+            remainingCharges--;
+        }
+    }
 
     /**
      * Creates a magical companion.
