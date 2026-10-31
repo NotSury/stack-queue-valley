@@ -10,7 +10,8 @@ import java.util.Random;
  * Sprout.
  *
  * @author Khoo Lynn 34598901
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.1.0
  */
 public class MelonSprout extends Plant {
     private static final int GROWTH_INTERVAL = 15;
@@ -32,7 +33,7 @@ public class MelonSprout extends Plant {
     public MelonSprout(Random random){
         super('t', "Melon Sprout");
 
-        addPlantBehaviour(new GrowBehaviour(GROWTH_INTERVAL, GROWTH_CHANCE, MelonCrop::new, random));
+        addGrowBehaviour(new GrowBehaviour(GROWTH_INTERVAL, GROWTH_CHANCE, MelonCrop::new, random));
         addPlantBehaviour(new SpreadBehaviour(SPREAD_INTERVAL, MelonSprout::new, random));
     }
 }

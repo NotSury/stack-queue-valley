@@ -10,7 +10,8 @@ import java.util.Random;
  * a new Seedling.
  *
  * @author Khoo Lynn 34598901
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.1.0
  */
 public class StrawberrySprout extends Plant{
     private static final int GROWTH_INTERVAL = 10;
@@ -32,7 +33,7 @@ public class StrawberrySprout extends Plant{
     public StrawberrySprout(Random random){
         super('v', "Strawberry Sprout");
 
-        addPlantBehaviour(new GrowBehaviour(GROWTH_INTERVAL, GROWTH_CHANCE, StrawberryCrop::new, random));
+        addGrowBehaviour(new GrowBehaviour(GROWTH_INTERVAL, GROWTH_CHANCE, StrawberryCrop::new, random));
         addPlantBehaviour(new SpreadBehaviour(SPREAD_INTERVAL, StrawberrySeedling::new, random));
     }
 }

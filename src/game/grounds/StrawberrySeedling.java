@@ -8,7 +8,8 @@ import java.util.Random;
  * Represents a Strawberry Seedling that can grow into a Strawberry Sprout.
  *
  * @author Khoo Lynn 34598901
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.1.0
  */
 public class StrawberrySeedling extends Plant{
     private static final int GROWTH_INTERVAL = 5;
@@ -29,6 +30,6 @@ public class StrawberrySeedling extends Plant{
     public StrawberrySeedling(Random random){
         super('\'', "Strawberry Seedling");
 
-        addPlantBehaviour(new GrowBehaviour(GROWTH_INTERVAL, GROWTH_CHANCE, StrawberrySprout::new, random));
+        addGrowBehaviour(new GrowBehaviour(GROWTH_INTERVAL, GROWTH_CHANCE, StrawberrySprout::new, random));
     }
 }

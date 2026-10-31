@@ -8,7 +8,8 @@ import java.util.Random;
  * Represents a Cauliflower Sprout that can grow into a Cauliflower Crop.
  *
  * @author Khoo Lynn 34598901
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.1.0
  */
 public class CauliflowerSprout extends Plant{
     private static final int GROWTH_INTERVAL = 15;
@@ -29,6 +30,6 @@ public class CauliflowerSprout extends Plant{
     public CauliflowerSprout(Random random) {
         super('y', "Cauliflower Sprout");
 
-        addPlantBehaviour(new GrowBehaviour(GROWTH_INTERVAL, GROWTH_CHANCE, CauliflowerCrop::new, random));
+        addGrowBehaviour(new GrowBehaviour(GROWTH_INTERVAL, GROWTH_CHANCE, CauliflowerCrop::new, random));
     }
 }
