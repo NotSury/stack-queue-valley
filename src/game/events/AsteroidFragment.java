@@ -3,6 +3,8 @@ package game.events;
 import game.api.AsteroidData;
 import game.interfaces.CelestialEvent;
 import java.util.Objects;
+import game.effects.EnvironmentalField;
+import game.effects.GravitationalDistortion;
 
 /**
  * Models one concentrated impact from a large or hazardous asteroid,
@@ -69,6 +71,24 @@ public final class AsteroidFragment implements CelestialEvent {
                 oreCount,
                 guardianCount,
                 duration
+        );
+    }
+
+    /**
+     * Creates a gravitational field for this asteroid fragment.
+     *
+     * @param impactProfile the calculated impact profile
+     * @return a new Gravitational Distortion field
+     */
+    @Override
+    public EnvironmentalField createField(
+            ImpactProfile impactProfile) {
+
+        Objects.requireNonNull(impactProfile, "impactProfile");
+
+        return new GravitationalDistortion(
+                impactProfile.getRadius(),
+                impactProfile.getEffectDurationTurns()
         );
     }
 }

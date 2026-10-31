@@ -76,3 +76,70 @@ to the killer, applies the creature's death effect and leaves `Remains`).
 - `HostileCreature` uses only `Cursed` and `Affliction` when a creature dies.
 - `RaiseDeadAction` uses only `Cursed` and `Undead`.
 - `MinionBehaviour` uses only `Hostile` (through `NearbyActors`) and the master `Actor`.
+
+## A3 REQ 4: Magical Farm Companions
+Author: Vanessa Liau Jia Yee (34599398)
+
+> This describes the implemented version and planned features of Magical Farm Companions.
+> Changes from the TA-approved proposal are documented in README.md.
+
+### Pitch
+Magical Farm Companions introduces three wandering magical animals(TimeRabbit,
+PrismFox and SanctuaryDeer) that assist the Farmer through time manipulation, 
+automated resource collection, environmental restoration and defensive magic.
+Each companion has two abilities that the Farmer can activate while standing next
+to it. The two abilities share three activation charges, cost no stamina and use 
+one Farmer turn.
+
+### Mechanics
+- **Activating:** standing next to a companion adds two actions to the Farmer's menu
+    while the companion still has charges. The companion's area effects stay fixed where 
+    they were cast, even if the companion wanders away.
+- **TimeRabbit** (3x3 area centred on the rabbit)
+    - **Growth Magic:** every plant in the area with a next growth stage advances
+        by exactly one stage, ignoring its age, interval and growth probability.
+        The new stage starts at age 0 and follows normal REQ1 rules. Mature crops
+        (Tomato, Parsnip, any crop with no next stage) are unaffected, and no spreading
+        or produce happens. Plants held by Temporal Freeze cannot be accelerated. If no plant
+        grows, the Farmer's turn is used but no charge is spent.
+    - **Temporal Freeze:** a field lasting three effect ticks that stops plants in the area
+        from ageing, growing, spreading and producing. The field is re-applied every tick, so 
+        plants that appear inside it later are frozen too. Watering and harvesting still work.
+        When the field expires the plants resume from their preserved age, and Growth Magic works
+        on them again. A TimeRabbit cannot activate another Temporal Freeze while its existing
+        field is active. Failed activation uses the Farmer's turn but no charge.
+- **PrismFox:** *to be added.* 
+- **SanctuaryDeer:** *to be added.* 
+
+### Architecture
+| Abstraction                                                 | Concrete class  | New or retrofitted | Complex effect |
+|-------------------------------------------------------------|-----------------|---|---|
+| `MagicalCompanion` (abstract class, extends engine 'Actor') | `TimeRabbit`    | New | Temporal Freeze: 3x3 lifecycle suspension for three ticks |
+|                                                             | `PrismFox`      | New | Magical Harvest Trail: persistent 3x3 fresh-produce collection |
+|                                                             | `SanctuaryDeer` | New | Living Soil and Nature's Regeneration |
+| `FarmMagic` (interface)                                     | `GrowthMagic`   | New | Guaranteed 3x3 plant growth |
+|                                                             | `StormMagic`    | New | Rainbow Storm: persistent 5x5 hostile stun and damage |
+|                                                             | `ShieldMagic`   | New | Nature's Sanctuary: healing, repulsion and re-entry block |
+
+**Class-to-ability mapping:** `TimeRabbit` owns Temporal Freeze, `PrismFox` owns
+Magical Harvest Trail, `SanctuaryDeer` owns Living Soil, and the three
+`FarmMagic` classes implement Growth Magic, Rainbow Storm and Nature's Sanctuary.
+
+**Supporting new classes (not counted among the six):** `CompanionAction` (abstract,
+shared charge and adjacency rules), `ActivateMagicAction`, `ActivateOwnAbilityAction`,
+`TimedAreaEffect` (abstract), `TemporalFreezeEffect`, `AreaLocationHelper`, and the 
+interfaces `GrowthAcceleratable` and `Freezable`.
+
+**Modified existing classes (REQ1):** 
+- `Plant` implements `GrowthAcceleratable` and `Freezable`, and registers growth
+   through `addGrowBehaviour`.
+- `GrowBehaviour` implements `GrowthAcceleratable`, so the forced transition reuses
+   the plant's own `PlantFactory`.
+- `StrawberrySeedling`, `StrawberrySprout`, `MelonSprout` and `CauliflowerSprout`
+   register their growth with `addGrowBehaviour`.
+
+**Higher-level classes that depend only on the abstractions (DIP):**
+- `ActivateMagicAction` uses only `FarmMagic`.
+- `GrowthMagic` uses only `GrowthAcceleratable`.
+- `TemporalFreezeEffect` uses only `Freezable`.
+- `MagicalCompanion` uses only `TimedAreaEffect`.

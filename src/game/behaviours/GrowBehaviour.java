@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.grounds.Plant;
 import game.interfaces.PlantBehaviour;
 import game.interfaces.PlantFactory;
+import game.interfaces.GrowthAcceleratable;
 
 import java.util.Objects;
 import java.util.Random;
@@ -15,9 +16,10 @@ import java.util.Random;
  * <p>Growth is attempted at a fixed interval with a configurable probability.</p>
  *
  * @author Khoo Lynn 34598901
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.1.0
  */
-public class GrowBehaviour implements PlantBehaviour {
+public class GrowBehaviour implements PlantBehaviour, GrowthAcceleratable {
     private final int interval;
     private final double probability;
     private final PlantFactory nextStageFactory;
@@ -56,17 +58,29 @@ public class GrowBehaviour implements PlantBehaviour {
     }
 
     /**
-     * Attempts to grow the plant into its next stage.
+     * Attempts to grow the plant according to its growth probability.
      *
      * @param location the Location containing the plant.
      * @return true if growth succeeds, false otherwise.
      */
     @Override
-    public boolean perform(Location location){
-        if (random.nextDouble() >= probability){
+    public boolean perform(Location location) {
+        if (random.nextDouble() >= probability) {
             return false;
         }
 
+        return advanceGrowth(location);
+    }
+
+    /**
+     * Immediately advances the plant into its next growth stage
+     * without applying the normal growth probability.
+     *
+     * @param location the Location containing the plant
+     * @return true if the plant successfully advances
+     */
+    public boolean advanceGrowth(Location location)
+    {
         Ground currentPlant = location.getGround();
         Plant nextStage = Objects.requireNonNull(nextStageFactory.create());
         location.setGround(nextStage);

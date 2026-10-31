@@ -27,6 +27,30 @@ import game.recipes.JamRecipe;
 import game.recipes.OmeletteRecipe;
 import game.teleportation.TeleportDestination;
 
+import game.api.NasaAsteroidClient;
+import game.api.NasaAsteroidFeed;
+import game.api.NasaAsteroidParser;
+import game.api.ObservatoryScanPlanner;
+
+import game.events.CelestialEventManager;
+import game.events.MeteorShower;
+import game.events.AsteroidFragment;
+import game.events.CelestialStorm;
+
+import game.interfaces.AsteroidFeed;
+import game.interfaces.CelestialEvent;
+import game.interfaces.CelestialReaction;
+
+import game.reactions.CropMutationReaction;
+import game.reactions.TerrainReaction;
+import game.reactions.ImpactDamageReaction;
+import game.reactions.ResourceReaction;
+import game.reactions.GuardianReaction;
+import game.companions.TimeRabbit;
+
+import java.time.Clock;
+import java.util.Random;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -46,7 +70,7 @@ import java.util.Random;
  * @author <Khoo Lynn> <34598901>
  * @author <Vanessa Liau Jia Yee> <34599398>
  * @author Surya Muni Peragas 35651628
- * @version 1.5.0
+ * @version 1.6.0
  */
 public class StackQueueValleyWorld extends World {
 
@@ -74,13 +98,13 @@ public class StackQueueValleyWorld extends World {
         groundCreator.registerGround('.', Dirt::new);
 
         List<String> inheritedFarm = Arrays.asList(
-                "..........",
-                "..........",
-                "..........",
-                "..........",
-                "..........",
-                "..........",
-                ".........."
+                "....................",
+                "....................",
+                "....................",
+                "....................",
+                "....................",
+                "....................",
+                "...................."
         );
 
         List<String> mines = Arrays.asList(
@@ -152,6 +176,51 @@ public class StackQueueValleyWorld extends World {
 
         Farmer farmer = new Farmer("Bob");
         this.addPlayer(farmer, inheritedFarmMap.at(0, 3));
+
+// NASA data source: HTTP and JSON are kept outside gameplay logic.
+        AsteroidFeed asteroidFeed = new NasaAsteroidFeed(
+                new NasaAsteroidClient(),
+                new NasaAsteroidParser()
+        );
+
+// The date range depends on the current game state.
+        ObservatoryScanPlanner scanPlanner =
+                new ObservatoryScanPlanner(Clock.systemDefaultZone());
+
+// Celestial events are selected polymorphically.
+        List<CelestialEvent> celestialEvents = List.of(
+                new MeteorShower(),
+                new AsteroidFragment(),
+                new CelestialStorm()
+        );
+
+// Order matters: mutation happens before crater creation,
+// and guardians spawn after impact damage.
+        List<CelestialReaction> celestialReactions = List.of(
+                new CropMutationReaction(),
+                new TerrainReaction(),
+                new ImpactDamageReaction(),
+                new ResourceReaction(),
+                new GuardianReaction()
+        );
+
+// Assemble the scanning system.
+        CelestialEventManager celestialManager =
+                new CelestialEventManager(
+                        asteroidFeed,
+                        scanPlanner,
+                        celestialEvents,
+                        celestialReactions,
+                        new Random()
+                );
+
+// Place the Observatory near the Farmer's starting location.
+        inheritedFarmMap.at(1, 3).setGround(
+                new Observatory(celestialManager)
+        );
+
+        TimeRabbit timeRabbit = new TimeRabbit();
+        inheritedFarmMap.at(1,3).addActor(timeRabbit);
 
         Cow cow = new Cow();
         Chicken chicken = new Chicken();

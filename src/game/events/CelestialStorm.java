@@ -3,6 +3,8 @@ package game.events;
 import game.api.AsteroidData;
 import game.interfaces.CelestialEvent;
 import java.util.Objects;
+import game.effects.CosmicRadiation;
+import game.effects.EnvironmentalField;
 
 /**
  * Models severe celestial disturbances caused by a fast,
@@ -66,6 +68,25 @@ public final class CelestialStorm implements CelestialEvent {
                 oreCount,
                 guardianCount,
                 duration
+        );
+    }
+
+    /**
+     * Creates a radiation field for this celestial storm.
+     *
+     * @param impactProfile the calculated impact profile
+     * @return a new Cosmic Radiation field
+     */
+    @Override
+    public EnvironmentalField createField(
+            ImpactProfile impactProfile) {
+
+        Objects.requireNonNull(impactProfile, "impactProfile");
+
+        return new CosmicRadiation(
+                impactProfile.getRadius(),
+                impactProfile.getEffectDurationTurns(),
+                impactProfile.getDamage()
         );
     }
 }
