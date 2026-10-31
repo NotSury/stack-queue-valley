@@ -3,6 +3,7 @@ package game.companions;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.magic.FarmMagic;
+import game.effects.HarvestTrailEffect;
 
 /**
  * A magical fox that help the Farmer through harvesting
@@ -52,6 +53,11 @@ public class PrismFox extends MagicalCompanion {
      */
     @Override
     public boolean castOwnAbility(Actor farmer, GameMap map) {
-        return false;
+        if (isEffectActive("Magical Harvest Trail")) {
+            return false;
+        }
+
+        startEffect(new HarvestTrailEffect(map, map.locationOf(this), farmer));
+        return true;
     }
 }
