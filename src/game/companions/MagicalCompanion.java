@@ -13,6 +13,7 @@ import game.actions.ActivateOwnAbilityAction;
 import game.actions.ActivateMagicAction;
 import game.capabilities.ActorRole;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,6 +134,16 @@ public abstract class MagicalCompanion extends Actor
     protected void startEffect(TimedAreaEffect effect)
     {
         activeEffects.add(effect);
+    }
+
+    /**
+     * Registers a timed effect activated by FarmMagic.
+     *
+     * @param effect the effect to register
+     */
+    public void addMagicEffect(TimedAreaEffect effect)
+    {
+        startEffect(effect);
     }
 
     /**

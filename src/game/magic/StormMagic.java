@@ -3,6 +3,7 @@ package game.magic;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.companions.MagicalCompanion;
+import game.effects.RainbowStormEffect;
 
 /**
  * Provides Rainbow Storm magic to PrismFox.
@@ -32,6 +33,15 @@ public class StormMagic implements FarmMagic {
      */
     @Override
     public boolean cast(Actor farmer, MagicalCompanion companion, GameMap map) {
-        return false;
+        if (companion.isEffectActive(RainbowStormEffect.NAME)) {
+            return false;
+        }
+
+        RainbowStormEffect effect = new RainbowStormEffect(map,
+                map.locationOf(companion));
+
+        companion.addMagicEffect(effect);
+
+        return true;
     }
 }
