@@ -2,6 +2,11 @@ package game.companions;
 
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.actions.Action;
+import edu.monash.fit2099.engine.actions.ActionList;
+import edu.monash.fit2099.engine.actions.DoNothingAction;
+import edu.monash.fit2099.engine.displays.Display;
+
 import game.magic.FarmMagic;
 
 /**
@@ -46,5 +51,22 @@ public abstract class MagicalCompanion extends Actor
      * @return true if the ability activates successfully
      */
     public abstract boolean castOwnAbility(Actor farmer, GameMap map);
+
+    /**
+     * Determines what the magical companion does each turn.
+     *
+     * @param actions collection of possible Actions for this Actor
+     * @param lastAction The Action this Actor took last turn. Can do
+     * interesting things in conjunction with Action.getNextAction()
+     * @param map the map containing the Actor
+     * @param display the I/O object to which messages may be written
+     * @return the action performed
+     */
+    @Override
+    public Action playTurn(ActionList actions, Action lastAction,
+                           GameMap map, Display display)
+    {
+        return new DoNothingAction();
+    }
 
 }
