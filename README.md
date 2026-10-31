@@ -32,7 +32,7 @@
 ## Contribution Log
 [Contribution Log Link](https://docs.google.com/spreadsheets/d/1VfutnfXfJ8pkZfCXGZGbKtAEHKDqI-Xkg6gcwM73iw8/edit?usp=sharing)
 
-## REQ5 — Cave Mimic
+## Assignment 2 REQ5 — Cave Mimic
 
 The Cave Mimic is a hostile creature that disguises itself as a Geode. It scatters items as bait, collects nearby loot, steals from the Farmer and creates a decoy when escaping.
 
@@ -142,7 +142,7 @@ The state framework keeps transition checks, immediate entry effects and ordinar
 
 ---
 
-## REQ5 — Nest Spider
+## Assignment 2 REQ5 — Nest Spider
 
 The Nest Spider is a hostile creature that guards a fixed nest, builds web traps and investigates triggered webs.
 
@@ -309,16 +309,6 @@ Walking and jumping respect terrain restrictions and Actor occupancy. Safe route
 
 Placement and spawning use eligible locations. If no ordinary action is available, the Spider remains stationary.
 
-## Running unit tests
-
-Requirements: JDK 17 or later and Apache Maven 3.6.3 or later.
-
-From the project root, run:
-
-```shell
-mvn test
-```
-
 Test classes are stored in `test/`.
 Test reports are generated in `target/surefire-reports/`.
 The first run requires internet access to download build dependencies.
@@ -436,3 +426,244 @@ the Wraith is given a seeded `Random`.
 
 - IntelliJ: Ctrl+click the three test classes → right-click → Run.
 - Maven: `mvn test -Dtest=AfflictionTest,RaiseDeadActionTest,UndeadTest`
+
+## Assignment 3 REQ5 — Starfall: Celestial Forge
+
+Starfall is a celestial-event system that integrates NASA's Near-Earth Object Web Service (NeoWs) API into the game. The Farmer can activate an Observatory to retrieve asteroid data, which is used to generate meteor impacts, transform terrain, mutate crops, create resources, summon hostile creatures and activate environmental effects.
+
+The Observatory is displayed as `O` and is located beside the Farmer's starting position on the Inherited Farm.
+
+### Settings
+
+| Setting | Value |
+|---|---|
+| External API | NASA Near-Earth Object Web Service (NeoWs) |
+| API endpoint | `https://api.nasa.gov/neo/rest/v1/feed` |
+| Observatory symbol | `O` |
+| Observatory location | Inherited Farm, (1, 3) |
+| Scan stamina cost | 3 stamina |
+| Scan requirement | Farmer must be on or adjacent to the Observatory |
+| API request range | 2 calendar days |
+| Event types | Meteor Shower, Asteroid Fragment, Celestial Storm |
+| Environmental fields | Astral Blessing, Gravitational Distortion, Cosmic Radiation |
+| Impact reactions | Crop mutation, terrain transformation, actor damage, resource generation and guardian spawning |
+| Maximum field radius | 2 tiles |
+| Maximum initial field duration | 4 turns |
+| Maximum gravity extension | 4 additional turns |
+| Active scan limit | One environmental field at a time |
+
+A successful Observatory scan deducts stamina and activates a celestial event. Another scan cannot begin until the previous environmental field expires.
+
+### Dynamic API requests
+
+The NASA request is generated using the current game state rather than a fixed URL.
+
+`ObservatoryScanPlanner` calculates the request dates using the Farmer's current stamina, X and Y coordinates, the number of completed Observatory scans, and the current date.
+
+The calculation is:
+
+```text
+signature = 3 × stamina + 5 × playerX + 11 × playerY + 7 × completedScans
+offsetDays = signature mod 60
+endDate = currentDate - (1 + offsetDays) days
+startDate = endDate - 1 day
+```
+
+For example, on 31 October 2026, a Farmer with 20 stamina at (0, 3) and no completed scans produces the following request:
+
+```text
+https://api.nasa.gov/neo/rest/v1/feed?start_date=2026-09-26&end_date=2026-09-27&api_key=YOUR_NASA_API_KEY
+```
+
+Changing the Farmer's stamina, position or completed scan count can change the requested dates. This ensures the API request is dynamically influenced by gameplay.
+
+### Expected API response
+
+`NasaAsteroidParser` expects a NASA JSON response containing `near_earth_objects`, grouped by approach date.
+
+An example of the expected JSON structure is:
+
+```json
+{
+  "near_earth_objects": {
+    "2026-09-26": [
+      {
+        "id": "123456",
+        "name": "Example Asteroid",
+        "is_potentially_hazardous_asteroid": false,
+        "estimated_diameter": {
+          "meters": {
+            "estimated_diameter_min": 30.0,
+            "estimated_diameter_max": 38.0
+          }
+        },
+        "close_approach_data": [
+          {
+            "close_approach_date": "2026-09-26",
+            "relative_velocity": {
+              "kilometers_per_second": "16.0"
+            },
+            "miss_distance": {
+              "kilometers": "500000.0"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The parser extracts the asteroid's ID, name, average estimated diameter, velocity, miss distance, hazardous classification and approach date.
+
+These values are stored in `AsteroidData` and used to determine the celestial event and its gameplay effects. The resulting events are fictional game mechanics, not NASA impact predictions.
+
+### Celestial events
+
+| Event | Trigger condition | Gameplay effect |
+|---|---|---|
+| Meteor Shower | Non-hazardous asteroid with diameter below 80 metres | Multiple small impacts, resources and Astral Blessing |
+| Asteroid Fragment | Non-hazardous asteroid with diameter at least 80 metres, or hazardous asteroid travelling below 20 km/s | Concentrated impact, resources, possible guardian and Gravitational Distortion |
+| Celestial Storm | Hazardous asteroid travelling at least 20 km/s | Stronger multiple impacts, guardian spawning and Cosmic Radiation |
+
+Each event calculates an `ImpactProfile` using NASA asteroid measurements. The profile determines impact count, radius, damage, ore count, guardian count and environmental field duration.
+
+The event manager selects suitable impact locations near the Observatory and applies the reactions in the following order:
+
+1. Crop Mutation
+2. Terrain Transformation
+3. Impact Damage
+4. Resource Generation
+5. Guardian Spawning
+
+Impacts can create `ImpactCrater` ground and `MeteoriteOre` items. Actors within an impact radius receive damage, while protected ground and structures are not transformed.
+
+An actor can receive direct impact damage only once per celestial event, even if multiple impact areas overlap. Guardian spawning is also limited by the event's total guardian allocation.
+
+### Cosmic crops and consumables
+
+Meteor impacts can transform eligible crops into Cosmic Crops or destroy them, depending on the impact damage and mutation probability.
+
+Five Cosmic Crop varieties are supported.
+
+| Cosmic item | Effect |
+|---|---|
+| Cosmic Parsnip | Restores up to 30 HP |
+| Cosmic Tomato | Restores up to 8 stamina |
+| Cosmic Cauliflower | Restores 10 HP per turn for 2 turns |
+| Cosmic Melon | Causes a delayed 12-damage explosion against adjacent actors |
+| Cosmic Strawberry | Protects against 2 subsequent Cosmic Radiation field ticks |
+
+Cosmic Crops can be harvested to obtain their corresponding consumable items.
+
+### Environmental fields
+
+Each successful celestial event creates one temporary environmental field at its main impact location.
+
+| Field | Effect |
+|---|---|
+| Astral Blessing | Restores 4 HP and 2 stamina per turn to nearby eligible actors. When it expires, affected Impact Craters become Starlite Soil and eligible Meteorite Ore is refined into Starlite Ore. |
+| Gravitational Distortion | Reduces nearby actors' stamina by 3 per turn and attracts loose celestial resources towards its centre. Absorbed resources can extend the field's duration by up to 4 additional turns. |
+| Cosmic Radiation | Damages nearby unprotected actors based on the impact profile and can generate temporary Fire on eligible terrain. Cosmic Strawberry provides temporary immunity. |
+
+Environmental fields operate automatically during game ticks and disappear when their durations expire.
+
+Astral Guardians can also appear during hazardous events. They behave as hostile creatures and drop Meteorite Ore when defeated.
+
+### NASA API key configuration
+
+The NASA API requires an API key for live Observatory scans.
+
+1. Visit `https://api.nasa.gov/` and request an API key.
+2. Open Windows **Environment Variables**.
+3. Under **User variables**, create a new variable named `NASA_API_KEY`.
+4. Set its value to the API key obtained from NASA.
+5. Restart IntelliJ IDEA so the updated environment variable is available.
+6. Open the Maven project and run `game.Application`.
+7. Activate the Observatory in the game to perform a NASA scan.
+
+`NasaApiConfig` reads the key using `System.getenv("NASA_API_KEY")`.
+
+The API key must not be hardcoded, committed to GitLab or included in submitted project files. Local IDE configuration files containing credentials should also be excluded from shared ZIP files.
+
+An internet connection is required for live Observatory scans, but not for the automated unit tests.
+
+### Failure handling
+
+The Observatory handles unavailable NASA responses, invalid data, interrupted requests and empty asteroid feeds without deducting stamina.
+
+Scanning is also rejected when the Farmer has insufficient stamina, is too far away, an environmental field is still active, or no suitable impactable terrain is available.
+
+Failed scans do not increase the completed scan count or create environmental fields.
+
+### Implementation notes
+
+The implementation separates API communication, JSON parsing, event calculations and gameplay effects into independent classes.
+
+`NasaAsteroidClient` performs HTTP requests, while `NasaAsteroidParser` converts responses into `AsteroidData`. `ObservatoryScanPlanner` generates dynamic date parameters based on the current game state.
+
+The feature introduces three main abstractions:
+
+| Abstraction | Concrete implementations |
+|---|---|
+| `CelestialEvent` | `MeteorShower`, `AsteroidFragment`, `CelestialStorm` |
+| `CelestialReaction` | `CropMutationReaction`, `TerrainReaction`, `ImpactDamageReaction`, `ResourceReaction`, `GuardianReaction` |
+| `EnvironmentalField` | `AstralBlessing`, `GravitationalDistortion`, `CosmicRadiation` |
+
+`CelestialEventManager` depends on the `CelestialEvent`, `CelestialReaction` and `AsteroidFeed` interfaces rather than their concrete implementations.
+
+`Observatory` and `ActivateObservatoryAction` depend on the `CelestialScanService` interface.
+
+This supports the Single Responsibility Principle by separating responsibilities, the Open-Closed Principle by allowing new events and reactions to be added through existing abstractions, and the Dependency Inversion Principle by making higher-level classes depend on abstractions.
+
+The API feature is tested using deterministic asteroid data, fixed clocks, controlled randomness and a fake NASA feed, allowing tests to run without external network access.
+
+---
+
+## Running unit tests
+
+Requirements: JDK 17 or later and Apache Maven.
+
+The project uses JUnit 5 for automated tests, Mockito where appropriate, and Maven Surefire for test execution and reporting.
+
+From the project root, run:
+
+```shell
+mvn clean test
+```
+
+Alternatively, use IntelliJ IDEA's Maven panel and run **Lifecycle → clean**, followed by **Lifecycle → test**.
+
+Test classes are stored in `test/`. Test reports are generated in `target/surefire-reports/`.
+
+To run an individual test class:
+
+```shell
+mvn -Dtest=ObservatoryIntegrationTest test
+```
+
+On Windows PowerShell, a test report can be viewed using:
+
+```powershell
+Get-Content .\target\surefire-reports\game.events.ObservatoryIntegrationTest.txt
+```
+
+### REQ5 test coverage
+
+| Test class | Tested functionality |
+|---|---|
+| `ObservatoryScanPlannerTest` | Dynamic API dates, game-state changes and invalid inputs |
+| `CelestialEventTest` | Event classification, impact calculations and field creation |
+| `CosmicCropMutationTest` | Crop mutation, destruction and harvesting |
+| `CosmicConsumableTest` | Five Cosmic Item effects and duration boundaries |
+| `EnvironmentalFieldTest` | Environmental effects, duration, terrain changes and resource movement |
+| `CelestialReactionTest` | Impact damage, resource generation, protected terrain and guardian spawning |
+| `ObservatoryIntegrationTest` | Complete scan workflow, API failures, cooldowns and gameplay integration |
+
+REQ5 tests use fixed dates, deterministic random values and simulated NASA responses to avoid depending on live network access, API keys or external state.
+
+The automated REQ5 suite has recorded 77 passing test executions with no failures or errors.
+
+The full assignment test suite must also include meaningful tests for REQ1–REQ4, covering at least three distinct cases per functional requirement.
+
+The first Maven build may require internet access to download dependencies.

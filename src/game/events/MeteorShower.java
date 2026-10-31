@@ -3,6 +3,8 @@ package game.events;
 import game.api.AsteroidData;
 import game.interfaces.CelestialEvent;
 import java.util.Objects;
+import game.effects.AstralBlessing;
+import game.effects.EnvironmentalField;
 
 /**
  * Models multiple small meteor impacts caused by a small, non-hazardous asteroid.
@@ -52,6 +54,11 @@ public final class MeteorShower implements CelestialEvent {
         int damage = 5 + Math.min(15, (int) (velocity / 4.0));
         int oreCount = 1 + Math.min(3, (int) (diameter / 25.0));
 
+        int blessingDuration = 2 + Math.min(
+                2,
+                (int) (asteroidData.getEstimatedDiameterMeters() / 30.0)
+        );
+
         return new ImpactProfile(
                 "Meteor Shower",
                 impactCount,
@@ -59,7 +66,25 @@ public final class MeteorShower implements CelestialEvent {
                 damage,
                 oreCount,
                 0,
-                1
+                blessingDuration
+        );
+    }
+
+    /**
+     * Creates an Astral Blessing field for this meteor shower.
+     *
+     * @param impactProfile the calculated impact profile
+     * @return a new Astral Blessing field
+     */
+    @Override
+    public EnvironmentalField createField(
+            ImpactProfile impactProfile) {
+
+        Objects.requireNonNull(impactProfile, "impactProfile");
+
+        return new AstralBlessing(
+                impactProfile.getRadius(),
+                impactProfile.getEffectDurationTurns()
         );
     }
 }

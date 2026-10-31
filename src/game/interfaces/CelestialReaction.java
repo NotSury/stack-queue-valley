@@ -4,23 +4,31 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.events.ImpactProfile;
 
 /**
- * Defines a reaction that modifies the game world
- * after a celestial event.
+ * Defines a reaction to a celestial impact.
  *
- * <p>Implementations can change terrain, create items,
- * spawn actors, cause immediate damage, or apply
- * lasting status effects.</p>
+ * <p>Reactions can reset event-specific state before a new
+ * celestial event begins. Stateless reactions do not need
+ * to override this lifecycle method.</p>
  *
  * @author Chin Kai Xuan 35730374
- * @version 1.0.0
+ * @version 1.1.0
  */
 public interface CelestialReaction {
 
     /**
-     * Applies this reaction at a selected impact location.
+     * Prepares the reaction for a new celestial event.
      *
-     * @param impactProfile gameplay properties calculated for the event
-     * @param location location where this reaction is applied
+     * <p>The default implementation does nothing.</p>
+     */
+    default void beginEvent() {
+        // Stateless reactions require no reset.
+    }
+
+    /**
+     * Applies this reaction at an impact location.
+     *
+     * @param impactProfile calculated impact properties
+     * @param location impact centre
      */
     void apply(ImpactProfile impactProfile, Location location);
 }
