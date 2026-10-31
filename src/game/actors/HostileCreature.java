@@ -16,6 +16,7 @@ import game.grounds.Remains;
 import game.interfaces.Cursed;
 import game.interfaces.Hostile;
 import game.weapons.CreatureWeapon;
+import game.interfaces.Stunnable;
 
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +36,7 @@ import java.util.TreeMap;
  * @author <Lee Le Si> <34599223>
  * @version 1.1.0
  */
-public abstract class HostileCreature extends Actor implements Hostile {
+public abstract class HostileCreature extends Actor implements Hostile, Stunnable {
     /**
      * Priority of attacking: tried first.
      */
@@ -52,6 +53,11 @@ public abstract class HostileCreature extends Actor implements Hostile {
      */
 
     private final Map<Integer, Behaviour<Actor, Action>>  behaviours = new TreeMap<>();
+
+    /**
+     * Number of remaining turns during which this creature cannot act.
+     */
+    private int stunTurns = 0;
     /**
      * Constructor for HostileCreature.
      *
@@ -65,6 +71,17 @@ public abstract class HostileCreature extends Actor implements Hostile {
         setIntrinsicWeapon(weapon);
         behaviours.put(ATTACK_PRIORITY, new AttackBehaviour());
         behaviours.put(WANDER_PRIORITY, new WanderBehaviour());
+    }
+
+    /**
+     * Applies a stun to this hostile creature.
+     * A new stun will not shorten an existing stun.
+     *
+     * @param turns the number of turns to remain stunned for the creature
+     */
+    @Override
+    public void stun(int turns) {
+        stunTurns = Math.max(stunTurns, turns);
     }
 
     /**
@@ -84,6 +101,13 @@ public abstract class HostileCreature extends Actor implements Hostile {
     public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
         if (!isConscious()) {
             display.println(unconscious(map));
+            return new DoNothingAction();
+        }
+
+        if (stunTurns > 0)
+        {
+            stunTurns--;
+            display.println(this + " is stunned and cannot act.");
             return new DoNothingAction();
         }
 

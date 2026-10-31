@@ -68,7 +68,11 @@ public abstract class TimedAreaEffect
                     AreaLocationHelper.square(map, centre, radius);
 
             applyTick(area);
-            remainingTurns--;
+
+            if (remainingTurns > 0)
+            {
+                remainingTurns--;
+            }
         }
     }
 
@@ -91,6 +95,14 @@ public abstract class TimedAreaEffect
         {
             onExpire();
         }
+    }
+
+    /**
+     * Ends the effect early when its completion condition is met.
+     */
+    protected void finishEarly()
+    {
+        remainingTurns = 0;
     }
 
 }
