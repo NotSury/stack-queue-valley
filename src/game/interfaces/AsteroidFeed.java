@@ -1,4 +1,3 @@
-
 package game.interfaces;
 
 import game.api.AsteroidData;
