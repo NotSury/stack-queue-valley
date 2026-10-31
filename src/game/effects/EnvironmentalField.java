@@ -23,9 +23,11 @@ public abstract class EnvironmentalField extends Item {
     private static final int MAX_RADIUS = 2;
     private static final int MIN_DURATION = 2;
     private static final int MAX_DURATION = 4;
+    private static final int MAX_BONUS_TURNS = 4;
 
     private final int radius;
     private int remainingTurns;
+    private int bonusTurns;
     private Location centre;
 
     /**
@@ -107,6 +109,34 @@ public abstract class EnvironmentalField extends Item {
      */
     public final int getRemainingTurns() {
         return remainingTurns;
+    }
+
+    /**
+     * Extends the field duration without exceeding the bonus-turn limit.
+     *
+     * @param requestedTurns number of additional turns requested
+     * @return number of turns actually added, or zero if unavailable
+     */
+    protected final int extendDuration(int requestedTurns) {
+        if (requestedTurns <= 0) {
+            throw new IllegalArgumentException(
+                    "Extension must be positive"
+            );
+        }
+
+        if (!isActive()) {
+            return 0;
+        }
+
+        int added = Math.min(
+                requestedTurns,
+                MAX_BONUS_TURNS - bonusTurns
+        );
+
+        remainingTurns += added;
+        bonusTurns += added;
+
+        return added;
     }
 
     /**
