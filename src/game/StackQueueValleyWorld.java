@@ -27,6 +27,8 @@ import game.recipes.JamRecipe;
 import game.recipes.OmeletteRecipe;
 import game.teleportation.TeleportDestination;
 import game.companions.TimeRabbit;
+import game.companions.PrismFox;
+import game.items.Strawberry;
 
 import java.util.Arrays;
 import java.util.List;
@@ -156,6 +158,10 @@ public class StackQueueValleyWorld extends World {
 
         TimeRabbit timeRabbit = new TimeRabbit();
         inheritedFarmMap.at(1,3).addActor(timeRabbit);
+
+        // REQ 4 TESTING
+        PrismFox prismFox = new PrismFox();
+        inheritedFarmMap.at(1, 4). addActor(prismFox);
 
         Cow cow = new Cow();
         Chicken chicken = new Chicken();

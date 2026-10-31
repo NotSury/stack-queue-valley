@@ -79,7 +79,12 @@ public abstract class MagicalCompanion extends Actor
 
         if (otherActor.hasAbility(ActorRole.FARMER) && hasCharges())
         {
-            actions.add(new ActivateMagicAction(getFarmMagic(), this));
+            FarmMagic magic = getFarmMagic();
+
+            if (magic != null)
+            {
+                actions.add(new ActivateMagicAction(getFarmMagic(), this));
+            }
             actions.add(new ActivateOwnAbilityAction(this));
         }
         return actions;
