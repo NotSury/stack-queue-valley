@@ -4,8 +4,11 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.behaviours.SpreadBehaviour;
 import game.effects.Explosion;
 import game.items.Melon;
+
+import java.util.Random;
 
 /**
  * Represents a Melon crop that can be watered and harvested.
@@ -18,8 +21,12 @@ import game.items.Melon;
  * receives a Melon. Explosion damage is reduced by the number of times
  * the crop has been watered.</p>
  *
+ * <p>The crop also spreads a new Melon Sprout onto a random adjacent plantable tile
+ * every 20 turns.</p>
+ *
  * @author Chin Kai Xuan 35730374
- * @version 1.0.0
+ * @author Khoo Lynn 34598901
+ * @version 1.1.0
  */
 public class MelonCrop extends WaterableCrop {
 
@@ -54,10 +61,26 @@ public class MelonCrop extends WaterableCrop {
     private static final int MAX_STAMINA_INCREASE = 1;
 
     /**
+     * Number of turns between spreading attempts.
+     */
+    private static final int SPREAD_INTERVAL = 20;
+
+    /**
      * Constructor for MelonCrop.
      */
-    public MelonCrop() {
+    public MelonCrop(){
+        this(new Random());
+    }
+
+    /**
+     * Constructor with a random number generator.
+     *
+     * @param random random number generator.
+     */
+    public MelonCrop(Random random) {
         super('W', "Melon Crop");
+
+        addPlantBehaviour(new SpreadBehaviour(SPREAD_INTERVAL, MelonSprout::new, random));
     }
 
     /**
