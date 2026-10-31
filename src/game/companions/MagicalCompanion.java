@@ -8,6 +8,7 @@ import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.displays.Display;
 import game.effects.TimedAreaEffect;
 import game.magic.FarmMagic;
+import game.behaviours.WanderBehaviour;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public abstract class MagicalCompanion extends Actor
     private final List<TimedAreaEffect> activeEffects = new ArrayList<>();
     private static final int MAX_CHARGES = 3;
     private int remainingCharges = MAX_CHARGES;
+    private final WanderBehaviour wanderBehaviour = new WanderBehaviour();
 
     /**
      * Returns the number of remaining ability charges.
@@ -129,6 +131,13 @@ public abstract class MagicalCompanion extends Actor
                 activeEffects.remove(i);
             }
         }
+        Action wanderAction = wanderBehaviour.operate(this, map.locationOf(this));
+
+        if (wanderAction != null)
+        {
+            return wanderAction;
+        }
+
         return new DoNothingAction();
     }
 }
