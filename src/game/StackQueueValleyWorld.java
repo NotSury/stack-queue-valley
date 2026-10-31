@@ -46,6 +46,7 @@ import game.reactions.TerrainReaction;
 import game.reactions.ImpactDamageReaction;
 import game.reactions.ResourceReaction;
 import game.reactions.GuardianReaction;
+import game.companions.TimeRabbit;
 
 import java.time.Clock;
 import java.util.Random;
@@ -69,7 +70,7 @@ import java.util.Random;
  * @author <Khoo Lynn> <34598901>
  * @author <Vanessa Liau Jia Yee> <34599398>
  * @author Surya Muni Peragas 35651628
- * @version 1.5.0
+ * @version 1.6.0
  */
 public class StackQueueValleyWorld extends World {
 
@@ -217,6 +218,9 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.at(1, 3).setGround(
                 new Observatory(celestialManager)
         );
+
+        TimeRabbit timeRabbit = new TimeRabbit();
+        inheritedFarmMap.at(1,3).addActor(timeRabbit);
 
         Cow cow = new Cow();
         Chicken chicken = new Chicken();

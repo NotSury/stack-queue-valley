@@ -2,7 +2,6 @@ package game.grounds;
 
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.HarvestAction;
 import game.interfaces.Harvestable;
@@ -19,9 +18,10 @@ import game.capabilities.GroundAbility;
  * harvest cost and harvesting effect.</p>
  *
  * @author Chin Kai Xuan 35730374
- * @version 1.0.0
+ * @author Khoo Lynn 34598901
+ * @version 1.1.0
  */
-public abstract class Crop extends Ground implements Harvestable {
+public abstract class Crop extends Plant implements Harvestable {
 
     /**
      * Constructor for the Crop class.

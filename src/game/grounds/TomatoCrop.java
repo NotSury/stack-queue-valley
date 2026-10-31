@@ -4,7 +4,11 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.behaviours.ProduceBehaviour;
+import game.behaviours.SpreadBehaviour;
 import game.items.Tomato;
+
+import java.util.Random;
 
 /**
  * TomatoCrop represents a mature Tomato crop that can be harvested.
@@ -13,9 +17,14 @@ import game.items.Tomato;
  * Tomatoes. The crop is removed and the actor's maximum stamina
  * is increased by 1.</p>
  *
+ * <p>The crop produces a Tomato on a random adjacent tile every 7 turns. It also
+ * has a 10 percent chance of spreading a new Tomato Crop onto adjacent plantable
+ * ground every 20 turns.</p>
+ *
  * @author Lee Le Si 34599223
  * @author Chin Kai Xuan 35730374
- * @version 1.0.0
+ * @author Khoo Lynn 34598901
+ * @version 1.1.0
  */
 public class TomatoCrop extends Crop {
 
@@ -35,10 +44,37 @@ public class TomatoCrop extends Crop {
     private static final int MAX_STAMINA_INCREASE = 1;
 
     /**
+     * Number of turns between producing Tomatoes.
+     */
+    private static final int PRODUCE_INTERVAL = 7;
+
+    /**
+     * Number of turns between spreading attempts.
+     */
+    private static final int SPREAD_INTERVAL = 20;
+
+    /**
+     * Chance of spreading a new Tomato Crop.
+     */
+    private static final double SPREAD_CHANCE = 0.1;
+
+    /**
      * Constructor for TomatoCrop.
      */
-    public TomatoCrop() {
+    public TomatoCrop(){
+        this(new Random());
+    }
+
+    /**
+     * Constructor with a random number generator.
+     *
+     * @param random random number generator.
+     */
+    public TomatoCrop(Random random) {
         super('T', "Tomato Crop");
+
+        addPlantBehaviour(new ProduceBehaviour(PRODUCE_INTERVAL, Tomato::new, random));
+        addPlantBehaviour(new SpreadBehaviour(SPREAD_INTERVAL, SPREAD_CHANCE, TomatoCrop::new, random));
     }
 
     /**

@@ -7,12 +7,18 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
+import game.afflictions.Affliction;
+import game.afflictions.CurseApplier;
 import game.behaviours.AttackBehaviour;
 import game.behaviours.WanderBehaviour;
+import game.grounds.Remains;
+import game.interfaces.Cursed;
 import game.interfaces.Hostile;
 import game.weapons.CreatureWeapon;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 /**
  * Base class for creatures in the mines that the farmer can fight.
@@ -21,8 +27,13 @@ import java.util.TreeMap;
  * wanders. Subclasses only set their stats and override {@link #respondToAttack}
  * (or {@code unconscious}) to add their special behaviour.</p>
  *
+ * <p>When a creature that is {@link Cursed} dies (REQ3), its killer inherits its
+ * curse, its death changes the land around it, and it leaves {@link Remains}.
+ * This happens once here for every cursed creature, so the subclasses only
+ * define their own curse and death effect.</p>
+ *
  * @author <Lee Le Si> <34599223>
- * @version 1.0.0
+ * @version 1.1.0
  */
 public abstract class HostileCreature extends Actor implements Hostile {
     /**
@@ -83,7 +94,7 @@ public abstract class HostileCreature extends Actor implements Hostile {
             }
         }
         return new DoNothingAction();
-        }
+    }
 
     /**
      * By default a hostile creature does nothing special when attacked.
@@ -96,5 +107,73 @@ public abstract class HostileCreature extends Actor implements Hostile {
     @Override
     public String respondToAttack(Actor attacker, GameMap map) {
         return "";
+    }
+
+    /**
+     * Called when another actor's blow knocks this creature out. A cursed
+     * creature passes its curse to the killer and leaves cursed remains before
+     * it is removed.
+     *
+     * @param attacker the actor that defeated this creature
+     * @param map      the map the creature is on
+     * @return a description of what happened
+     */
+    @Override
+    public String unconscious(Actor attacker, GameMap map) {
+        Location here = map.locationOf(this);
+        String curseResult = passCurseTo(attacker) + leaveRemains(here);
+        return curseResult + super.unconscious(attacker, map);
+    }
+
+    /**
+     * Called when this creature dies without a killer (for example, from a
+     * status effect). A cursed creature still leaves cursed remains, but its
+     * curse has nobody to pass to.
+     *
+     * @param map the map the creature is on
+     * @return a description of what happened
+     */
+    @Override
+    public String unconscious(GameMap map) {
+        Location here = map.locationOf(this);
+        String curseResult = leaveRemains(here);
+        return curseResult + super.unconscious(map);
+    }
+
+    /**
+     * Passes a fresh copy of this creature's curse to its killer, if this
+     * creature is cursed.
+     *
+     * @param killer the actor that defeated this creature
+     * @return a description of what happened, or an empty string if this creature is not cursed
+     */
+    private String passCurseTo(Actor killer) {
+        Optional<Cursed> cursed = asCapability(Cursed.class);
+        if (cursed.isEmpty()) {
+            return "";
+        }
+        Affliction curse = cursed.get().curse();
+        if (CurseApplier.apply(killer, curse)) {
+            return killer + " inherits " + curse + " from " + this + "." + System.lineSeparator();
+        }
+        return "The " + curse + " curse of " + this + " fizzles out." + System.lineSeparator();
+    }
+
+    /**
+     * Applies this creature's death effect and leaves cursed remains on its
+     * tile, if this creature is cursed.
+     *
+     * @param here the location where this creature died
+     * @return a description of what happened, or an empty string if this creature is not cursed
+     */
+    private String leaveRemains(Location here) {
+        Optional<Cursed> cursed = asCapability(Cursed.class);
+        if (cursed.isEmpty()) {
+            return "";
+        }
+        String deathEffect = cursed.get().onDeath(here);
+        here.setGround(new Remains(here.getGround(), cursed.get()));
+        return deathEffect + System.lineSeparator()
+                + this + " leaves cursed remains." + System.lineSeparator();
     }
 }

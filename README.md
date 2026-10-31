@@ -309,6 +309,124 @@ Walking and jumping respect terrain restrictions and Actor occupancy. Safe route
 
 Placement and spawning use eligible locations. If no ordinary action is available, the Spider remains stationary.
 
+Test classes are stored in `test/`.
+Test reports are generated in `target/surefire-reports/`.
+The first run requires internet access to download build dependencies.
+
+## A3 REQ 3: The Necromancer's Curse
+Author: Lee Le Si (34599223)
+
+Every monster in the Mines carries a curse that passes to whoever kills it.
+Each curse spreads or changes the land in its own way, dead cursed monsters
+leave remains that reshape the ground around them, and the Farmer can raise
+those remains as undead minions that are immune to curses. The implemented
+design (pitch, mechanics, architecture) is in `feature-proposal.md`.
+
+### Original approved A3 REQ 3 proposal
+
+<details>
+<summary>Click to expand the proposal approved by our TA</summary>
+
+**Pitch**
+
+Every monster in the Mines carries a curse, and whoever kills it inherits that
+curse. A Bat's Contagion spreads from actor to actor and blights the ground; a
+Slime's Mire turns the land around its victim into a swallowing swamp; a Cave
+Ghost's Soul Tether chains its victim to another creature and drags them
+together. The Farmer can raise slain monsters as undead minions that are immune
+to curses, so the smart necromancer lets the dead do the killing.
+
+**How it plays**
+
+1. Killing a cursed hostile passes its curse to the killer:
+   - Bat → Contagion. Every turn, each actor next to the host catches
+     Contagion, and the host's tile turns into Blight ground that infects
+     anyone stepping on it.
+   - Slime → Mire. Every 2 turns, the tiles around the host turn into Mire:
+     nobody can walk onto it, and any item lying there sinks and is lost. Mire
+     dries up after 4 turns.
+   - Cave Ghost → Soul Tether. Every 3 turns, the host is chained to the
+     nearest other actor within radius 3. Whenever that actor ends a turn more
+     than 2 tiles away, it's dragged back next to the host.
+2. The dead creature's remains change the land:
+   - Bat: a bone burst spreads Contagion to every hostile within radius 2 and
+     blights the area.
+   - Slime: its body becomes a Mire pool around the remains.
+   - Cave Ghost: it haunts the surrounding tiles, and anyone entering one gets
+     a Soul Tether.
+3. The Farmer raises the remains (costs stamina; one minion at a time):
+   - Skeleton Bat: a plague aura. Every turn, adjacent hostiles catch Contagion.
+   - Zombie Slime: every tile it leaves turns to Mire, building a wall that
+     blocks pursuing hostiles. When it crumbles or is destroyed, its body
+     becomes a Mire pool.
+   - Wraith: every 3 turns it wails, pulling every hostile within radius 3 one
+     tile closer and tethering them to itself so they can't escape.
+4. Undead are immune to curses. A curse passed to an undead killer fizzles out,
+   so minions are the safe way to finish cursed monsters.
+
+**Architecture**
+
+| Abstraction | Concrete class | New or retrofitted | When | What happens |
+|---|---|---|---|---|
+| Affliction (abstract class implementing the engine's Status) | Contagion | New | Every turn | The curse jumps to everyone standing next to the host including the Farmer. The host's tile turns into Blight, and anyone who steps on Blight catches the curse too. |
+| | Mire | New | Every 2 turns | The tiles around the host turn into swamp (the host's own tile stays solid). Nobody can walk onto them, and any item lying there sinks and disappears. The swamp dries up after 4 turns. |
+| | SoulTether | New | Every 3 turns | The host is chained to the closest actor within 3 tiles. If that actor moves more than 2 tiles away, it gets dragged back next to the host. |
+| Cursed (interface) | Bat | Retrofitted | When it dies | Its killer catches Contagion. Its bones burst, giving Contagion to every hostile within 2 tiles and turning the nearby ground into Blight. It can be raised as a SkeletonBat. |
+| | Slime | Retrofitted | When it dies | Its killer catches Mire. Its body melts into a swamp around the remains. It can be raised as a ZombieSlime. |
+| | CaveGhost | Retrofitted | When it dies | Its killer gets a Soul Tether. The nearby tiles become haunted, and anyone who walks in gets a Soul Tether too. It can be raised as a Wraith. |
+| Undead (abstract class extending the engine's Actor) | SkeletonBat | New | Every turn | Every hostile standing next to it catches Contagion, so the curse spreads through groups of enemies. |
+| | ZombieSlime | New | Every turn, and when it ends | Every tile it leaves turns into swamp, building a wall behind it that hostiles can't cross. When it crumbles or is destroyed, its body becomes a swamp pool. |
+| | Wraith | New | Every 3 turns | It wails: every hostile within 3 tiles is pulled 1 tile closer and chained to the Wraith, so they can't run away. |
+
+Supporting new classes: Remains, RaiseDeadAction, MinionBehaviour,
+TemporaryGround (abstract), Blight, MireGround, HauntedGround,
+NecromancyCapability (HAS_MINION, UNDEAD).
+
+Modified existing class: HostileCreature (passes the curse to the killer and
+leaves Remains in its death hook).
+
+Higher-level classes that depend only on the abstractions (DIP):
+- HostileCreature uses only Cursed and Affliction when a creature dies.
+- RaiseDeadAction uses only Cursed and Undead.
+- MinionBehaviour uses only Undead and Hostile.
+
+</details>
+
+### Changes from the approved A3 REQ 3 proposal
+To ensure changes are allowed for A3 REQ 3 and REQ 4 proposal for preventing overlapping features, an Ed forum question was posted
+. From the teaching teams' reply, the TA/lecturer confirmed that minor changes are fine if documented here. All three
+abstractions (Affliction, Cursed, Undead) and all nine concrete classes are
+unchanged; only the effects below differ.
+
+| # | Class | Approved proposal | Implemented | Reason |
+|---|-------|-------------------|-------------|--------|
+| 1 | SoulTether | Every 3 turns, the host is chained to the closest actor within 3 tiles. If that actor moves more than 2 tiles away, it's dragged back next to the host. | Every 3 turns, the host is linked to the closest actor within 3 tiles, and every other curse the host carries is copied onto that actor. If the host has no other curse, the linked actor's tile becomes Haunted Ground instead. | Removes forced movement, which used the same mechanism as A3 REQ 4's Nature's Sanctuary push (and restricted movement like Rainbow Storm's stun). |
+| 2 | Wraith | Every 3 turns, it wails: every hostile within 3 tiles is pulled 1 tile closer and chained to the Wraith. | Every 3 turns, it wails: every curse on the Farmer is lifted and pushed onto a random hostile within 3 tiles; if none can take it, the curse fizzles out. Every tile it leaves becomes Haunted Ground. | Same as above: no A3 REQ 3 effect moves actors any more. |
+| 3 | Pitch | "…a Cave Ghost's Soul Tether chains its victim to another creature and drags them together." | "…a Cave Ghost's Soul Tether binds its victim to another creature and shares every curse between them." | Matches change 1. |
+| 4 | Contagion | Every turn, the curse jumps to everyone next to the host and the host's tile turns into Blight. | Same, but Contagion weakens as it spreads: each new infection is one generation further from the source, and the third generation can no longer spread or blight. | Without this, an actor standing on its own Blight was re-infected forever, so an outbreak never ended. |
+| 5 | Supporting classes | – | Added `CurseApplier`, `CurseType`, `NearbyActors`, and the `CURSED_GROUND` capability. | Shared helpers so curse rules, area searches and the "don't cover cursed ground" rule are written once (DRY). |
+
+### Implementation details
+- **Values not stated in the proposal:** raising the dead costs 5 stamina;
+  minions last 15 turns; the Farmer can have one minion at a time.
+- **Minion behaviour:** attack an adjacent hostile; otherwise move towards the
+  closest hostile within 4 tiles; otherwise return to the Farmer if more than 2
+  tiles away; otherwise wander. Hostiles attack minions too.
+- **Curse durations:** Contagion 6 turns, Mire 6 turns, Soul Tether 9 turns.
+  Cursed ground lasts Blight 4, Mire 4, Haunted Ground 5 turns, then the
+  original ground returns. Remains stay until raised.
+- **Display characters:** Blight `;` (`:` is already used by Web), Mire `=`,
+  Haunted Ground `?`, Remains `%`, Skeleton Bat `B`, Zombie Slime `Z`,
+  Wraith `V`.
+
+### Running the A3 REQ 3 tests
+Tests: `AfflictionTest`, `RaiseDeadActionTest`, `UndeadTest` (17 cases:
+normal, edge and invalid). All are deterministic: curses use no randomness, and
+the Wraith is given a seeded `Random`.
+
+- IntelliJ: Ctrl+click the three test classes → right-click → Run.
+- Maven: `mvn test -Dtest=AfflictionTest,RaiseDeadActionTest,UndeadTest`
+
 ## Assignment 3 REQ5 — Starfall: Celestial Forge
 
 Starfall is a celestial-event system that integrates NASA's Near-Earth Object Web Service (NeoWs) API into the game. The Farmer can activate an Observatory to retrieve asteroid data, which is used to generate meteor impacts, transform terrain, mutate crops, create resources, summon hostile creatures and activate environmental effects.

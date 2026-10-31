@@ -3,12 +3,15 @@ package game.grounds;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
+import game.behaviours.ProduceBehaviour;
 import game.items.Parsnip;
 
 import java.util.List;
+import java.util.Random;
 
 /**
- * Represents a mature Parsnip crop that can be watered and harvested.
+ * Represents a mature Parsnip crop that can be watered and harvested, and
+ * automatically produce Parsnips.
  *
  * <p>Harvesting costs 1 stamina and gives the actor one Parsnip.
  * The crop is then removed, with a 50 percent chance that an additional
@@ -18,9 +21,12 @@ import java.util.List;
  * The crop then has a destruction chance equal to 10 percent plus
  * the number of times it has been watered.</p>
  *
+ * <p>The crop also produces a Parsnip on a random adjacent tile every 15 turns.</p>
+ *
  * @author Lee Le Si 34599223
  * @author Chin Kai Xuan 35730374
- * @version 1.0.0
+ * @author Khoo Lynn 34598901
+ * @version 1.1.0
  */
 public class ParsnipCrop extends WaterableCrop {
 
@@ -50,10 +56,25 @@ public class ParsnipCrop extends WaterableCrop {
     private static final double EXTRA_PARSNIP_CHANCE = 0.5;
 
     /**
+     * Number of turns between producing Parsnips.
+     */
+    private static final int PRODUCE_INTERVAL = 15;
+
+    /**
      * Constructor for ParsnipCrop.
      */
-    public ParsnipCrop() {
+    public ParsnipCrop(){
+        this(new Random());
+    }
+
+    /**
+     * Constructor with a random number generator.
+     *
+     * @param random random number generator.
+     */
+    public ParsnipCrop(Random random) {
         super('P', "Parsnip Crop");
+        addPlantBehaviour(new ProduceBehaviour(PRODUCE_INTERVAL, Parsnip::new, random));
     }
 
     /**
