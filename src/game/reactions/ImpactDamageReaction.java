@@ -1,29 +1,46 @@
 package game.reactions;
 
+import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.events.ImpactProfile;
 import game.interfaces.CelestialReaction;
 
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Objects;
+import java.util.Set;
 
 /**
- * Damages actors within a circular celestial impact area.
+ * Damages conscious actors within celestial impact areas.
  *
- * <p>Damage is determined by NASA-derived impact properties.
- * The reaction affects all actors within the radius, including
- * the Farmer, farm animals, and hostile creatures.</p>
+ * <p>An actor receives direct impact damage at most once
+ * during a single celestial event, even when blast areas
+ * overlap.</p>
  *
  * @author Chin Kai Xuan 35730374
- * @version 1.0.0
+ * @version 1.1.0
  */
-public final class ImpactDamageReaction implements CelestialReaction {
+public final class ImpactDamageReaction
+        implements CelestialReaction {
+
+    private final Set<Actor> damagedActors =
+            Collections.newSetFromMap(new IdentityHashMap<>());
 
     /**
-     * Applies impact damage to actors inside the blast radius.
+     * Resets damage tracking for a new celestial event.
+     */
+    @Override
+    public void beginEvent() {
+        damagedActors.clear();
+    }
+
+    /**
+     * Applies impact damage to actors that have not already
+     * been hit during the current event.
      *
      * @param profile calculated celestial impact properties
-     * @param location centre of the impact
+     * @param location impact centre
      */
     @Override
     public void apply(ImpactProfile profile, Location location) {
@@ -33,7 +50,7 @@ public final class ImpactDamageReaction implements CelestialReaction {
 
         int damage = profile.getDamage();
 
-        if (damage == 0) {
+        if (damage <= 0) {
             return;
         }
 
@@ -46,14 +63,22 @@ public final class ImpactDamageReaction implements CelestialReaction {
                 long dx = (long) x - location.x();
                 long dy = (long) y - location.y();
 
-                if (dx * dx + dy * dy
-                        <= radius * radius) {
+                if (dx * dx + dy * dy > radius * radius) {
+                    continue;
+                }
 
-                    Location affected = map.at(x, y);
+                Location affected = map.at(x, y);
 
-                    if (affected.containsAnActor()) {
-                        affected.getActor().hurt(damage);
-                    }
+                if (!affected.containsAnActor()) {
+                    continue;
+                }
+
+                Actor actor = affected.getActor();
+
+                if (actor.isConscious()
+                        && damagedActors.add(actor)) {
+
+                    actor.hurt(damage);
                 }
             }
         }

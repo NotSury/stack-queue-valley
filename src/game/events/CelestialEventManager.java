@@ -189,31 +189,51 @@ public final class CelestialEventManager
                     + "window. No stamina was spent.";
         }
 
-        // Find asteroids handled by our celestial event strategies.
-        List<AsteroidData> supported = asteroids.stream()
-                .filter(Objects::nonNull)
-                .filter(data -> events.stream()
-                        .anyMatch(event -> event.supports(data)))
-                .toList();
+        // Validate and prepare the event before modifying game state.
+        AsteroidData asteroid;
+        CelestialEvent selected;
+        ImpactProfile profile;
+        EnvironmentalField field;
 
-        if (supported.isEmpty()) {
-            return "No supported celestial event was found. "
-                    + "No stamina was spent.";
+        try {
+            List<AsteroidData> supported = asteroids.stream()
+                    .filter(Objects::nonNull)
+                    .filter(data -> events.stream()
+                            .anyMatch(event -> event.supports(data)))
+                    .toList();
+
+            if (supported.isEmpty()) {
+                return "No supported celestial event was found. "
+                        + "No stamina was spent.";
+            }
+
+            asteroid = supported.get(
+                    random.nextInt(supported.size())
+            );
+
+            selected = events.stream()
+                    .filter(event -> event.supports(asteroid))
+                    .findFirst()
+                    .orElseThrow();
+
+            profile = selected.buildProfile(asteroid);
+
+            field = Objects.requireNonNull(
+                    selected.createField(profile),
+                    "Celestial event created no field"
+            );
+
+        } catch (RuntimeException exception) {
+
+            return "NASA asteroid data could not produce a valid "
+                    + "celestial event. No stamina was spent.";
         }
 
-        AsteroidData asteroid = supported.get(
-                random.nextInt(supported.size())
-        );
-
-        CelestialEvent selected = events.stream()
-                .filter(event -> event.supports(asteroid))
-                .findFirst()
-                .orElseThrow();
-
-        ImpactProfile profile = selected.buildProfile(asteroid);
-
-        // Polymorphic creation: no concrete event checks required.
-        EnvironmentalField field = selected.createField(profile);
+        // Reset reaction state once per celestial event,
+        // not once per individual impact location.
+        for (CelestialReaction reaction : reactions) {
+            reaction.beginEvent();
+        }
 
         // Select valid impact sites near the Observatory.
         Collections.shuffle(candidates, random);

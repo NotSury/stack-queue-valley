@@ -14,31 +14,41 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Spawns Astral Guardians at available crater tiles inside
- * a celestial impact radius.
+ * Spawns Astral Guardians on unoccupied impact craters.
  *
- * <p>Existing actors and protected structures are preserved.</p>
+ * <p>The profile's guardian count is treated as the total
+ * allocation for one celestial event, not a separate
+ * allocation for each impact site.</p>
  *
  * @author Chin Kai Xuan 35730374
- * @version 1.0.0
+ * @version 1.1.0
  */
-public final class GuardianReaction implements CelestialReaction {
+public final class GuardianReaction
+        implements CelestialReaction {
+
+    private int spawnedThisEvent;
 
     /**
-     * Spawns up to the number of guardians specified by the profile.
-     *
-     * <p>If insufficient free crater tiles exist, fewer guardians
-     * are spawned.</p>
+     * Resets the guardian allocation for a new event.
+     */
+    @Override
+    public void beginEvent() {
+        spawnedThisEvent = 0;
+    }
+
+    /**
+     * Spawns guardians without exceeding the event's allocation.
      *
      * @param profile calculated celestial impact properties
-     * @param location centre of the celestial impact
+     * @param location centre of an impact
      */
     @Override
     public void apply(ImpactProfile profile, Location location) {
+
         Objects.requireNonNull(profile, "profile");
         Objects.requireNonNull(location, "location");
 
-        if (profile.getGuardianCount() == 0) {
+        if (spawnedThisEvent >= profile.getGuardianCount()) {
             return;
         }
 
@@ -64,7 +74,6 @@ public final class GuardianReaction implements CelestialReaction {
             }
         }
 
-        // Prioritise locations closest to the impact centre.
         eligible.sort(
                 Comparator.comparingLong(
                         candidate -> distanceSquared(
@@ -72,11 +81,10 @@ public final class GuardianReaction implements CelestialReaction {
                 )
         );
 
-        int spawned = 0;
-
         for (Location candidate : eligible) {
 
-            if (spawned >= profile.getGuardianCount()) {
+            if (spawnedThisEvent
+                    >= profile.getGuardianCount()) {
                 break;
             }
 
@@ -88,7 +96,7 @@ public final class GuardianReaction implements CelestialReaction {
 
             try {
                 candidate.addActor(guardian);
-                spawned++;
+                spawnedThisEvent++;
 
             } catch (GameEngineException exception) {
                 throw new IllegalStateException(
@@ -101,13 +109,15 @@ public final class GuardianReaction implements CelestialReaction {
     }
 
     /**
-     * Calculates the squared distance between two locations.
+     * Calculates squared distance between locations.
      *
      * @param first first location
      * @param second second location
-     * @return squared distance between locations
+     * @return squared Euclidean distance
      */
-    private long distanceSquared(Location first, Location second) {
+    private long distanceSquared(
+            Location first,
+            Location second) {
 
         long dx = (long) first.x() - second.x();
         long dy = (long) first.y() - second.y();
