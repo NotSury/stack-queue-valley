@@ -15,6 +15,8 @@ import game.magic.StormMagic;
  */
 public class PrismFox extends MagicalCompanion {
 
+    private final FarmMagic stormMagic = new StormMagic();
+
     /**
      * Creates a PrismFox with 20 hit points.
      */
@@ -31,7 +33,7 @@ public class PrismFox extends MagicalCompanion {
     @Override
     protected FarmMagic getFarmMagic()
     {
-        return new StormMagic();
+        return stormMagic;
     }
 
     /**
@@ -42,7 +44,7 @@ public class PrismFox extends MagicalCompanion {
     @Override
     public String getOwnAbilityName()
     {
-        return "Magical Harvest Trail";
+        return HarvestTrailEffect.NAME;
     }
 
     /**
@@ -54,7 +56,7 @@ public class PrismFox extends MagicalCompanion {
      */
     @Override
     public boolean castOwnAbility(Actor farmer, GameMap map) {
-        if (isEffectActive("Magical Harvest Trail")) {
+        if (isEffectActive(HarvestTrailEffect.NAME)) {
             return false;
         }
 

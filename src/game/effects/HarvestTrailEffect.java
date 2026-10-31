@@ -17,10 +17,12 @@ import java.util.Optional;
  * @author Vanessa Liau Jia Yee 34599398
  * @version 1.0.0
  */
-public class HarvestTrailEffect extends TimedAreaEffect{
+public class HarvestTrailEffect extends TimedAreaEffect {
+
+    public static final String NAME = "Magical Harvest Trail";
     private static final int RADIUS = 1;
     private static final int DURATION = 3;
-    private static final int MAX_PRODUCE = 5;
+    private static final int MAX_ITEMS = 5;
 
     private final Actor farmer;
     private int collectedCount = 0;
@@ -28,12 +30,11 @@ public class HarvestTrailEffect extends TimedAreaEffect{
     /**
      * Creates a magical harvest trail.
      *
-     * @param map the current game map
+     * @param map    the current game map
      * @param centre the centre of the effect
      * @param farmer the Farmer receiving collected produce
      */
-    public HarvestTrailEffect(GameMap map, Location centre, Actor farmer)
-    {
+    public HarvestTrailEffect(GameMap map, Location centre, Actor farmer) {
         super(map, centre, RADIUS, DURATION);
         this.farmer = farmer;
     }
@@ -45,7 +46,7 @@ public class HarvestTrailEffect extends TimedAreaEffect{
      */
     @Override
     public String getAbilityName() {
-        return "Magical Harvest Trail";
+        return NAME;
     }
 
     /**
@@ -55,33 +56,24 @@ public class HarvestTrailEffect extends TimedAreaEffect{
      */
     @Override
     protected void applyTick(List<Location> area) {
-        for (Location location : area)
-        {
-            if (collectedCount >= MAX_PRODUCE)
-            {
-                return;
-            }
-
-            List<Item> items = new ArrayList<>(location.getItems());
-
-            for (Item item : items)
-            {
-                if (collectedCount >= MAX_PRODUCE)
-                {
-                    return;
-                }
+        for (Location location : area) {
+            for (Item item : new ArrayList<>(location.getItems())) {
 
                 Optional<FreshProduce> produce =
                         item.asCapability(FreshProduce.class);
 
-                if (produce.isPresent() && produce.get().isFresh())
-                {
+                if (produce.isPresent() && produce.get().isFresh()) {
                     location.removeItem(item);
                     farmer.getInventory().add(item);
                     collectedCount++;
                 }
+
+                if (collectedCount >= MAX_ITEMS) {
+                    finishEarly();
+                    return;
+                }
             }
         }
-
     }
 }
+

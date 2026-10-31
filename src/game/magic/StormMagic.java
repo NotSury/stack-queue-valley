@@ -20,7 +20,7 @@ public class StormMagic implements FarmMagic {
      */
     @Override
     public String getName() {
-        return "Rainbow Storm";
+        return RainbowStormEffect.NAME;
     }
 
     /**

@@ -13,7 +13,6 @@ import game.actions.ActivateOwnAbilityAction;
 import game.actions.ActivateMagicAction;
 import game.capabilities.ActorRole;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +66,7 @@ public abstract class MagicalCompanion extends Actor
      * Both abilities are available as long as the companion has
      * remaining charges.
      *
-     * @param otherActor the Actor that might be performing attack
+     * @param otherActor the Actor interacting with this companion
      * @param direction String representing the direction of the other Actor
      * @param map current GameMap containing the companion
      * @return a list of available actions
@@ -84,7 +83,7 @@ public abstract class MagicalCompanion extends Actor
 
             if (magic != null)
             {
-                actions.add(new ActivateMagicAction(getFarmMagic(), this));
+                actions.add(new ActivateMagicAction(magic, this));
             }
             actions.add(new ActivateOwnAbilityAction(this));
         }
