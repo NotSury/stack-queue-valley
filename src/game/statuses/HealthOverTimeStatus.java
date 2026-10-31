@@ -68,7 +68,7 @@ public class HealthOverTimeStatus implements Status {
                 Actor actor = location.getActor();
 
                 if (actor == currentEntity && !actor.isConscious()){
-                    location.map().removeActor(actor);
+                    actor.unconscious(location.map());
                 }
             }
 

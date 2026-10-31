@@ -7,6 +7,7 @@ import game.actors.AstralGuardian;
 import game.capabilities.GroundAbility;
 import game.events.ImpactProfile;
 import game.interfaces.CelestialReaction;
+import game.navigation.MovementSafety;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -67,7 +68,8 @@ public final class GuardianReaction
                         && candidate.getGround() != null
                         && candidate.getGround().hasAbility(
                         GroundAbility.METEOR_IMPACT_SITE)
-                        && !candidate.containsAnActor()) {
+                        && !candidate.containsAnActor()
+                        && MovementSafety.isSafe(candidate)) {
 
                     eligible.add(candidate);
                 }
