@@ -3,6 +3,9 @@ package game.grounds;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.interfaces.PlantBehaviour;
+import game.interfaces.Freezable;
+import game.interfaces.GrowthAcceleratable;
+import game.behaviours.GrowBehaviour;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +16,19 @@ import java.util.List;
  * <p>Tracks plant age and executes registered behaviours in priority order,
  * stopping after the first successful behaviour.</p>
  *
+ * <p>Supports magical growth acceleration and temporary freezing
+ * of automatic plant lifecylce behaviours.</p>
+ *
  * @author Khoo Lynn 34598901
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.1.0
  */
-public abstract class Plant extends Ground {
+public abstract class Plant extends Ground implements
+        GrowthAcceleratable, Freezable {
     private int age;
     private final List<PlantBehaviour> behaviours;
+    private GrowBehaviour growthBehaviour;
+    private int frozenTicks = 0;
 
     /**
      * Constructor for Plant.
@@ -51,13 +61,57 @@ public abstract class Plant extends Ground {
     }
 
     /**
+     * Registers a growth behaviour that can also be
+     * activated through Growth Magic.
+     *
+     * @param behaviour the growth behaviour to register
+     */
+    protected void addGrowBehaviour(GrowBehaviour behaviour)
+    {
+        addPlantBehaviour(behaviour);
+        growthBehaviour = behaviour;
+    }
+
+    /**
+     * Advances the plant by one growth stage when eligible.
+     *
+     * @param location the Location containing the plant
+     * @return true if the plant successfully advances
+     */
+    public boolean advanceGrowth(Location location)
+    {
+        if (frozenTicks > 0 || growthBehaviour == null)
+        {
+            return false;
+        }
+        return  growthBehaviour.advanceGrowth(location);
+    }
+
+    /**
+     * Temporarily freezes the plant's automatic lifecycle.
+     */
+    public void freeze()
+    {
+        frozenTicks = 1;
+    }
+
+    /**
      * Increments the plant's age and attempts behaviours in priority order.
+     * Automatic ageing and behaviours are skipped while frozen. (REQ 4)
      *
      * @param location The location of the Ground
      */
     @Override
-    public void tick(Location location){
+    public void tick(Location location)
+    {
         super.tick(location);
+
+        if (frozenTicks > 0)
+        {
+            frozenTicks--;
+            return;
+        }
+
         age++;
 
         for (PlantBehaviour behaviour : behaviours){
