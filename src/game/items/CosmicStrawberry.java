@@ -33,7 +33,7 @@ public final class CosmicStrawberry extends ConsumableItem {
             actor.removeStatus(status);
         }
 
-        actor.addStatus(new RadiationImmunityStatus(2));
+        actor.addStatus(new RadiationImmunityStatus(3));
 
         return actor
                 + " consumes a Cosmic Strawberry and gains "
