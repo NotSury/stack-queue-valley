@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.magic.FarmMagic;
 import game.effects.HarvestTrailEffect;
+import game.magic.StormMagic;
 
 /**
  * A magical fox that help the Farmer through harvesting
@@ -30,7 +31,7 @@ public class PrismFox extends MagicalCompanion {
     @Override
     protected FarmMagic getFarmMagic()
     {
-        return null;
+        return new StormMagic();
     }
 
     /**
