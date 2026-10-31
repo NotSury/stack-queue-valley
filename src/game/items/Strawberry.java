@@ -1,6 +1,7 @@
 package game.items;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import game.interfaces.FreshProduce;
 import game.statuses.HealthOverTimeStatus;
 
 /**
@@ -11,9 +12,10 @@ import game.statuses.HealthOverTimeStatus;
  * 1 health point per turn for the next 3 turns.</p>
  *
  * @author Chin Kai Xuan 35730374
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.1.0
  */
-public class Strawberry extends ConsumableItem {
+public class Strawberry extends ConsumableItem implements FreshProduce {
 
     /**
      * Whether this Strawberry is rotten.
@@ -37,6 +39,16 @@ public class Strawberry extends ConsumableItem {
      */
     public boolean isRotten() {
         return rotten;
+    }
+
+    /**
+     * Checks if this Strawberry is fresh.
+     *
+     * @return true if the Strawberry is not rotten
+     */
+    @Override
+    public boolean isFresh() {
+        return !rotten;
     }
 
     /**
