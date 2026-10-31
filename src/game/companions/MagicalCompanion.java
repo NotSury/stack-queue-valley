@@ -1,6 +1,8 @@
 package game.companions;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.positions.GameMap;
+import game.magic.FarmMagic;
 
 /**
  * Abstract base class for magical farm companions.
@@ -21,5 +23,28 @@ public abstract class MagicalCompanion extends Actor
     {
         super(name, displayChar, hitPoints);
     }
+
+    /**
+     * Returns the companion's farm magic.
+     *
+     * @return the companion's magic ability
+     */
+    protected abstract FarmMagic getFarmMagic();
+
+    /**
+     * Returns the name of the companion's own ability.
+     *
+     * @return the ability name
+     */
+    public abstract String getOwnAbilityName();
+
+    /**
+     * Activates the companion's own ability.
+     *
+     * @param farmer the farmer using the ability
+     * @param map the game map
+     * @return true if the ability activates successfully
+     */
+    public abstract boolean castOwnAbility(Actor farmer, GameMap map);
 
 }
