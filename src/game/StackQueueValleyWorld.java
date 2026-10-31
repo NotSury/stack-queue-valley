@@ -26,6 +26,7 @@ import game.recipes.HarvestFeastRecipe;
 import game.recipes.JamRecipe;
 import game.recipes.OmeletteRecipe;
 import game.teleportation.TeleportDestination;
+import game.companions.TimeRabbit;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,7 +47,7 @@ import java.util.Random;
  * @author <Khoo Lynn> <34598901>
  * @author <Vanessa Liau Jia Yee> <34599398>
  * @author Surya Muni Peragas 35651628
- * @version 1.5.0
+ * @version 1.6.0
  */
 public class StackQueueValleyWorld extends World {
 
@@ -152,6 +153,9 @@ public class StackQueueValleyWorld extends World {
 
         Farmer farmer = new Farmer("Bob");
         this.addPlayer(farmer, inheritedFarmMap.at(0, 3));
+
+        TimeRabbit timeRabbit = new TimeRabbit();
+        inheritedFarmMap.at(1,3).addActor(timeRabbit);
 
         Cow cow = new Cow();
         Chicken chicken = new Chicken();

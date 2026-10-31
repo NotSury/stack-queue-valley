@@ -128,7 +128,6 @@ public abstract class MagicalCompanion extends Actor
     protected void startEffect(TimedAreaEffect effect)
     {
         activeEffects.add(effect);
-        effect.tick();
     }
 
     /**
