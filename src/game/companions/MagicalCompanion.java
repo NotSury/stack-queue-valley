@@ -11,6 +11,7 @@ import game.magic.FarmMagic;
 import game.behaviours.WanderBehaviour;
 import game.actions.ActivateOwnAbilityAction;
 import game.actions.ActivateMagicAction;
+import game.capabilities.ActorRole;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,12 +71,13 @@ public abstract class MagicalCompanion extends Actor
      * @param map current GameMap containing the companion
      * @return a list of available actions
      */
+    @Override
     public ActionList allowableActions(Actor otherActor,
                                        String direction, GameMap map)
     {
         ActionList actions = new ActionList();
 
-        if (hasCharges())
+        if (otherActor.hasAbility(ActorRole.FARMER) && hasCharges())
         {
             actions.add(new ActivateMagicAction(getFarmMagic(), this));
             actions.add(new ActivateOwnAbilityAction(this));
