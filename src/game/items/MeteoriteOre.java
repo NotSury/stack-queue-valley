@@ -27,6 +27,6 @@ public class MeteoriteOre extends Item
      */
     @Override
     public Item refine() {
-        return new StarlitOre();
+        return new StarliteOre();
     }
 }
