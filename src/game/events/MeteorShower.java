@@ -54,6 +54,11 @@ public final class MeteorShower implements CelestialEvent {
         int damage = 5 + Math.min(15, (int) (velocity / 4.0));
         int oreCount = 1 + Math.min(3, (int) (diameter / 25.0));
 
+        int blessingDuration = 2 + Math.min(
+                2,
+                (int) (asteroidData.getEstimatedDiameterMeters() / 30.0)
+        );
+
         return new ImpactProfile(
                 "Meteor Shower",
                 impactCount,
@@ -61,7 +66,7 @@ public final class MeteorShower implements CelestialEvent {
                 damage,
                 oreCount,
                 0,
-                1
+                blessingDuration
         );
     }
 
