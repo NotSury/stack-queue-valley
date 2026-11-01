@@ -15,6 +15,7 @@ import game.interfaces.FeedItem;
 import game.interfaces.Feedable;
 import game.interfaces.Ingredient;
 import game.interfaces.PlantableGround;
+import game.interfaces.FreshProduce;
 
 import java.util.Optional;
 
@@ -28,9 +29,10 @@ import java.util.Optional;
  * different processed products.</p>
  *
  * @author Lee Le Si 34599223
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee <34599398>
+ * @version 1.1.0
  */
-public class Parsnip extends ProcessableItem implements FeedItem, Ingredient {
+public class Parsnip extends ProcessableItem implements FeedItem, Ingredient, FreshProduce {
     /**
      * Constructor for the Parsnip class.
      *
@@ -174,4 +176,15 @@ public class Parsnip extends ProcessableItem implements FeedItem, Ingredient {
 
         return "A Parsnip Crop grows at " + plantingLocation + ".";
     }
+
+    /**
+     * Checks if this Parsnip is fresh.
+     *
+     * @return true because the Parsnip cannot become rotten
+     */
+    @Override
+    public boolean isFresh() {
+        return true;
+    }
+
 }

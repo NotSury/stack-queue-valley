@@ -108,7 +108,21 @@ one Farmer turn.
         When the field expires the plants resume from their preserved age, and Growth Magic works
         on them again. A TimeRabbit cannot activate another Temporal Freeze while its existing
         field is active. Failed activation uses the Farmer's turn but no charge.
-- **PrismFox:** *to be added.* 
+- **PrismFox:** (3x3 trail area, 5x5 storm area, both centred on the fox)
+    - **Magical Harvest Trail:** a collection area lasting three effect ticks. Each tick it moves
+        fresh produce lying on the ground in the area into the activating Farmer's inventory,
+        including produce dropped there after activation. It collects at most five items in total
+        and ends early once the fifth is collected. Rotten produce, tools, weapons and other non-produce
+        items stay on the ground, and planted crops are never harvested or removed.
+        The area stays where it was cast, even if the fox or Farmer moves away. If there is no produce at
+        first, the trail still activates.
+    - **Rainbow Storm:** a storm lasting three effect ticks. Each tick, every hostile creature inside the area
+        takes 5 damage and is stunned, so it cannot move or attack. Hostile creatures that enter the area later
+        are affected too. The Farmer, farm animals and allied undead are never affected. A creature killed by the
+        storm dies through its normal death handling, so its REQ3 curse and remains still apply. Other status effects
+        on the creature are neither removed nor paused.
+    - **Overlap:** the two abilities may run at the same time, even over the same tiles. A second cast of the same
+        ability is refused while one is active. A refused cast uses the Farmer's turn but no charge.
 - **SanctuaryDeer:** *to be added.* 
 
 ### Architecture
@@ -128,7 +142,7 @@ Magical Harvest Trail, `SanctuaryDeer` owns Living Soil, and the three
 **Supporting new classes (not counted among the six):** `CompanionAction` (abstract,
 shared charge and adjacency rules), `ActivateMagicAction`, `ActivateOwnAbilityAction`,
 `TimedAreaEffect` (abstract), `TemporalFreezeEffect`, `AreaLocationHelper`, and the 
-interfaces `GrowthAcceleratable` and `Freezable`.
+interfaces `GrowthAcceleratable`, `Freezable`, `FreshProduce` and `Stunnable`.
 
 **Modified existing classes (REQ1):** 
 - `Plant` implements `GrowthAcceleratable` and `Freezable`, and registers growth
@@ -143,3 +157,5 @@ interfaces `GrowthAcceleratable` and `Freezable`.
 - `GrowthMagic` uses only `GrowthAcceleratable`.
 - `TemporalFreezeEffect` uses only `Freezable`.
 - `MagicalCompanion` uses only `TimedAreaEffect`.
+- `RainbowStormEffect` uses only `Hostile` and `Stunnable`.
+- `HarvestTrailEffect` uses only `FreshProduce`.

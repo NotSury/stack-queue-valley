@@ -9,6 +9,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.states.CreatureState;
 import game.states.CreatureStateType;
+import game.interfaces.Stunnable;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -19,9 +20,10 @@ import java.util.Map;
  * Concrete states provide transition conditions, entry effects and ordinary-turn actions.
  *
  * @author Surya Muni Peragas 35651628
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.1.0
  */
-public abstract class StatefulCreature extends Actor {
+public abstract class StatefulCreature extends Actor implements Stunnable {
 
     private final Map<CreatureStateType, CreatureState> states = new EnumMap<>(CreatureStateType.class);
 
@@ -30,6 +32,8 @@ public abstract class StatefulCreature extends Actor {
     private CreatureState currentState;
 
     private String pendingEntryMessage = "";
+
+    private int stunTurns = 0;
 
     /**
      * Creates a creature with an initial state identifier.
@@ -80,6 +84,17 @@ public abstract class StatefulCreature extends Actor {
     }
 
     /**
+     * Applies a temporary stun to this creature.
+     * A new stun does not shorten an existing stun.
+     *
+     * @param turns the number of turns to remain stunned
+     */
+    @Override
+    public void stun(int turns) {
+        stunTurns = Math.max(stunTurns, turns);
+    }
+
+    /**
      * Evaluates one transition and selects an ordinary-turn action.
      * Entry effects execute only when a different state is selected.
      * The selected action is returned for the engine to execute.
@@ -95,6 +110,13 @@ public abstract class StatefulCreature extends Actor {
     public final Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
         if (!isConscious()) {
             display.println(unconscious(map));
+            return new DoNothingAction();
+        }
+
+        if (stunTurns > 0)
+        {
+            stunTurns--;
+            display.println(this + " is stunned and cannot act.");
             return new DoNothingAction();
         }
 
