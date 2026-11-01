@@ -9,7 +9,6 @@ import game.actions.WateringAction;
 import game.capabilities.GroundAbility;
 import game.interfaces.Tillable;
 import game.interfaces.Waterable;
-import game.capabilities.GroundAbility;
 
 /**
  * Dirt represents a ground that can be tilled or watered by an actor.
