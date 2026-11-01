@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
+import game.support.MovementRestrictions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,8 @@ import java.util.Random;
  * returns null and no movement action is performed.</p>
  *
  * @author Lee Le Si 34599223
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.2.0
  */
 public class WanderBehaviour implements Behaviour<Actor,Action> {
     /**
@@ -49,12 +51,15 @@ public class WanderBehaviour implements Behaviour<Actor,Action> {
     List<Action> actions = new ArrayList<>();
 
         for (Exit exit : location.getExits()) {
-         if (exit.getDestination().canActorEnter(actor)) {
-             actions.add(new MoveActorAction(
-                     exit.getDestination(),
-                     exit.getName()
-             ));
-         }
+            Location destination = exit.getDestination();
+
+             if (exit.getDestination().canActorEnter(actor)
+                     && !MovementRestrictions.isForbidden(actor, destination)) {
+                 actions.add(new MoveActorAction(
+                         exit.getDestination(),
+                         exit.getName()
+                 ));
+             }
      }
 
      if (!actions.isEmpty()){

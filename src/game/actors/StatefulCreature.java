@@ -7,12 +7,12 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.interfaces.Repellable;
 import game.states.CreatureState;
 import game.states.CreatureStateType;
 import game.interfaces.Stunnable;
 
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * An actor whose turn is controlled by its current state.
@@ -21,9 +21,9 @@ import java.util.Map;
  *
  * @author Surya Muni Peragas 35651628
  * @author Vanessa Liau Jia Yee 34599398
- * @version 1.1.0
+ * @version 1.2.0
  */
-public abstract class StatefulCreature extends Actor implements Stunnable {
+public abstract class StatefulCreature extends Actor implements Stunnable, Repellable {
 
     private final Map<CreatureStateType, CreatureState> states = new EnumMap<>(CreatureStateType.class);
 
@@ -34,6 +34,10 @@ public abstract class StatefulCreature extends Actor implements Stunnable {
     private String pendingEntryMessage = "";
 
     private int stunTurns = 0;
+
+    private final Set<Location> forbiddenLocations = new HashSet<>();
+
+    private boolean restrictionTurnUsed = false;
 
     /**
      * Creates a creature with an initial state identifier.
@@ -95,6 +99,54 @@ public abstract class StatefulCreature extends Actor implements Stunnable {
     }
 
     /**
+     * Temporarily prevents this creature from entering the specified locations.
+     *
+     * @param area locations forbidden by Nature's Sanctuary
+     */
+    @Override
+    public void forbid(Collection<Location> area) {
+        forbiddenLocations.addAll(area);
+        restrictionTurnUsed = false;
+    }
+
+    /**
+     * Checks if this creature is forbidden from entering a location.
+     *
+     * @param location the destination being checked
+     * @return true if the location is forbidden
+     */
+    @Override
+    public boolean isForbidden(Location location) {
+        return forbiddenLocations.contains(location);
+    }
+
+    /**
+     * Clears all temporary movement restriction imposed on this creature.
+     */
+    @Override
+    public void clearForbidden() {
+        forbiddenLocations.clear();
+        restrictionTurnUsed = false;
+    }
+
+    /**
+     * Keeps restrictions active for the creature's next turn
+     * and clears them at the beginning of its following turn.
+     */
+    private void updateRestrictionTurn() {
+        if (forbiddenLocations.isEmpty()) {
+            return;
+        }
+
+        if (restrictionTurnUsed) {
+            clearForbidden();
+        }
+        else {
+            restrictionTurnUsed = true;
+        }
+    }
+
+    /**
      * Evaluates one transition and selects an ordinary-turn action.
      * Entry effects execute only when a different state is selected.
      * The selected action is returned for the engine to execute.
@@ -108,6 +160,7 @@ public abstract class StatefulCreature extends Actor implements Stunnable {
      */
     @Override
     public final Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
+        updateRestrictionTurn();
         if (!isConscious()) {
             display.println(unconscious(map));
             return new DoNothingAction();

@@ -17,7 +17,11 @@ import game.interfaces.Cursed;
 import game.interfaces.Hostile;
 import game.weapons.CreatureWeapon;
 import game.interfaces.Stunnable;
+import game.interfaces.Repellable;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -34,9 +38,11 @@ import java.util.TreeMap;
  * define their own curse and death effect.</p>
  *
  * @author <Lee Le Si> <34599223>
- * @version 1.1.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.2.0
  */
-public abstract class HostileCreature extends Actor implements Hostile, Stunnable {
+public abstract class HostileCreature extends Actor implements
+        Hostile, Stunnable, Repellable {
     /**
      * Priority of attacking: tried first.
      */
@@ -53,6 +59,16 @@ public abstract class HostileCreature extends Actor implements Hostile, Stunnabl
      */
 
     private final Map<Integer, Behaviour<Actor, Action>>  behaviours = new TreeMap<>();
+
+    /**
+     * Locations temporarily forbidden by Nature's Sanctuary.
+     */
+    private final Set<Location> forbiddenLocations = new HashSet<>();
+
+    /**
+     * Tracks if the creature has already taken its restricted turn.
+     */
+    private boolean restrictionTurnUsed = false;
 
     /**
      * Number of remaining turns during which this creature cannot act.
@@ -85,6 +101,56 @@ public abstract class HostileCreature extends Actor implements Hostile, Stunnabl
     }
 
     /**
+     * Temporarily prevents this creature from entering the specified locations.
+     *
+     * @param area locations forbidden by Nature's Sanctuary
+     */
+    @Override
+    public void forbid(Collection<Location> area) {
+        forbiddenLocations.addAll(area);
+        restrictionTurnUsed = false;
+    }
+
+    /**
+     * Checks if this creature is forbidden from entering a location.
+     *
+     * @param location the destination being checked
+     * @return true if the location is forbidden
+     */
+    @Override
+    public boolean isForbidden(Location location) {
+        return forbiddenLocations.contains(location);
+    }
+
+    /**
+     * Clears all temporary movement restriction imposed on this creature.
+     */
+    @Override
+    public void clearForbidden() {
+        forbiddenLocations.clear();
+        restrictionTurnUsed = false;
+    }
+
+    /**
+     * Maintains movement restrictions for one complete creature turn.
+     *
+     * The restriction remains active during the first turn after
+     * activation and is cleared at the start of the following turn.
+     */
+    private void updateRestrictionTurn() {
+        if (forbiddenLocations.isEmpty()) {
+            return;
+        }
+
+        if (restrictionTurnUsed) {
+            clearForbidden();
+        }
+        else {
+            restrictionTurnUsed = true;
+        }
+    }
+
+    /**
      * Chooses what the creature does this turn.
      *
      * <p>If it has no health left (e.g. it burned to death), it is removed.
@@ -99,6 +165,8 @@ public abstract class HostileCreature extends Actor implements Hostile, Stunnabl
      */
     @Override
     public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
+        updateRestrictionTurn();
+
         if (!isConscious()) {
             display.println(unconscious(map));
             return new DoNothingAction();
