@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,6 +23,7 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
     private static final int DURATION = 1;
     private final Actor farmer;
     private final SanctuaryProtection protection = new SanctuaryProtection();
+    private List<Location> protectedArea;
 
     /**
      * Creates Nature's Sanctuary.
@@ -57,13 +59,23 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
     }
 
     /**
+     * Removes sanctuary protection when the effect expires.
+     */
+    @Override
+    protected void onExpire() {
+        protection.clear();
+    }
+
+    /**
      * Activates sanctuary protection and restores the Farmer's health and stamina when the Farmer
      * is inside the sanctuary area.
      *
      * @param area locations covered by the sanctuary
      */
     public void activate(List<Location> area) {
+        protectedArea = new ArrayList<>(area);
         protection.protect(area);
+        protection.activate();
 
         for (Location location : area) {
             if (location.containsAnActor() &&
