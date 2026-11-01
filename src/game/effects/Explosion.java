@@ -78,6 +78,11 @@ public class Explosion {
 
         Actor actor = location.getActor();
         actor.hurt(damage);
+
+        if (!actor.isConscious()) {
+            actor.unconscious(location.map());
+        }
+
         return 1;
     }
 }
