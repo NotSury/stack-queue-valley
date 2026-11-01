@@ -41,10 +41,14 @@ public class SanctuaryProtection {
     }
 
     /**
-     * Removes the sanctuary protection.
+     * Removes the sanctuary protection and clears the active reference.
      */
     public void clear() {
         protectedLocations.clear();
+
+        if (activeProtection == this) {
+            activeProtection = null;
+        }
     }
 
     /**

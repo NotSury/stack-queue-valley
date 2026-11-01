@@ -50,6 +50,8 @@ import game.companions.TimeRabbit;
 import game.companions.PrismFox;
 import game.items.Strawberry;
 
+import game.companions.SanctuaryDeer;
+
 import java.time.Clock;
 import java.util.Random;
 
@@ -221,12 +223,15 @@ public class StackQueueValleyWorld extends World {
                 new Observatory(celestialManager)
         );
 
+        // REQ4: Magical farm companions
         TimeRabbit timeRabbit = new TimeRabbit();
         inheritedFarmMap.at(1,3).addActor(timeRabbit);
 
-        // REQ4: Magical farm companions
         PrismFox prismFox = new PrismFox();
         inheritedFarmMap.at(1, 4). addActor(prismFox);
+
+        SanctuaryDeer sanctuaryDeer = new SanctuaryDeer();
+        inheritedFarmMap.at(1, 2).addActor(sanctuaryDeer);
 
         Cow cow = new Cow();
         Chicken chicken = new Chicken();
