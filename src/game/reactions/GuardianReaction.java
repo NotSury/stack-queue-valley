@@ -1,13 +1,13 @@
 package game.reactions;
 
 import edu.monash.fit2099.engine.GameEngineException;
-import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.AstralGuardian;
 import game.capabilities.GroundAbility;
 import game.events.ImpactProfile;
 import game.interfaces.CelestialReaction;
 import game.navigation.MovementSafety;
+import game.support.AreaLocationHelper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,10 +38,11 @@ public final class GuardianReaction
     }
 
     /**
-     * Spawns guardians without exceeding the event's allocation.
+     * Spawns guardians at safe impact crater locations
+     * without exceeding the event's guardian allocation.
      *
      * @param profile calculated celestial impact properties
-     * @param location centre of an impact
+     * @param location centre of the meteor impact
      */
     @Override
     public void apply(ImpactProfile profile, Location location) {
@@ -53,32 +54,24 @@ public final class GuardianReaction
             return;
         }
 
-        GameMap map = location.map();
-        long radius = profile.getRadius();
-
         List<Location> eligible = new ArrayList<>();
 
-        for (int x : map.getXRange()) {
-            for (int y : map.getYRange()) {
+        for (Location candidate : AreaLocationHelper.circle(
+                location, profile.getRadius())) {
 
-                Location candidate = map.at(x, y);
+            if (candidate.getGround() != null
+                    && candidate.getGround().hasAbility(
+                    GroundAbility.METEOR_IMPACT_SITE)
+                    && !candidate.containsAnActor()
+                    && MovementSafety.isSafe(candidate)) {
 
-                if (distanceSquared(candidate, location)
-                        <= radius * radius
-                        && candidate.getGround() != null
-                        && candidate.getGround().hasAbility(
-                        GroundAbility.METEOR_IMPACT_SITE)
-                        && !candidate.containsAnActor()
-                        && MovementSafety.isSafe(candidate)) {
-
-                    eligible.add(candidate);
-                }
+                eligible.add(candidate);
             }
         }
 
         eligible.sort(
                 Comparator.comparingLong(
-                        candidate -> distanceSquared(
+                        candidate -> AreaLocationHelper.distanceSquared(
                                 candidate, location)
                 )
         );

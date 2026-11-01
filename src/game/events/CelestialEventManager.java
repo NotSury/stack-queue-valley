@@ -15,6 +15,7 @@ import game.interfaces.AsteroidFeed;
 import game.interfaces.CelestialEvent;
 import game.interfaces.CelestialReaction;
 import game.interfaces.CelestialScanService;
+import game.support.AreaLocationHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -281,9 +282,10 @@ public final class CelestialEventManager
                 + SCAN_STAMINA_COST + " stamina.";
     }
 
+
     /**
-     * Removes unconscious actors through their own death hooks.
-     * This preserves specialised effects such as ore drops.
+     * Removes unconscious actors within an impact area
+     * through their specialised death-handling methods.
      *
      * @param centre centre of the impact
      * @param radius impact radius
@@ -294,23 +296,13 @@ public final class CelestialEventManager
 
         GameMap map = centre.map();
 
-        for (int x : map.getXRange()) {
-            for (int y : map.getYRange()) {
+        for (Location affected :
+                AreaLocationHelper.circle(centre, radius)) {
 
-                long dx = (long) x - centre.x();
-                long dy = (long) y - centre.y();
+            if (affected.containsAnActor()
+                    && !affected.getActor().isConscious()) {
 
-                if (dx * dx + dy * dy
-                        <= (long) radius * radius) {
-
-                    Location affected = map.at(x, y);
-
-                    if (affected.containsAnActor()
-                            && !affected.getActor().isConscious()) {
-
-                        affected.getActor().unconscious(map);
-                    }
-                }
+                affected.getActor().unconscious(map);
             }
         }
     }

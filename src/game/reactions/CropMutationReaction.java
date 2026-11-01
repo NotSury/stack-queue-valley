@@ -7,6 +7,7 @@ import game.capabilities.GroundAbility;
 import game.events.ImpactProfile;
 import game.grounds.*;
 import game.interfaces.CelestialReaction;
+import game.support.AreaLocationHelper;
 
 import java.util.Map;
 import java.util.Objects;
@@ -49,10 +50,10 @@ public final class CropMutationReaction implements CelestialReaction {
     }
 
     /**
-     * Mutates or destroys crops within the impact radius.
+     * Mutates or destroys eligible crops within the impact radius.
      *
      * @param profile calculated celestial impact properties
-     * @param location centre of the impact
+     * @param location centre of the meteor impact
      */
     @Override
     public void apply(ImpactProfile profile, Location location) {
@@ -60,46 +61,34 @@ public final class CropMutationReaction implements CelestialReaction {
         Objects.requireNonNull(profile, "profile");
         Objects.requireNonNull(location, "location");
 
-        GameMap map = location.map();
-        long radius = profile.getRadius();
-
         double mutationChance = Math.max(
                 0.20,
                 Math.min(0.65, 0.65 - profile.getDamage() / 100.0)
         );
 
-        for (int x : map.getXRange()) {
-            for (int y : map.getYRange()) {
+        for (Location affected : AreaLocationHelper.circle(
+                location, profile.getRadius())) {
 
-                long dx = (long) x - location.x();
-                long dy = (long) y - location.y();
+            Ground ground = affected.getGround();
 
-                if (dx * dx + dy * dy > radius * radius) {
-                    continue;
-                }
+            if (ground == null
+                    || !ground.hasAbility(GroundAbility.CROP)
+                    || !ground.hasAbility(
+                    GroundAbility.METEOR_IMPACTABLE)) {
+                continue;
+            }
 
-                Location affected = map.at(x, y);
-                Ground ground = affected.getGround();
+            CosmicCrop.Variety variety =
+                    VARIETIES.get(ground.getClass());
 
-                if (ground == null
-                        || !ground.hasAbility(GroundAbility.CROP)
-                        || !ground.hasAbility(
-                        GroundAbility.METEOR_IMPACTABLE)) {
-                    continue;
-                }
+            if (variety == null) {
+                continue;
+            }
 
-                CosmicCrop.Variety variety =
-                        VARIETIES.get(ground.getClass());
-
-                if (variety == null) {
-                    continue;
-                }
-
-                if (random.nextDouble() < mutationChance) {
-                    affected.setGround(new CosmicCrop(variety));
-                } else {
-                    affected.setGround(new ImpactCrater());
-                }
+            if (random.nextDouble() < mutationChance) {
+                affected.setGround(new CosmicCrop(variety));
+            } else {
+                affected.setGround(new ImpactCrater());
             }
         }
     }

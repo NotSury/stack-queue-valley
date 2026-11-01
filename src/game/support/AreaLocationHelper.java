@@ -64,4 +64,48 @@ public final class AreaLocationHelper
         }
         return locations;
     }
+
+    /**
+     * Returns locations within a circular area.
+     *
+     * @param centre centre of the circle
+     * @param radius circle radius
+     * @return list of locations within the circle
+     */
+    public static List<Location> circle(Location centre, int radius)
+    {
+        GameMap map = centre.map();
+        List<Location> locations = new ArrayList<>();
+
+        for (int y : map.getYRange())
+        {
+            for (int x : map.getXRange())
+            {
+                Location candidate = map.at(x, y);
+
+                if (distanceSquared(candidate, centre)
+                        <= (long) radius * radius)
+                {
+                    locations.add(candidate);
+                }
+            }
+        }
+
+        return locations;
+    }
+
+    /**
+     * Calculates the squared distance between two locations.
+     *
+     * @param first first location
+     * @param second second location
+     * @return squared distance
+     */
+    public static long distanceSquared(Location first, Location second)
+    {
+        long dx = (long) first.x() - second.x();
+        long dy = (long) first.y() - second.y();
+
+        return dx * dx + dy * dy;
+    }
 }

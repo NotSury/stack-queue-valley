@@ -1,10 +1,10 @@
 package game.effects;
 
 import edu.monash.fit2099.engine.items.Item;
-import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 
-import java.util.ArrayList;
+import game.support.AreaLocationHelper;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -187,32 +187,18 @@ public abstract class EnvironmentalField extends Item {
     }
 
     /**
-     * Takes a snapshot of locations within the field's circular radius.
+     * Returns an immutable snapshot of locations within
+     * the environmental field's circular radius.
      *
      * @param centre field centre
-     * @return immutable list of affected locations
+     * @return affected locations
      */
     protected final List<Location> affectedLocations(Location centre) {
 
         Objects.requireNonNull(centre, "centre");
 
-        GameMap map = centre.map();
-        List<Location> affected = new ArrayList<>();
-
-        for (int y : map.getYRange()) {
-            for (int x : map.getXRange()) {
-
-                long dx = (long) x - centre.x();
-                long dy = (long) y - centre.y();
-
-                if (dx * dx + dy * dy
-                        <= (long) radius * radius) {
-
-                    affected.add(map.at(x, y));
-                }
-            }
-        }
-
-        return List.copyOf(affected);
+        return List.copyOf(
+                AreaLocationHelper.circle(centre, radius)
+        );
     }
 }
