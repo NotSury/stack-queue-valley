@@ -123,7 +123,27 @@ one Farmer turn.
         on the creature are neither removed nor paused.
     - **Overlap:** the two abilities may run at the same time, even over the same tiles. A second cast of the same
         ability is refused while one is active. A refused cast uses the Farmer's turn but no charge.
-- **SanctuaryDeer:** *to be added.* 
+- **SanctuaryDeer:** (3x3 restoration area centred on the deer for three effect ticks)
+    - **Living Soil:** On each tick, Dirt tiles in the area become Soil. The first tick restores the ground without
+        growing plants. On later ticks, each tile newly restored
+        from Dirt (for example, left behind after a crop is harvested) gets one
+        independent 50% chance to regrow a random Strawberry Seedling, Cauliflower
+        Sprout or Melon Sprout (Nature's Regeneration). Existing crops, Soil and
+        special ground are never overwritten. A second cast is refused while active.
+    - **Nature's Sanctuary:** immediately restores 2 HP and 2 stamina to the
+        Farmer and creates a fixed 3x3 shield centred on the Farmer. Hostiles inside
+        the shield are pushed along a single axis to the nearest free tile outside it
+        (search distance 1 to 5, ties resolved up, right, down, left). If none is
+        found they stay. Hostiles within the 5x5 detection area are forbidden from
+        entering the shield on their next turn; the ban is cleared at the start of
+        that creature's following turn, so it does not depend on actor order. The
+        push checks the destination only, so it can pass over obstacles. This is a
+        re-entry ban, not attack immunity. Recasting is allowed while charges remain.
+        Movement and jump planners consult the restriction.
+    - **Restriction expiry:** each affected hostile creature retains its forbidden tiles while selecting and executing 
+        its next action. The restriction is cleared at the start of that creature's following turn, avoiding dependence 
+        on SanctuaryDeer's position in the engine's actor order. This is a per-creature turn rule, not a global round-long
+        shield.
 
 ### Architecture
 | Abstraction                                                 | Concrete class  | New or retrofitted | Complex effect |
@@ -138,24 +158,32 @@ one Farmer turn.
 **Class-to-ability mapping:** `TimeRabbit` owns Temporal Freeze, `PrismFox` owns
 Magical Harvest Trail, `SanctuaryDeer` owns Living Soil, and the three
 `FarmMagic` classes implement Growth Magic, Rainbow Storm and Nature's Sanctuary.
+Only the three `FarmMagic` classes implement that interface; the companion-owned abilities
+are TimedAreaEffects started by the companion.
 
 **Supporting new classes (not counted among the six):** `CompanionAction` (abstract,
 shared charge and adjacency rules), `ActivateMagicAction`, `ActivateOwnAbilityAction`,
 `TimedAreaEffect` (abstract), `TemporalFreezeEffect`, `AreaLocationHelper`, and the 
-interfaces `GrowthAcceleratable`, `Freezable`, `FreshProduce` and `Stunnable`.
+interfaces `GrowthAcceleratable`, `Freezable`, `FreshProduce`, `Stunnable`, 
+`Repellable` and `SoilConvertible`.
 
-**Modified existing classes (REQ1):** 
-- `Plant` implements `GrowthAcceleratable` and `Freezable`, and registers growth
-   through `addGrowBehaviour`.
-- `GrowBehaviour` implements `GrowthAcceleratable`, so the forced transition reuses
-   the plant's own `PlantFactory`.
-- `StrawberrySeedling`, `StrawberrySprout`, `MelonSprout` and `CauliflowerSprout`
-   register their growth with `addGrowBehaviour`.
+**Modified existing classes:** 
+- REQ 1: `Plant` (implements `GrowthAcceleratable`, `Freezable`; `addGrowBehaviour`;
+  freeze holds), `GrowBehaviour` (implements `GrowthAcceleratable`),
+  `StrawberrySeedling`, `StrawberrySprout`, `MelonSprout`, `CauliflowerSprout`
+  (register growth through `addGrowBehaviour`), `Dirt` (implements `SoilConvertible`).
+- Items: `Strawberry`, `Tomato`, `Parsnip` (implement `FreshProduce`).
+- REQ 3 / REQ 5: `HostileCreature` and `StatefulCreature` (implement `Stunnable`
+  and `Repellable`), `WanderBehaviour`, `MapMovementPlanner`, `MapJumpPlanner`
+  (consult `MovementRestrictions`).
+- No engine classes are modified.
 
 **Higher-level classes that depend only on the abstractions (DIP):**
 - `ActivateMagicAction` uses only `FarmMagic`.
 - `GrowthMagic` uses only `GrowthAcceleratable`.
 - `TemporalFreezeEffect` uses only `Freezable`.
-- `MagicalCompanion` uses only `TimedAreaEffect`.
-- `RainbowStormEffect` uses only `Hostile` and `Stunnable`.
 - `HarvestTrailEffect` uses only `FreshProduce`.
+- `RainbowStormEffect` uses only `Hostile` and `Stunnable`.
+- `LivingSoilEffect` uses only `SoilConvertible` and `PlantFactory`.
+- `NatureSanctuaryEffect` uses only `Repellable`.
+- `MagicalCompanion` uses only `TimedAreaEffect`.
