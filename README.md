@@ -427,6 +427,54 @@ the Wraith is given a seeded `Random`.
 - IntelliJ: Ctrl+click the three test classes → right-click → Run.
 - Maven: `mvn test -Dtest=AfflictionTest,RaiseDeadActionTest,UndeadTest`
 
+## A3 REQ 4: Magical Farm Companions
+Author: Vanessa Liau Jia Yee (34599398)
+
+Magical Farm Companions introduces three wandering animals: TimeRabbit, PrismFox
+and SanctuaryDeer. Each companion provides two Farmer-activated abilities
+sharing three magical charges. Activating an ability requires adjacency, consumes
+one Farmer turn and costs no stamina. Charges are consumed only when an activation
+succeeds.
+
+The implemented mechanics and class architecture are documented in `Feature Proposals.md`.
+
+### Original approved A3 REQ 4 proposal
+| Abstraction                                                 | Concrete class  | New or retrofitted | Complex effect |
+|-------------------------------------------------------------|-----------------|---|---|
+| `MagicalCompanion` (abstract class, extends engine 'Actor') | `TimeRabbit`    | New | Temporal Freeze: 3x3 lifecycle suspension for three ticks |
+|                                                             | `PrismFox`      | New | Magical Harvest Trail: persistent 3x3 fresh-produce collection |
+|                                                             | `SanctuaryDeer` | New | Living Soil and Nature's Regeneration |
+| `FarmMagic` (interface)                                     | `GrowthMagic`   | New | Guaranteed 3x3 plant growth |
+|                                                             | `StormMagic`    | New | Rainbow Storm: persistent 5x5 hostile stun and damage |
+|                                                             | `ShieldMagic`   | New | Nature's Sanctuary: healing, repulsion and re-entry block |
+
+Supporting classes: `ActivateMagicAction`, `TemporalFreezeEffect`, `HarvestTrailEffect`, `RainbowStormEffect`,
+`LivingSoilEffect`, `NatureSanctuaryEffect`, `GrowthAcceleratable`.
+
+### Changes from the approved A3 REQ 4 proposal
+The two abstractions, six concrete classes and six complex effects are unchanged.
+The Ed forum answer was recorded under REQ 3 (minor changes are fine if documented) also applies here.
+
+### Implementation details
+- **Menu:** `MagicalCompanion.allowableActions` offers two action to an actor with `ActorRole.FARMER` while
+charges remain. `ActivateMagicAction` depends only on `FarmMagic`. `ActivateOwnAbilityAction`
+runs the companion's own ability. Both extend `CompanionAction`.
+- **Charges:** owned by `MagicalCompanion`. A charge is spent only if the ability took effect.
+- **Timing:** effects are registered on activation and ticked in companion's `playTurn`.
+In play-testing the order each round was the Farmer, then the other actors in shuffled order,
+then ground ticks. A hostile that acts before the fox escapes that round's stun.
+- **Known limitations:** pushes check only the destination; a companion's effects stop ticking if it
+leaves the map.
+- **Modified teammate files:** listed in `feature-proposal.md`, each agreed with its author.
+
+### Running the A3 REQ 4 tests
+Tests: `GrowhtAndFreezeTest`, `MagicalCompanionChargesTest`, `RainbowStormTest`, `MagicalCompanionsTest`. 
+They are deterministic: effects are ticked directly and the tests use fixed random seeds when necessary to
+ensure reproducible results.
+
+- IntelliJ: right-click the four test classes, then Run.
+- Maven: `mvn test -Dtest=GrowhtAndFreezeTest, MagicalCompanionChargesTest, RainbowStormTest, MagicalCompanionsTest`
+
 ## Assignment 3 REQ5 — Starfall: Celestial Forge
 
 Starfall is a celestial-event system that integrates NASA's Near-Earth Object Web Service (NeoWs) API into the game. The Farmer can activate an Observatory to retrieve asteroid data, which is used to generate meteor impacts, transform terrain, mutate crops, create resources, summon hostile creatures and activate environmental effects.
