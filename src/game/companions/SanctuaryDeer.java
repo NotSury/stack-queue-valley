@@ -5,6 +5,13 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import game.magic.FarmMagic;
 import game.effects.LivingSoilEffect;
 import game.magic.ShieldMagic;
+import game.grounds.StrawberrySeedling;
+import game.grounds.CauliflowerSprout;
+import game.grounds.MelonSprout;
+import game.interfaces.PlantFactory;
+
+import java.util.Random;
+import java.util.List;
 
 /**
  * A magical deer that help the farm through
@@ -15,7 +22,13 @@ import game.magic.ShieldMagic;
  */
 public class SanctuaryDeer extends MagicalCompanion {
 
-    private final FarmMagic sheildMagic = new ShieldMagic();
+    private final FarmMagic shieldMagic = new ShieldMagic();
+    private final Random random = new Random();
+    private final List<PlantFactory> regrowth = List.<PlantFactory>of(
+            StrawberrySeedling::new,
+            CauliflowerSprout::new,
+            MelonSprout::new
+    );
 
     /**
      * Creates a PrismFox with 20 hit points.
@@ -33,17 +46,18 @@ public class SanctuaryDeer extends MagicalCompanion {
     @Override
     protected FarmMagic getFarmMagic()
     {
-        return sheildMagic;
+        return shieldMagic;
     }
 
     /**
-     * Returns the deer's unique ability name.
+     * Returns the name of SanctuaryDeer's own ability.
      *
+     * @return the Living Soil ability name
      */
     @Override
     public String getOwnAbilityName()
     {
-        return "Living Soil";
+        return LivingSoilEffect.NAME;
     }
 
     /**
@@ -55,9 +69,15 @@ public class SanctuaryDeer extends MagicalCompanion {
      */
     @Override
     public boolean castOwnAbility(Actor farmer, GameMap map) {
-        LivingSoilEffect effect = new LivingSoilEffect();
+        if (isEffectActive(LivingSoilEffect.NAME))
+        {
+            return false;
+        }
 
-        effect.apply(map, map.locationOf(this));
+        LivingSoilEffect effect = new LivingSoilEffect(map,
+                map.locationOf(this), random, regrowth);
+
+        startEffect(effect);
 
         return true;
     }

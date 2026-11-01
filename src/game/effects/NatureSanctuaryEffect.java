@@ -20,7 +20,7 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
     public static final String NAME = "Nature's Sanctuary";
 
     private static final int RADIUS = 1;
-    private static final int DURATION = 1;
+    private static final int DURATION = 2;
     private final Actor farmer;
     private final SanctuaryProtection protection = new SanctuaryProtection();
     private List<Location> protectedArea;
