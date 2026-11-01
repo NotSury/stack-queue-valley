@@ -431,7 +431,7 @@ the Wraith is given a seeded `Random`.
 
 Starfall is a celestial-event system that integrates NASA's Near-Earth Object Web Service (NeoWs) API into the game. The Farmer can activate an Observatory to retrieve asteroid data, which is used to generate meteor impacts, transform terrain, mutate crops, create resources, summon hostile creatures and activate environmental effects.
 
-The Observatory is displayed as `O` and is located beside the Farmer's starting position on the Inherited Farm.
+The Observatory is displayed as `O` and is located beside the Farmer's starting position on the Inherited Farm. It cannot be entered by actors, allowing the Farmer to access its scanning action from an adjacent tile without interference from other creatures.
 
 ### Settings
 
@@ -441,18 +441,20 @@ The Observatory is displayed as `O` and is located beside the Farmer's starting 
 | API endpoint | `https://api.nasa.gov/neo/rest/v1/feed` |
 | Observatory symbol | `O` |
 | Observatory location | Inherited Farm, (1, 3) |
+| Observatory accessibility | Impassable; activated from an adjacent tile |
 | Scan stamina cost | 3 stamina |
-| Scan requirement | Farmer must be on or adjacent to the Observatory |
+| Scan requirement | Farmer must be adjacent to the Observatory |
 | API request range | 2 calendar days |
 | Event types | Meteor Shower, Asteroid Fragment, Celestial Storm |
-| Environmental fields | Astral Blessing, Gravitational Distortion, Cosmic Radiation |
+| Environmental fields | Astral Blessing (`!`), Gravitational Distortion (`Q`), Cosmic Radiation (`X`) |
 | Impact reactions | Crop mutation, terrain transformation, actor damage, resource generation and guardian spawning |
 | Maximum field radius | 2 tiles |
 | Maximum initial field duration | 4 turns |
 | Maximum gravity extension | 4 additional turns |
 | Active scan limit | One environmental field at a time |
+| Reusable impact locations | Existing Impact Craters can be targeted again |
 
-A successful Observatory scan deducts stamina and activates a celestial event. Another scan cannot begin until the previous environmental field expires.
+A successful Observatory scan deducts stamina and activates a celestial event. Another scan cannot begin until the previous environmental field expires. Existing Impact Craters can be targeted again during later scans, preventing the Observatory from unnecessarily exhausting its available impact locations.
 
 ### Dynamic API requests
 
@@ -538,7 +540,13 @@ The event manager selects suitable impact locations near the Observatory and app
 
 Impacts can create `ImpactCrater` ground and `MeteoriteOre` items. Actors within an impact radius receive damage, while protected ground and structures are not transformed.
 
-An actor can receive direct impact damage only once per celestial event, even if multiple impact areas overlap. Guardian spawning is also limited by the event's total guardian allocation.
+Both ground with `METEOR_IMPACTABLE` and existing ground with `METEOR_IMPACT_SITE` can be selected as impact locations. This allows subsequent celestial events to reuse existing craters without destroying protected Starlite Soil.
+
+`ResourceReaction` distributes Meteorite Ore across suitable neighbouring impact craters instead of placing all resources directly at the impact centre. If no suitable neighbouring craters are available, ore is placed at the centre instead.
+
+This allows Gravitational Distortion to attract and absorb naturally generated ore during gameplay.
+
+An actor can receive direct impact damage only once per celestial event, even if multiple impact areas overlap. Guardian spawning is also limited by the event's total guardian allocation, and unsafe locations are excluded.
 
 ### Cosmic crops and consumables
 
@@ -552,23 +560,31 @@ Five Cosmic Crop varieties are supported.
 | Cosmic Tomato | Restores up to 8 stamina |
 | Cosmic Cauliflower | Restores 10 HP per turn for 2 turns |
 | Cosmic Melon | Causes a delayed 12-damage explosion against adjacent actors |
-| Cosmic Strawberry | Protects against 2 subsequent Cosmic Radiation field ticks |
+| Cosmic Strawberry | Protects against the next 2 Cosmic Radiation field ticks |
 
 Cosmic Crops can be harvested to obtain their corresponding consumable items.
+
+Eligible crops implement the `CosmicMutable` interface, which defines the Cosmic Crop variety associated with each crop. `CropMutationReaction` uses this interface instead of checking concrete crop classes, allowing compatible crop subclasses to participate without modifying the reaction.
+
+Cosmic Melon's explosion also handles defeated actors immediately by calling their `unconscious()` behaviour. This ensures that unconscious actors are removed from the map and specialised death effects, such as Astral Guardian resource drops, are executed correctly.
 
 ### Environmental fields
 
 Each successful celestial event creates one temporary environmental field at its main impact location.
 
-| Field | Effect |
-|---|---|
-| Astral Blessing | Restores 4 HP and 2 stamina per turn to nearby eligible actors. When it expires, affected Impact Craters become Starlite Soil and eligible Meteorite Ore is refined into Starlite Ore. |
-| Gravitational Distortion | Reduces nearby actors' stamina by 3 per turn and attracts loose celestial resources towards its centre. Absorbed resources can extend the field's duration by up to 4 additional turns. |
-| Cosmic Radiation | Damages nearby unprotected actors based on the impact profile and can generate temporary Fire on eligible terrain. Cosmic Strawberry provides temporary immunity. |
+| Field | Symbol | Effect |
+|---|---|---|
+| Astral Blessing | `!` | Restores 4 HP and 2 stamina per turn to nearby eligible actors. When it expires, affected Impact Craters become Starlite Soil (`_`) and eligible Meteorite Ore is refined into Starlite Ore. |
+| Gravitational Distortion | `Q` | Reduces nearby actors' stamina by 3 per turn and attracts loose celestial resources towards its centre. Absorbed resources can extend the field's duration by up to 4 additional turns. |
+| Cosmic Radiation | `X` | Damages nearby unprotected actors based on the impact profile and can generate temporary Fire on eligible terrain. Cosmic Strawberry provides temporary immunity. |
 
 Environmental fields operate automatically during game ticks and disappear when their durations expire.
 
-Astral Guardians can also appear during hazardous events. They behave as hostile creatures and drop Meteorite Ore when defeated.
+Gravitational Distortion attracts eligible Meteorite Ore one orthogonal tile at a time. When the ore reaches the field's centre, it can be absorbed to extend the field's duration.
+
+This introduces a risk-and-reward mechanic: the Farmer can collect nearby resources, but leaving them within the gravitational field may cause the resources to be absorbed instead.
+
+Astral Guardians can also appear during hazardous events. They behave as hostile creatures, avoid unsafe spawning locations and drop Meteorite Ore when defeated.
 
 ### NASA API key configuration
 
@@ -580,7 +596,7 @@ The NASA API requires an API key for live Observatory scans.
 4. Set its value to the API key obtained from NASA.
 5. Restart IntelliJ IDEA so the updated environment variable is available.
 6. Open the Maven project and run `game.Application`.
-7. Activate the Observatory in the game to perform a NASA scan.
+7. Activate the Observatory from an adjacent tile to perform a NASA scan.
 
 `NasaApiConfig` reads the key using `System.getenv("NASA_API_KEY")`.
 
@@ -596,25 +612,37 @@ Scanning is also rejected when the Farmer has insufficient stamina, is too far a
 
 Failed scans do not increase the completed scan count or create environmental fields.
 
+The Observatory is impassable to all actors to prevent creatures from occupying its tile and hiding the scan action. Existing Impact Craters remain eligible for future impacts, reducing the likelihood of scans failing after repeated use.
+
 ### Implementation notes
 
 The implementation separates API communication, JSON parsing, event calculations and gameplay effects into independent classes.
 
 `NasaAsteroidClient` performs HTTP requests, while `NasaAsteroidParser` converts responses into `AsteroidData`. `ObservatoryScanPlanner` generates dynamic date parameters based on the current game state.
 
-The feature introduces three main abstractions:
+The feature introduces the following abstractions:
 
 | Abstraction | Concrete implementations |
 |---|---|
 | `CelestialEvent` | `MeteorShower`, `AsteroidFragment`, `CelestialStorm` |
 | `CelestialReaction` | `CropMutationReaction`, `TerrainReaction`, `ImpactDamageReaction`, `ResourceReaction`, `GuardianReaction` |
 | `EnvironmentalField` | `AstralBlessing`, `GravitationalDistortion`, `CosmicRadiation` |
+| `CosmicMutable` | `ParsnipCrop`, `TomatoCrop`, `CauliflowerCrop`, `MelonCrop`, `StrawberryCrop` |
 
 `CelestialEventManager` depends on the `CelestialEvent`, `CelestialReaction` and `AsteroidFeed` interfaces rather than their concrete implementations.
 
 `Observatory` and `ActivateObservatoryAction` depend on the `CelestialScanService` interface.
 
-This supports the Single Responsibility Principle by separating responsibilities, the Open-Closed Principle by allowing new events and reactions to be added through existing abstractions, and the Dependency Inversion Principle by making higher-level classes depend on abstractions.
+`CropMutationReaction` depends on `CosmicMutable` instead of maintaining a hard-coded mapping of concrete crop classes. This allows new compatible crop implementations to be introduced without modifying the reaction.
+
+The implementation also reuses `AreaLocationHelper` for circular-area and squared-distance calculations across the event manager, impact reactions and environmental effects. This removes repeated calculations and maintains consistent area behaviour.
+
+This design supports several object-oriented principles:
+
+- **Single Responsibility Principle (SRP):** API communication, parsing, event calculations, reactions and environmental field behaviour are separated into dedicated classes.
+- **Open-Closed Principle (OCP):** New celestial events, reactions and compatible crop types can be introduced through their existing abstractions without modifying their higher-level consumers.
+- **Dependency Inversion Principle (DIP):** Higher-level gameplay classes depend on interfaces rather than concrete event, reaction and scanning implementations.
+- **Don't Repeat Yourself (DRY):** Shared circular-area and distance calculations are centralised in `AreaLocationHelper` instead of being duplicated across multiple classes.
 
 The API feature is tested using deterministic asteroid data, fixed clocks, controlled randomness and a fake NASA feed, allowing tests to run without external network access.
 
@@ -648,21 +676,43 @@ On Windows PowerShell, a test report can be viewed using:
 Get-Content .\target\surefire-reports\game.events.ObservatoryIntegrationTest.txt
 ```
 
+To display the results of all test classes:
+
+```powershell
+Get-ChildItem .\target\surefire-reports\*.txt |
+ForEach-Object {
+    Select-String -Path $_.FullName -Pattern "^Tests run:"
+}
+```
+
 ### REQ5 test coverage
 
 | Test class | Tested functionality |
 |---|---|
 | `ObservatoryScanPlannerTest` | Dynamic API dates, game-state changes and invalid inputs |
 | `CelestialEventTest` | Event classification, impact calculations and field creation |
-| `CosmicCropMutationTest` | Crop mutation, destruction and harvesting |
-| `CosmicConsumableTest` | Five Cosmic Item effects and duration boundaries |
-| `EnvironmentalFieldTest` | Environmental effects, duration, terrain changes and resource movement |
-| `CelestialReactionTest` | Impact damage, resource generation, protected terrain and guardian spawning |
-| `ObservatoryIntegrationTest` | Complete scan workflow, API failures, cooldowns and gameplay integration |
+| `CosmicCropMutationTest` | Crop mutation, destruction, harvesting and mutation through the `CosmicMutable` interface |
+| `CosmicConsumableTest` | Five Cosmic Item effects, duration boundaries, and actor death handling after Cosmic Melon explosions |
+| `EnvironmentalFieldTest` | Environmental effects, duration, terrain changes, resource movement and field extensions |
+| `CelestialReactionTest` | Impact damage, resource generation, protected terrain, guardian spawning and map boundary handling |
+| `ObservatoryIntegrationTest` | Complete scan workflow, repeated scans, API failures, Observatory accessibility, gravity resource attraction and gameplay integration |
 
 REQ5 tests use fixed dates, deterministic random values and simulated NASA responses to avoid depending on live network access, API keys or external state.
 
-The automated REQ5 suite has recorded 77 passing test executions with no failures or errors.
+The recorded REQ5 unit test results include:
+
+| Test class | Passing executions |
+|---|---:|
+| `ObservatoryScanPlannerTest` | 9 |
+| `CelestialEventTest` | 20 |
+| `CosmicCropMutationTest` | 11 |
+| `CosmicConsumableTest` | 12 |
+| `EnvironmentalFieldTest` | 7 |
+| `CelestialReactionTest` | 6 |
+| `ObservatoryIntegrationTest` | 18 |
+| **Total** | **83** |
+
+All recorded executions passed without failures or errors. The complete Maven suite should be rerun on the final merged project before submission to verify that every requirement remains compatible.
 
 The full assignment test suite must also include meaningful tests for REQ1–REQ4, covering at least three distinct cases per functional requirement.
 
