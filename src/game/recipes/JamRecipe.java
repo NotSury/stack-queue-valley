@@ -60,13 +60,13 @@ public class JamRecipe extends AllIngredientRecipe {
     }
 
     /**
-     * Creates a fresh Jam using the batch's Fruit count.
+     * Creates a fresh Jam using the number of selected ingredients.
      *
-     * @param batch the ingredients used to cook the Jam
+     * @param batch the validated Fruit ingredients used for this Jam
      * @return a new Jam with its own fruit count
      */
     @Override
     protected ConsumableItem createDish(CookingBatch batch) {
-        return new Jam(batch.count(IngredientCategory.FRUIT));
+        return new Jam(batch.size());
     }
 }
