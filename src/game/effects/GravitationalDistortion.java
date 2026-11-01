@@ -202,21 +202,4 @@ public final class GravitationalDistortion
 
         return best;
     }
-
-    /**
-     * Calculates the squared distance between two locations.
-     *
-     * @param first first location
-     * @param second second location
-     * @return squared Euclidean distance
-     */
-    private long distanceSquared(
-            Location first,
-            Location second) {
-
-        long dx = (long) first.x() - second.x();
-        long dy = (long) first.y() - second.y();
-
-        return dx * dx + dy * dy;
-    }
 }

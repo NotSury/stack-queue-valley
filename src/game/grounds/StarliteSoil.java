@@ -19,7 +19,7 @@ public final class StarliteSoil extends Ground
      * Creates a restored, meteor-resistant soil tile.
      */
     public StarliteSoil() {
-        super(':', "Starlite Soil");
+        super('_', "Starlite Soil");
 
         enableAbility(GroundAbility.OPEN_GROUND);
     }
