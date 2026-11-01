@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.magic.FarmMagic;
 import game.effects.LivingSoilEffect;
+import game.magic.ShieldMagic;
 
 /**
  * A magical deer that help the farm through
@@ -13,6 +14,8 @@ import game.effects.LivingSoilEffect;
  * @version 1.0.0
  */
 public class SanctuaryDeer extends MagicalCompanion {
+
+    private final FarmMagic sheildMagic = new ShieldMagic();
 
     /**
      * Creates a PrismFox with 20 hit points.
@@ -25,11 +28,12 @@ public class SanctuaryDeer extends MagicalCompanion {
     /**
      * Returns the deer's magical ability.
      *
+     * @return the Nature's Sanctuary magic ability
      */
     @Override
     protected FarmMagic getFarmMagic()
     {
-        return null;
+        return sheildMagic;
     }
 
     /**

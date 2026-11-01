@@ -36,12 +36,13 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
     }
 
     /**
+     * Returns the name of Nature's Sanctuary.
      *
-     * @return
+     * @return the sanctuary ability name
      */
     @Override
     public String getAbilityName() {
-        return "";
+        return NAME;
     }
 
     /**
