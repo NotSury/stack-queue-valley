@@ -246,4 +246,45 @@ public class CosmicCropMutationTest {
                 map.at(2, 2).getGround()
         );
     }
+
+    /**
+     * Verifies that subclasses of existing mutable crops can
+     * mutate without being registered in a concrete-class map.
+     *
+     * @throws Exception if map creation fails
+     */
+    @Test
+    void subclassOfMutableCropCanMutate() throws Exception {
+
+        GameMap map = createMap();
+
+        // This anonymous subclass would not match the old
+        // VARIETIES map, which used exact concrete classes.
+        ParsnipCrop subclass = new ParsnipCrop() {
+        };
+
+        map.at(3, 3).setGround(subclass);
+
+        Random alwaysMutate = new Random() {
+            @Override
+            public double nextDouble() {
+                return 0.0;
+            }
+        };
+
+        CropMutationReaction reaction =
+                new CropMutationReaction(alwaysMutate);
+
+        reaction.apply(profile(20), map.at(3, 3));
+
+        CosmicCrop result = assertInstanceOf(
+                CosmicCrop.class,
+                map.at(3, 3).getGround()
+        );
+
+        assertEquals(
+                CosmicCrop.Variety.PARSNIP,
+                result.getVariety()
+        );
+    }
 }

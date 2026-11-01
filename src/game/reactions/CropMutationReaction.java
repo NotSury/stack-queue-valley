@@ -5,11 +5,12 @@ import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.capabilities.GroundAbility;
 import game.events.ImpactProfile;
-import game.grounds.*;
+import game.grounds.CosmicCrop;
+import game.grounds.ImpactCrater;
 import game.interfaces.CelestialReaction;
 import game.support.AreaLocationHelper;
+import game.interfaces.CosmicMutable;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
@@ -21,15 +22,6 @@ import java.util.Random;
  * @version 1.0.0
  */
 public final class CropMutationReaction implements CelestialReaction {
-
-    private static final Map<Class<?>, CosmicCrop.Variety> VARIETIES =
-            Map.of(
-                    ParsnipCrop.class, CosmicCrop.Variety.PARSNIP,
-                    TomatoCrop.class, CosmicCrop.Variety.TOMATO,
-                    CauliflowerCrop.class, CosmicCrop.Variety.CAULIFLOWER,
-                    MelonCrop.class, CosmicCrop.Variety.MELON,
-                    StrawberryCrop.class, CosmicCrop.Variety.STRAWBERRY
-            );
 
     private final Random random;
 
@@ -78,8 +70,10 @@ public final class CropMutationReaction implements CelestialReaction {
                 continue;
             }
 
-            CosmicCrop.Variety variety =
-                    VARIETIES.get(ground.getClass());
+            CosmicCrop.Variety variety = ground
+                    .asCapability(CosmicMutable.class)
+                    .map(CosmicMutable::getCosmicVariety)
+                    .orElse(null);
 
             if (variety == null) {
                 continue;

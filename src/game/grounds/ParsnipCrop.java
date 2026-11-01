@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.behaviours.ProduceBehaviour;
 import game.items.Parsnip;
+import game.interfaces.CosmicMutable;
 
 import java.util.List;
 import java.util.Random;
@@ -28,7 +29,8 @@ import java.util.Random;
  * @author Khoo Lynn 34598901
  * @version 1.1.0
  */
-public class ParsnipCrop extends WaterableCrop {
+public class ParsnipCrop extends WaterableCrop
+        implements CosmicMutable {
 
     /**
      * Stamina required to harvest this crop.
@@ -167,5 +169,15 @@ public class ParsnipCrop extends WaterableCrop {
         removeCrop(location);
 
         return actor + " harvests the Parsnip crop";
+    }
+
+    /**
+     * Returns the cosmic mutation variety for Parsnip.
+     *
+     * @return Cosmic Parsnip variety
+     */
+    @Override
+    public CosmicCrop.Variety getCosmicVariety() {
+        return CosmicCrop.Variety.PARSNIP;
     }
 }
