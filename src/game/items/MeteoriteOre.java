@@ -23,7 +23,7 @@ public class MeteoriteOre extends Item
     }
 
     /**
-     * Converts meteorite ore into Starlit Ore.
+     * Converts meteorite ore into Starlite Ore.
      *
      * @return the refined item
      */

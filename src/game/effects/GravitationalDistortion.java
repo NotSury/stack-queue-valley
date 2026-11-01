@@ -9,6 +9,7 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.capabilities.GroundAbility;
 import game.interfaces.GravitationalFuel;
 import game.navigation.MovementSafety;
+import game.support.AreaLocationHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ public final class GravitationalDistortion
 
         super(
                 "Gravitational Distortion",
-                'G',
+                'Q',
                 radius,
                 durationTurns
         );
@@ -158,7 +159,7 @@ public final class GravitationalDistortion
             Location centre) {
 
         long originalDistance =
-                distanceSquared(source, centre);
+                AreaLocationHelper.distanceSquared(source, centre);
 
         Location best = null;
         long bestDistance = originalDistance;
@@ -179,7 +180,7 @@ public final class GravitationalDistortion
             }
 
             long distance =
-                    distanceSquared(next, centre);
+                    AreaLocationHelper.distanceSquared(next, centre);
 
             if (distance >= bestDistance) {
                 continue;

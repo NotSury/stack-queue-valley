@@ -222,7 +222,7 @@ public class StackQueueValleyWorld extends World {
         );
 
         TimeRabbit timeRabbit = new TimeRabbit();
-        inheritedFarmMap.at(1,3).addActor(timeRabbit);
+        inheritedFarmMap.at(3,5).addActor(timeRabbit);
 
         // REQ 4 TESTING
         PrismFox prismFox = new PrismFox();

@@ -687,7 +687,7 @@ public class ObservatoryIntegrationTest {
                         != fixture.observatory) {
 
                     fixture.map.at(x, y).setGround(
-                            new ImpactCrater()
+                            new Rock()
                     );
                 }
             }
@@ -867,5 +867,167 @@ public class ObservatoryIntegrationTest {
             // Prevent interference with subsequent JUnit tests.
             Thread.interrupted();
         }
+    }
+
+/**
+ * Verifies that repeated scans can reuse existing impact
+ * craters instead of exhausting nearby impactable terrain.
+ *
+ * @throws Exception if the test environment cannot initialize
+ */
+
+ @Test
+    void repeatedScansKeepFindingTargets() throws Exception {
+
+        Fixture fixture = new Fixture(
+                asteroid(400, 10, false)
+        );
+
+        for (int scan = 0; scan < 5; scan++) {
+
+            fixture.farmer.modifyStatistic(
+                    ActorStatistics.STAMINA,
+                    StatisticOperations.INCREASE,
+                    20
+            );
+
+            String result = fixture.manager.scan(
+                    fixture.farmer,
+                    fixture.observatory
+            );
+
+            assertTrue(
+                    result.contains("triggered"),
+                    "Scan " + (scan + 1)
+                            + " failed: " + result
+            );
+
+            int ticks = 0;
+
+            while (!fixture.manager.canScan()
+                    && ticks < 20) {
+
+                fixture.map.tick();
+                ticks++;
+            }
+
+            assertTrue(
+                    fixture.manager.canScan(),
+                    "Environmental field did not expire"
+            );
+        }
+
+        assertEquals(
+                5,
+                fixture.manager.getCompletedScans()
+        );
+    }
+
+    /**
+     * Verifies that the Observatory cannot be entered while
+     * its scan action remains available to the Farmer.
+     *
+     * @throws Exception if test initialization fails
+     */
+    @Test
+    void observatoryIsImpassableButScanRemainsAvailable()
+            throws Exception {
+
+        Fixture fixture = new Fixture(
+                asteroid(34, 16, false)
+        );
+
+        var ground = fixture.observatory.getGround();
+
+        // Neither the Farmer nor another actor can enter.
+        assertFalse(
+                ground.canActorEnter(fixture.farmer)
+        );
+
+        assertFalse(
+                ground.canActorEnter(new Cow())
+        );
+
+        // The Farmer can still use the Observatory.
+        var actions = ground.allowableActions(
+                fixture.farmer,
+                fixture.observatory,
+                "East"
+        );
+
+        assertEquals(1, actions.size());
+
+        assertInstanceOf(
+                ActivateObservatoryAction.class,
+                actions.get(0)
+        );
+
+        // Other actors cannot activate the Observatory.
+        Cow cow = new Cow();
+
+        assertEquals(
+                0,
+                ground.allowableActions(
+                        cow,
+                        fixture.observatory,
+                        "East"
+                ).size()
+        );
+    }
+
+    /**
+     * Verifies that naturally generated meteorite ore is
+     * attracted and absorbed by a Gravitational Distortion
+     * field after a successful Observatory scan.
+     *
+     * @throws Exception if test setup fails
+     */
+    @Test
+    void gravityAttractsImpactOreDuringRealScan()
+            throws Exception {
+
+        // A large non-hazardous asteroid generates
+        // an Asteroid Fragment event.
+        Fixture fixture = new Fixture(
+                asteroid(150, 12, false)
+        );
+
+        String result = fixture.manager.scan(
+                fixture.farmer,
+                fixture.observatory
+        );
+
+        assertTrue(
+                result.contains("Asteroid Fragment"),
+                "Expected an Asteroid Fragment event"
+        );
+
+        EnvironmentalField field =
+                fixture.manager.getActiveField().orElseThrow();
+
+        assertInstanceOf(
+                GravitationalDistortion.class,
+                field
+        );
+
+        int durationBefore = field.getRemainingTurns();
+
+        // The field should pull surrounding meteorite ore
+        // into its centre and absorb it as extra duration.
+        fixture.map.tick();
+
+        int durationAfter = field.getRemainingTurns();
+
+        assertTrue(
+                durationAfter > durationBefore,
+                "Gravity did not absorb generated ore. "
+                        + "Duration before: " + durationBefore
+                        + ", after: " + durationAfter
+        );
+
+        assertTrue(
+                field.isActive(),
+                "Gravity field should remain active"
+        );
     }
 }

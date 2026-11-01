@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.behaviours.ProduceBehaviour;
 import game.behaviours.SpreadBehaviour;
 import game.items.Tomato;
+import game.interfaces.CosmicMutable;
 
 import java.util.Random;
 
@@ -26,7 +27,8 @@ import java.util.Random;
  * @author Khoo Lynn 34598901
  * @version 1.1.0
  */
-public class TomatoCrop extends Crop {
+public class TomatoCrop extends Crop
+        implements CosmicMutable {
 
     /**
      * Stamina required to harvest this crop.
@@ -114,4 +116,15 @@ public class TomatoCrop extends Crop {
 
         return actor + " harvests the Tomato crop";
     }
+
+    /**
+     * Returns the cosmic mutation variety for Tomato.
+     *
+     * @return Cosmic Tomato variety
+     */
+    @Override
+    public CosmicCrop.Variety getCosmicVariety() {
+        return CosmicCrop.Variety.TOMATO;
+    }
+
 }

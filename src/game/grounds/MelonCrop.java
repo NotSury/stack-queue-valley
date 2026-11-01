@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.behaviours.SpreadBehaviour;
 import game.effects.Explosion;
 import game.items.Melon;
+import game.interfaces.CosmicMutable;
 
 import java.util.Random;
 
@@ -28,7 +29,8 @@ import java.util.Random;
  * @author Khoo Lynn 34598901
  * @version 1.1.0
  */
-public class MelonCrop extends WaterableCrop {
+public class MelonCrop extends WaterableCrop
+        implements CosmicMutable {
 
     /**
      * Stamina required to water this crop.
@@ -173,4 +175,15 @@ public class MelonCrop extends WaterableCrop {
         return actor
                 + " harvests the Melon crop and receives a Melon.";
     }
+
+    /**
+     * Returns the cosmic mutation variety for Melon.
+     *
+     * @return Cosmic Melon variety
+     */
+    @Override
+    public CosmicCrop.Variety getCosmicVariety() {
+        return CosmicCrop.Variety.MELON;
+    }
+
 }

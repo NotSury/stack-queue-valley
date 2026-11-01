@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.items.Cauliflower;
 import game.capabilities.GroundAbility;
+import game.interfaces.CosmicMutable;
 
 /**
  * Represents a Cauliflower crop that can be watered and harvested.
@@ -20,7 +21,8 @@ import game.capabilities.GroundAbility;
  * @author Chin Kai Xuan 35730374
  * @version 1.0.0
  */
-public class CauliflowerCrop extends WaterableCrop {
+public class CauliflowerCrop extends WaterableCrop
+        implements CosmicMutable {
 
     /**
      * Stamina required to water this crop.
@@ -155,5 +157,15 @@ public class CauliflowerCrop extends WaterableCrop {
 
         return actor
                 + " harvests the Cauliflower crop, but the harvest fails.";
+    }
+
+    /**
+     * Returns the cosmic mutation variety for Cauliflower.
+     *
+     * @return Cosmic Cauliflower variety
+     */
+    @Override
+    public CosmicCrop.Variety getCosmicVariety() {
+        return CosmicCrop.Variety.CAULIFLOWER;
     }
 }

@@ -4,7 +4,8 @@ import edu.monash.fit2099.engine.actors.Actor;
 import game.statuses.RadiationImmunityStatus;
 
 /**
- * Cosmic Strawberry grants two turns of radiation immunity.
+ * Cosmic Strawberry protects against the next two
+ * Cosmic Radiation field ticks.
  *
  * @author Chin Kai Xuan 35730374
  * @version 1.0.0
@@ -19,7 +20,8 @@ public final class CosmicStrawberry extends ConsumableItem {
     }
 
     /**
-     * Refreshes radiation immunity to two ticks.
+     * Refreshes protection against the next two
+     * Cosmic Radiation field ticks.
      *
      * @param actor consuming actor
      * @return consumption result
