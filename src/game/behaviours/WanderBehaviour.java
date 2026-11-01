@@ -6,7 +6,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
-import game.effects.SanctuaryProtection;
+import game.support.MovementRestrictions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.Random;
  *
  * @author Lee Le Si 34599223
  * @author Vanessa Liau Jia Yee 34599398
- * @version 1.1.0
+ * @version 1.2.0
  */
 public class WanderBehaviour implements Behaviour<Actor,Action> {
     /**
@@ -54,7 +54,7 @@ public class WanderBehaviour implements Behaviour<Actor,Action> {
             Location destination = exit.getDestination();
 
              if (exit.getDestination().canActorEnter(actor)
-                     && !SanctuaryProtection.isEntryBlocked(actor, destination)) {
+                     && !MovementRestrictions.isForbidden(actor, destination)) {
                  actions.add(new MoveActorAction(
                          exit.getDestination(),
                          exit.getName()

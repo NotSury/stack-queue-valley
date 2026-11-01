@@ -3,7 +3,7 @@ package game.navigation;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
-import game.effects.SanctuaryProtection;
+import game.support.MovementRestrictions;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.Queue;
  *
  * @author Surya Muni Peragas 35651628
  * @author <Vanessa Liau Jia Yee> <34599398>
- * @version 1.1.0
+ * @version 1.2.0
  */
 public class MapMovementPlanner implements MovementPlanner {
 
@@ -66,7 +66,7 @@ public class MapMovementPlanner implements MovementPlanner {
                 if (!isLocalStep(current, destination)
                         || firstSteps.containsKey(destination)
                         || !destination.canActorEnter(creature)
-                        || SanctuaryProtection.isEntryBlocked(creature, destination)) {
+                        || MovementRestrictions.isForbidden(creature, destination)) {
                     continue;
                 }
 
@@ -162,7 +162,7 @@ public class MapMovementPlanner implements MovementPlanner {
                         || destination == excludedDestination
                         || firstSteps.containsKey(destination)
                         || !destination.canActorEnter(creature)
-                        || SanctuaryProtection.isEntryBlocked(creature, destination))
+                        || MovementRestrictions.isForbidden(creature, destination))
                 {
                     continue;
                 }
@@ -253,7 +253,7 @@ public class MapMovementPlanner implements MovementPlanner {
 
             if (exit.getName().equals(direction) && isLocalStep(origin, destination)
                     && destination.canActorEnter(creature)
-                    && !SanctuaryProtection.isEntryBlocked(creature, destination)) {
+                    && !MovementRestrictions.isForbidden(creature, destination)) {
                 return exit;
             }
         }
@@ -297,7 +297,7 @@ public class MapMovementPlanner implements MovementPlanner {
                     && destination != excludeDestination
                     && isLocalStep(location, destination)
                     && destination.canActorEnter(creature)
-                    && !SanctuaryProtection.isEntryBlocked(creature, destination)) {
+                    && !MovementRestrictions.isForbidden(creature, destination)) {
                 return true;
             }
         }

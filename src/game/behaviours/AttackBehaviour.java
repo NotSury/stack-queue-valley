@@ -7,7 +7,7 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.AttackAction;
 import game.capabilities.CombatStatus;
-import game.effects.SanctuaryProtection;
+import game.support.MovementRestrictions;
 
 /**
  * Attacks an adjacent actor that hostile creatures go after (the farmer),
@@ -15,7 +15,7 @@ import game.effects.SanctuaryProtection;
  *
  * @author <Lee Le Si> <34599223>
  * @author Vanessa Liau Jia Yee 34599398
- * @version 1.1.0
+ * @version 1.2.0
  */
 public class AttackBehaviour implements Behaviour<Actor, Action> {
     /**
@@ -33,7 +33,7 @@ public class AttackBehaviour implements Behaviour<Actor, Action> {
             Location destination = exit.getDestination();
             if (destination.containsAnActor()
             && destination.getActor().hasAbility(CombatStatus.HOSTILE_TARGET)
-            && !SanctuaryProtection.isEntryBlocked(actor, destination)){
+            && !MovementRestrictions.isForbidden(actor, destination)){
                 return new AttackAction(destination.getActor(), exit.getName(),
                         actor.getIntrinsicWeapon());
             }

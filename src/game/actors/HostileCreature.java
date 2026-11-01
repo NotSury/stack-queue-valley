@@ -17,7 +17,11 @@ import game.interfaces.Cursed;
 import game.interfaces.Hostile;
 import game.weapons.CreatureWeapon;
 import game.interfaces.Stunnable;
+import game.interfaces.Repellable;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -34,9 +38,11 @@ import java.util.TreeMap;
  * define their own curse and death effect.</p>
  *
  * @author <Lee Le Si> <34599223>
- * @version 1.1.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.2.0
  */
-public abstract class HostileCreature extends Actor implements Hostile, Stunnable {
+public abstract class HostileCreature extends Actor implements
+        Hostile, Stunnable, Repellable {
     /**
      * Priority of attacking: tried first.
      */
@@ -53,6 +59,11 @@ public abstract class HostileCreature extends Actor implements Hostile, Stunnabl
      */
 
     private final Map<Integer, Behaviour<Actor, Action>>  behaviours = new TreeMap<>();
+
+    /**
+     * Locations temporarily forbidden by Nature's Sanctuary.
+     */
+    private final Set<Location> forbiddenLocations = new HashSet<>();
 
     /**
      * Number of remaining turns during which this creature cannot act.
@@ -82,6 +93,35 @@ public abstract class HostileCreature extends Actor implements Hostile, Stunnabl
     @Override
     public void stun(int turns) {
         stunTurns = Math.max(stunTurns, turns);
+    }
+
+    /**
+     * Prevents this creature from entering the specified locations.
+     *
+     * @param area locations forbidden by Nature's Sanctuary
+     */
+    @Override
+    public void forbid(Collection<Location> area) {
+        forbiddenLocations.addAll(area);
+    }
+
+    /**
+     * Checks if this creature is forbidden from entering a location.
+     *
+     * @param location the destination being checked
+     * @return true if the location is forbidden
+     */
+    @Override
+    public boolean isForbidden(Location location) {
+        return forbiddenLocations.contains(location);
+    }
+
+    /**
+     * Clears all temporary movement restriction imposed on this creature.
+     */
+    @Override
+    public void clearForbidden() {
+        forbiddenLocations.clear();
     }
 
     /**

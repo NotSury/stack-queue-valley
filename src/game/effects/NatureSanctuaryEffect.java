@@ -5,7 +5,10 @@ import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.interfaces.Repellable;
+import game.support.AreaLocationHelper;
 
+import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +17,7 @@ import java.util.List;
  * Protects its area and supports the Farmer.
  *
  * @author <Vanessa Liau Jia Yee> <34599398>
- * @version 1.0.0
+ * @version 1.1.0
  */
 public class NatureSanctuaryEffect extends TimedAreaEffect {
     public static final String NAME = "Nature's Sanctuary";
@@ -22,7 +25,6 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
     private static final int RADIUS = 1;
     private static final int DURATION = 2;
     private final Actor farmer;
-    private final SanctuaryProtection protection = new SanctuaryProtection();
     private List<Location> protectedArea;
 
     /**
@@ -36,6 +38,52 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
     {
         super(map, centre, RADIUS, DURATION);
         this.farmer = farmer;
+    }
+
+    /**
+     * Repels hostile creature inside the sanctuary and prevents
+     * nearby hostile creature from entering its protected area.
+     *
+     * @param area the sanctuary's protected locations
+     */
+    private void repelHostiles(List<Location> area) {
+        GameMap map = area.get(0).map();
+
+        for (Location location : area) {
+            if (!location.containsAnActor()) {
+                continue;
+            }
+            Actor actor = location.getActor();
+
+            Optional<Repellable> repellable =
+                    actor.asCapability(Repellable.class);
+
+            if (repellable.isEmpty()) {
+                continue;
+            }
+
+            boolean moved = false;
+
+            for (int distance = 1; distance <= 5 && !moved; distance++) {
+                for (Location candidate : AreaLocationHelper.square(map, location, distance)) {
+                    if (area.contains(candidate) || !candidate.canActorEnter(actor)) {
+                        continue;
+                    }
+
+                    int dx = Math.abs(candidate.x() - location.x());
+                    int dy = Math.abs(candidate.y() - location.y());
+
+                    if (Math.max(dx, dy) != distance) {
+                        continue;
+                    }
+
+                    map.moveActor(actor, candidate);
+                    moved = true;
+                    break;
+                }
+            }
+            repellable.get().forbid(area);
+        }
     }
 
     /**
@@ -59,14 +107,6 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
     }
 
     /**
-     * Removes sanctuary protection when the effect expires.
-     */
-    @Override
-    protected void onExpire() {
-        protection.clear();
-    }
-
-    /**
      * Activates sanctuary protection and restores the Farmer's health and stamina when the Farmer
      * is inside the sanctuary area.
      *
@@ -74,8 +114,7 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
      */
     public void activate(List<Location> area) {
         protectedArea = new ArrayList<>(area);
-        protection.protect(area);
-        protection.activate();
+        repelHostiles(area);
 
         for (Location location : area) {
             if (location.containsAnActor() &&

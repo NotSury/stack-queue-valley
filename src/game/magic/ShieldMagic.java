@@ -39,7 +39,7 @@ public class ShieldMagic implements FarmMagic {
             return false;
         }
 
-        Location centre =  map.locationOf(companion);
+        Location centre =  map.locationOf(farmer);
 
         NatureSanctuaryEffect effect = new NatureSanctuaryEffect(map,
                 map.locationOf(companion), farmer);

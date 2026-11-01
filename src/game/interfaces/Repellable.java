@@ -27,4 +27,9 @@ public interface Repellable {
      * @return true if entry is forbidden
      */
     boolean isForbidden(Location location);
+
+    /**
+     * Removes temporary movement restrictions.
+     */
+    void clearForbidden();
 }
