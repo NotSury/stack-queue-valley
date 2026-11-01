@@ -33,6 +33,17 @@ public final class Observatory extends Ground {
     }
 
     /**
+     * Prevents actors from entering the Observatory tile.
+     *
+     * @param actor actor attempting to enter
+     * @return false because the Observatory is impassable
+     */
+    @Override
+    public boolean canActorEnter(Actor actor) {
+        return false;
+    }
+
+    /**
      * Offers a scan to the Farmer when no field is active.
      *
      * @param actor actor interacting with the Observatory

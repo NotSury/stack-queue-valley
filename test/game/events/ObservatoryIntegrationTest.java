@@ -922,4 +922,56 @@ public class ObservatoryIntegrationTest {
                 fixture.manager.getCompletedScans()
         );
     }
+
+    /**
+     * Verifies that the Observatory cannot be entered while
+     * its scan action remains available to the Farmer.
+     *
+     * @throws Exception if test initialization fails
+     */
+    @Test
+    void observatoryIsImpassableButScanRemainsAvailable()
+            throws Exception {
+
+        Fixture fixture = new Fixture(
+                asteroid(34, 16, false)
+        );
+
+        var ground = fixture.observatory.getGround();
+
+        // Neither the Farmer nor another actor can enter.
+        assertFalse(
+                ground.canActorEnter(fixture.farmer)
+        );
+
+        assertFalse(
+                ground.canActorEnter(new Cow())
+        );
+
+        // The Farmer can still use the Observatory.
+        var actions = ground.allowableActions(
+                fixture.farmer,
+                fixture.observatory,
+                "East"
+        );
+
+        assertEquals(1, actions.size());
+
+        assertInstanceOf(
+                ActivateObservatoryAction.class,
+                actions.get(0)
+        );
+
+        // Other actors cannot activate the Observatory.
+        Cow cow = new Cow();
+
+        assertEquals(
+                0,
+                ground.allowableActions(
+                        cow,
+                        fixture.observatory,
+                        "East"
+                ).size()
+        );
+    }
 }

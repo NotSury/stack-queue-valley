@@ -220,7 +220,7 @@ public class StackQueueValleyWorld extends World {
         );
 
         TimeRabbit timeRabbit = new TimeRabbit();
-        inheritedFarmMap.at(1,3).addActor(timeRabbit);
+        inheritedFarmMap.at(3,5).addActor(timeRabbit);
 
         Cow cow = new Cow();
         Chicken chicken = new Chicken();
