@@ -974,4 +974,60 @@ public class ObservatoryIntegrationTest {
                 ).size()
         );
     }
+
+    /**
+     * Verifies that naturally generated meteorite ore is
+     * attracted and absorbed by a Gravitational Distortion
+     * field after a successful Observatory scan.
+     *
+     * @throws Exception if test setup fails
+     */
+    @Test
+    void gravityAttractsImpactOreDuringRealScan()
+            throws Exception {
+
+        // A large non-hazardous asteroid generates
+        // an Asteroid Fragment event.
+        Fixture fixture = new Fixture(
+                asteroid(150, 12, false)
+        );
+
+        String result = fixture.manager.scan(
+                fixture.farmer,
+                fixture.observatory
+        );
+
+        assertTrue(
+                result.contains("Asteroid Fragment"),
+                "Expected an Asteroid Fragment event"
+        );
+
+        EnvironmentalField field =
+                fixture.manager.getActiveField().orElseThrow();
+
+        assertInstanceOf(
+                GravitationalDistortion.class,
+                field
+        );
+
+        int durationBefore = field.getRemainingTurns();
+
+        // The field should pull surrounding meteorite ore
+        // into its centre and absorb it as extra duration.
+        fixture.map.tick();
+
+        int durationAfter = field.getRemainingTurns();
+
+        assertTrue(
+                durationAfter > durationBefore,
+                "Gravity did not absorb generated ore. "
+                        + "Duration before: " + durationBefore
+                        + ", after: " + durationAfter
+        );
+
+        assertTrue(
+                field.isActive(),
+                "Gravity field should remain active"
+        );
+    }
 }
