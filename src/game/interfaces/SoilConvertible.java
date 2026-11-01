@@ -1,5 +1,7 @@
 package game.interfaces;
 
+import edu.monash.fit2099.engine.positions.Ground;
+
 import game.grounds.Soil;
 
 /**
@@ -15,5 +17,5 @@ public interface SoilConvertible {
      *
      * @return the resulting Soil ground
      */
-    Soil convertToSoil();
+    Ground convertToSoil();
 }

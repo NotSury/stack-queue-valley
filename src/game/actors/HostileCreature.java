@@ -165,8 +165,9 @@ public abstract class HostileCreature extends Actor implements
      */
     @Override
     public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
+        updateRestrictionTurn();
+
         if (!isConscious()) {
-            updateRestrictionTurn();
             display.println(unconscious(map));
             return new DoNothingAction();
         }
