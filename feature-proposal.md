@@ -272,8 +272,11 @@ Starfall introduces a NASA-powered celestial event system where the Farmer activ
 
 **Higher-level classes that depend on abstractions (DIP):**
 - `CelestialEventManager` uses `AsteroidFeed`, `CelestialEvent` and `CelestialReaction` for asteroid retrieval, event selection and impact processing.
-- `Observatory` depends on `CelestialScanService` to determine scan availability and offer the activation action.
-- `ActivateObservatoryAction` depends on `CelestialScanService` to execute scans without knowing the concrete manager.
+- `Observatory` uses `CelestialScanService` to provide scanning functionality without depending directly on `CelestialEventManager`.
+- `ActivateObservatoryAction` uses `CelestialScanService` to execute scans without knowing the concrete manager.
+- `CropMutationReaction` uses `CosmicMutable` to identify eligible crop varieties without depending on concrete crop classes.
+- `AstralBlessing` uses `CelestialRefinable` to refine eligible resources without checking their concrete types.
+- `GravitationalDistortion` uses `GravitationalFuel` to attract and absorb eligible resources without depending on specific resource implementations.
 
 ### Request
 
