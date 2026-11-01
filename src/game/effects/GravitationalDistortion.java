@@ -50,7 +50,7 @@ public final class GravitationalDistortion
 
         super(
                 "Gravitational Distortion",
-                'G',
+                'Q',
                 radius,
                 durationTurns
         );
