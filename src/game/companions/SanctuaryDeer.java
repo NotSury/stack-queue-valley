@@ -3,6 +3,7 @@ package game.companions;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.magic.FarmMagic;
+import game.effects.LivingSoilEffect;
 
 /**
  * A magical deer that help the farm through
@@ -42,11 +43,18 @@ public class SanctuaryDeer extends MagicalCompanion {
     }
 
     /**
-     * Activates the deer's unique harvesting ability.
+     * Activates Living Soil around the SanctuaryDeer.
      *
+     * @param farmer the farmer using the ability
+     * @param map the game map
+     * @return true when Living Soil is activated
      */
     @Override
     public boolean castOwnAbility(Actor farmer, GameMap map) {
-        return false;
+        LivingSoilEffect effect = new LivingSoilEffect();
+
+        effect.apply(map, map.locationOf(this));
+
+        return true;
     }
 }
