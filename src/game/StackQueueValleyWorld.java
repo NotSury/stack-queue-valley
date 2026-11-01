@@ -9,6 +9,8 @@ import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
+import edu.monash.fit2099.engine.actors.ActorStatistics;
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actors.*;
 import game.behaviours.AmbushBehaviour;
 import game.behaviours.AttackBehaviour;
@@ -47,6 +49,9 @@ import game.reactions.ImpactDamageReaction;
 import game.reactions.ResourceReaction;
 import game.reactions.GuardianReaction;
 import game.companions.TimeRabbit;
+import game.companions.PrismFox;
+import game.companions.SanctuaryDeer;
+import game.items.Strawberry;
 
 import java.time.Clock;
 import java.util.Random;
@@ -219,8 +224,15 @@ public class StackQueueValleyWorld extends World {
                 new Observatory(celestialManager)
         );
 
+        // REQ4: Magical farm companions
         TimeRabbit timeRabbit = new TimeRabbit();
         inheritedFarmMap.at(3,5).addActor(timeRabbit);
+
+        PrismFox prismFox = new PrismFox();
+        inheritedFarmMap.at(1, 4). addActor(prismFox);
+
+        SanctuaryDeer sanctuaryDeer = new SanctuaryDeer();
+        inheritedFarmMap.at(1, 2).addActor(sanctuaryDeer);
 
         Cow cow = new Cow();
         Chicken chicken = new Chicken();

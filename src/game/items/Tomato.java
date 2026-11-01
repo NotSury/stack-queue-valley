@@ -10,6 +10,8 @@ import game.actions.ConsumeAction;
 import game.actions.FeedAction;
 import game.interfaces.FeedItem;
 import game.interfaces.Feedable;
+import game.interfaces.FreshProduce;
+
 /**
  * Tomato represents a harvested product that can be consumed,
  * fed to farm animals, and processed by processing facilities.
@@ -20,9 +22,10 @@ import game.interfaces.Feedable;
  * processed into different processed products.</p>
  *
  * @author Lee Le Si 34599223
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.1.0
  */
-public class Tomato extends ProcessableItem implements FeedItem {
+public class Tomato extends ProcessableItem implements FeedItem, FreshProduce {
     /**
      * Constructor for the Tomato class.
      *
@@ -116,6 +119,16 @@ public class Tomato extends ProcessableItem implements FeedItem {
                 feedable -> actions.add(new FeedAction(feedable,this, location))
         );
         return actions;
+    }
+
+    /**
+     * Checks if this Tomato is fresh.
+     *
+     * @return true because the Tomato cannot become rotten
+     */
+    @Override
+    public boolean isFresh() {
+        return true;
     }
 
     /**

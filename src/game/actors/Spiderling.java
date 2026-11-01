@@ -10,6 +10,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import game.actions.SpiderlingTurnAction;
 import game.capabilities.WebAbility;
 import game.interfaces.Hostile;
+import game.interfaces.Stunnable;
 
 /**
  * A small, independent Spiderling that wanders without attacking.
@@ -17,9 +18,10 @@ import game.interfaces.Hostile;
  * Spiderlings are immune to web bindings.
  *
  * @author Surya Muni Peragas 35651628
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.1.0
  */
-public class Spiderling extends Actor implements Hostile {
+public class Spiderling extends Actor implements Hostile, Stunnable {
 
     private static final int STARTING_HEALTH = 10;
     private static final int LIFETIME_TURNS = 8;
@@ -27,6 +29,8 @@ public class Spiderling extends Actor implements Hostile {
     private final Behaviour<Actor, Action> wanderingBehaviour;
 
     private int remainingTurns = LIFETIME_TURNS;
+
+    private int stunTurns = 0;
 
     /**
      * Creates an unplaced Spiderling with ordinary NPC movement.
@@ -61,6 +65,13 @@ public class Spiderling extends Actor implements Hostile {
             return new DoNothingAction();
         }
 
+        if (stunTurns > 0)
+        {
+            stunTurns--;
+            display.println(this + " is stunned and cannot act.");
+            return new DoNothingAction();
+        }
+
         Action action = wanderingBehaviour.operate(
                 this,
                 map.locationOf(this)
@@ -92,6 +103,16 @@ public class Spiderling extends Actor implements Hostile {
         if (map.contains(this)) {
             map.removeActor(this);
         }
+    }
+
+    /**
+     * Applies a temporary stun without shortening an existing stun.
+     *
+     * @param turns the number of turns to remain stunned
+     */
+    @Override
+    public void stun(int turns) {
+        stunTurns = Math.max(stunTurns, turns);
     }
 
     /**

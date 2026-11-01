@@ -10,6 +10,7 @@ import game.capabilities.GroundAbility;
 import game.interfaces.Tillable;
 import game.interfaces.Waterable;
 import game.capabilities.GroundAbility;
+import game.interfaces.SoilConvertible;
 
 /**
  * Dirt represents a ground that can be tilled or watered by an actor.
@@ -21,9 +22,9 @@ import game.capabilities.GroundAbility;
  * @author <Lee Le Si> <34599223>
  * @author <Chin Kai Xuan> <35730374>
  * @author <Vanessa Liau Jia Yee> <34599398>
- * @version 1.1.0
+ * @version 1.2.0
  */
-public class Dirt extends Ground implements Tillable, Waterable {
+public class Dirt extends Ground implements Tillable, Waterable, SoilConvertible {
 
     /**
      * Constructor for the Dirt class.
@@ -33,6 +34,16 @@ public class Dirt extends Ground implements Tillable, Waterable {
         this.enableAbility(GroundAbility.BARE_DIRT);
         this.enableAbility(GroundAbility.OPEN_GROUND);
         this.enableAbility(GroundAbility.METEOR_IMPACTABLE);
+    }
+
+    /**
+     * Converts this Dirt ground into Soil for magical terrain effects.
+     *
+     * @return a new Soil instance
+     */
+    @Override
+    public Soil convertToSoil() {
+        return new Soil();
     }
 
     /**
