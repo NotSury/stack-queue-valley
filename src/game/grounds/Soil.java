@@ -2,7 +2,7 @@ package game.grounds;
 import edu.monash.fit2099.engine.positions.Ground;
 import game.capabilities.GroundAbility;
 import game.interfaces.PlantableGround;
-import game.capabilities.GroundAbility;
+import game.interfaces.SoilConvertible;
 
 /**
  * Soil represents cultivated ground created when Dirt is tilled.
@@ -11,7 +11,7 @@ import game.capabilities.GroundAbility;
  * @author <Vanessa Liau Jia Yee> <34599398>
  * @version 1.1.0
  */
-public class Soil extends Ground implements PlantableGround{
+public class Soil extends Ground implements PlantableGround, SoilConvertible {
     /**
      * Constructor for the Soil class.
      *
@@ -21,5 +21,15 @@ public class Soil extends Ground implements PlantableGround{
         super(',',"Soil");
         this.enableAbility(GroundAbility.OPEN_GROUND);
         this.enableAbility(GroundAbility.METEOR_IMPACTABLE);
+    }
+
+    /**
+     * Converts this Dirt ground into Soil.
+     *
+     * @return a new Soil instance
+     */
+    @Override
+    public Soil convertToSoil() {
+        return new Soil();
     }
 }
