@@ -14,6 +14,10 @@ import game.grounds.Dirt;
 import game.grounds.Puddle;
 import game.statuses.MelonBurstStatus;
 import game.statuses.RadiationImmunityStatus;
+import game.actors.AstralGuardian;
+import game.actors.Merchant;
+import game.companions.TimeRabbit;
+import game.items.MeteoriteOre;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -294,6 +298,96 @@ public class CosmicConsumableTest {
 
         assertFalse(
                 farmer.hasStatus(RadiationImmunityStatus.class)
+        );
+    }
+
+    /**
+     * Verifies that Cosmic Melon removes actors defeated by
+     * its explosion, including actors with specialised turns.
+     *
+     * @throws Exception if the map cannot be initialized
+     */
+    @Test
+    void cosmicMelonRemovesUnconsciousActors()
+            throws Exception {
+
+        GameMap map = createMap();
+
+        Farmer farmer = new Farmer("Tester");
+        TimeRabbit rabbit = new TimeRabbit();
+        Merchant merchant = new Merchant();
+
+        map.addActor(farmer, map.at(3, 3));
+        map.addActor(rabbit, map.at(4, 3));
+        map.addActor(merchant, map.at(3, 4));
+
+        // Leave both adjacent actors with only 5 HP.
+        rabbit.hurt(15);
+        merchant.hurt(95);
+
+        new CosmicMelon().consume(farmer);
+
+        // Trigger the delayed 12-damage explosion.
+        map.tick();
+
+        assertFalse(
+                map.contains(rabbit),
+                "TimeRabbit remained on the map after defeat"
+        );
+
+        assertFalse(
+                map.contains(merchant),
+                "Merchant remained on the map after defeat"
+        );
+
+        // The consumer must remain protected.
+        assertTrue(map.contains(farmer));
+
+        assertEquals(
+                100,
+                farmer.getStatistic(ActorStatistics.HEALTH)
+        );
+    }
+
+    /**
+     * Verifies that an Astral Guardian defeated by Cosmic Melon
+     * drops Meteorite Ore before disappearing.
+     *
+     * @throws Exception if the map cannot be initialized
+     */
+    @Test
+    void cosmicMelonDefeatsGuardianAndDropsOre()
+            throws Exception {
+
+        GameMap map = createMap();
+
+        Farmer farmer = new Farmer("Tester");
+        AstralGuardian guardian = new AstralGuardian();
+
+        map.addActor(farmer, map.at(3, 3));
+        map.addActor(guardian, map.at(4, 3));
+
+        // Astral Guardian starts with 60 HP.
+        guardian.hurt(55);
+
+        new CosmicMelon().consume(farmer);
+
+        map.tick();
+
+        assertFalse(
+                map.contains(guardian),
+                "Astral Guardian should be removed after defeat"
+        );
+
+        assertTrue(
+                map.at(4, 3).getItems().stream()
+                        .anyMatch(MeteoriteOre.class::isInstance),
+                "Astral Guardian did not drop Meteorite Ore"
+        );
+
+        assertEquals(
+                100,
+                farmer.getStatistic(ActorStatistics.HEALTH)
         );
     }
 }
