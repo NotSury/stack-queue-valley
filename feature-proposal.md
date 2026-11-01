@@ -197,3 +197,156 @@ capability interfaces `GrowthAcceleratable`, `Freezable`, `FreshProduce`, `Stunn
 - `LivingSoilEffect` uses only `SoilConvertible` and `PlantFactory`.
 - `NatureSanctuaryEffect` uses only `Repellable`.
 - `MagicalCompanion` uses only `TimedAreaEffect`.
+
+## A3 REQ 5: Starfall: Celestial Forge
+Author: Chin Kai Xuan (35730374)
+
+> This describes the implemented version of Starfall: Celestial Forge.
+
+### Pitch
+
+Starfall introduces a NASA-powered celestial event system where the Farmer activates an Observatory to retrieve real asteroid information. Depending on the asteroid's diameter, velocity and hazardous classification, meteor impacts can transform terrain, mutate crops, generate resources, summon Astral Guardians and create temporary environmental fields. These events fundamentally alter the game world and introduce new environmental hazards, resources and gameplay interactions.
+
+### Mechanics
+
+- **Activating the Observatory:** The Observatory (`O`) is located at (1, 3) on the Inherited Farm. The Farmer must stand adjacent to it and spend 3 stamina to perform a successful scan.
+    - The Observatory is impassable, preventing actors from occupying it.
+    - Another scan cannot begin while an environmental field remains active.
+    - Failed scans do not consume stamina or increase the completed scan count.
+
+- **Dynamic NASA scanning:** `ObservatoryScanPlanner` generates a two-day request window based on the Farmer's current stamina, map coordinates and number of completed scans. `NasaAsteroidFeed` retrieves and parses the response into `AsteroidData`, which influences the resulting event.
+
+- **Three celestial events:**
+    - **Meteor Shower:** small, non-hazardous asteroids generate multiple impacts, Meteorite Ore and an Astral Blessing field.
+    - **Asteroid Fragment:** large non-hazardous or lower-speed hazardous asteroids generate a concentrated impact, resources, possible guardian spawning and Gravitational Distortion.
+    - **Celestial Storm:** fast, hazardous asteroids generate stronger multiple impacts, guardians and Cosmic Radiation.
+
+- **Meteor impact reactions:** each event creates an `ImpactProfile` containing impact count, radius, damage, ore count, guardian count and field duration.
+    - **Crop Mutation:** eligible crops may transform into Cosmic Crops or be destroyed.
+    - **Terrain Transformation:** impactable ground becomes an Impact Crater.
+    - **Impact Damage:** actors within the impact area receive damage, with each actor damaged at most once per celestial event.
+    - **Resource Generation:** Meteorite Ore is generated on suitable impact sites, including neighbouring craters.
+    - **Guardian Spawning:** Astral Guardians appear dynamically at safe impact locations, fight as hostile creatures and drop Meteorite Ore when defeated.
+    - Existing Impact Craters can be targeted by later scans, while protected terrain is preserved.
+
+- **Three environmental fields:** one field is created per successful event and operates automatically during game ticks.
+    - **Astral Blessing (`!`):** restores 4 HP and 2 stamina per tick. On expiration, it transforms affected Impact Craters into Starlite Soil and refines eligible Meteorite Ore into Starlite Ore.
+    - **Gravitational Distortion (`Q`):** drains 3 stamina per tick and pulls loose celestial resources towards its centre. Absorbed resources can extend its duration by up to 4 additional turns.
+    - **Cosmic Radiation (`X`):** damages unprotected actors and can generate temporary Fire on eligible terrain. Radiation immunity prevents this damage.
+
+- **Cosmic Crops:** meteor impacts can produce five harvestable Cosmic Crop varieties.
+    - **Cosmic Parsnip:** restores up to 30 HP.
+    - **Cosmic Tomato:** restores up to 8 stamina.
+    - **Cosmic Cauliflower:** restores 10 HP per turn for 2 turns.
+    - **Cosmic Melon:** triggers a delayed 12-damage explosion against adjacent actors, including their normal unconscious and death effects.
+    - **Cosmic Strawberry:** protects against the next 2 Cosmic Radiation field ticks.
+
+- **Failure handling:** missing API keys, unavailable NASA responses, interrupted requests, invalid responses and empty asteroid feeds are handled without spending the Farmer's stamina.
+
+### Architecture
+
+| Abstraction | Concrete class | New or retrofitted | Complex effect |
+|---|---|---|---|
+| `CelestialReaction` (interface) | `CropMutationReaction` | New | Area-based crop mutation and terrain destruction |
+| | `ResourceReaction` | New | Dynamic Meteorite Ore generation and placement around impact sites |
+| | `GuardianReaction` | New | Safe spawning of hostile Astral Guardians with combat and resource drops |
+| `EnvironmentalField` (abstract class, extends engine `Item`) | `AstralBlessing` | New | Persistent area recovery, terrain restoration and resource refinement |
+| | `GravitationalDistortion` | New | Resource attraction, stamina drain and duration extension through absorption |
+| | `CosmicRadiation` | New | Area damage, immunity interaction and temporary Fire generation |
+
+**Additional concrete reaction classes (new):** `TerrainReaction` and `ImpactDamageReaction`, which also implement `CelestialReaction`.
+
+**Additional new abstractions:**
+- `CelestialEvent` (interface): implemented by `MeteorShower`, `AsteroidFragment` and `CelestialStorm` (all new). Each class classifies asteroid data, calculates an impact profile and creates its corresponding environmental field.
+- `AsteroidFeed` (interface): implemented by `NasaAsteroidFeed` to separate external data retrieval from gameplay processing.
+- `CelestialScanService` (interface): implemented by `CelestialEventManager` to provide scanning operations without exposing the concrete manager.
+- `CosmicMutable` (interface): implemented by existing `ParsnipCrop`, `TomatoCrop`, `CauliflowerCrop`, `MelonCrop` and `StrawberryCrop` classes (retrofitted). Each crop identifies its corresponding Cosmic Crop variety.
+
+**Supporting new classes:** `AsteroidData`, `NasaApiConfig`, `NasaAsteroidClient`, `NasaAsteroidParser`, `NasaAsteroidFeed`, `ObservatoryScanPlanner`, `ImpactProfile`, `CelestialEventManager`, `Observatory`, `ActivateObservatoryAction`, `CosmicCrop`, `ImpactCrater`, `StarliteSoil`, `MeteoriteOre`, `StarliteOre`, `AstralGuardian`, `CosmicParsnip`, `CosmicTomato`, `CosmicCauliflower`, `CosmicMelon`, `CosmicStrawberry`, `MelonBurstStatus` and `RadiationImmunityStatus`.
+
+**Reused existing classes:** `AreaLocationHelper` for circular-area and distance calculations, `MovementSafety` for safe spawning and resource movement, `Explosion` for Cosmic Melon, and `HealthOverTimeStatus` for temporary healing.
+
+**Modified existing classes:**
+- `StackQueueValleyWorld` integrates the Observatory, NASA dependencies, event strategies and ordered reactions into the game.
+- `ParsnipCrop`, `TomatoCrop`, `CauliflowerCrop`, `MelonCrop` and `StrawberryCrop` implement `CosmicMutable`.
+
+**Higher-level classes that depend on abstractions (DIP):**
+- `CelestialEventManager` uses `AsteroidFeed`, `CelestialEvent` and `CelestialReaction` for asteroid retrieval, event selection and impact processing.
+- `Observatory` depends on `CelestialScanService` to determine scan availability and offer the activation action.
+- `ActivateObservatoryAction` depends on `CelestialScanService` to execute scans without knowing the concrete manager.
+
+### Request
+
+NASA's Near-Earth Object Web Service (NeoWs) receives a dynamic request generated from the current game state.
+
+`ObservatoryScanPlanner` calculates the date range using the Farmer's stamina, X coordinate, Y coordinate and number of completed scans:
+
+```text
+signature = 3 × stamina + 5 × playerX + 11 × playerY + 7 × completedScans
+offsetDays = signature mod 60
+endDate = currentDate - (1 + offsetDays) days
+startDate = endDate - 1 day
+```
+
+For example, assuming the current UTC date is 31 October 2026, the Farmer has 20 stamina, is at (0, 3), and has completed 0 scans:
+
+```text
+signature = 3(20) + 5(0) + 11(3) + 7(0) = 93
+offsetDays = 93 mod 60 = 33
+
+startDate = 2026-09-26
+endDate = 2026-09-27
+```
+
+**Example dynamic API request:**
+
+```text
+https://api.nasa.gov/neo/rest/v1/feed?start_date=2026-09-26&end_date=2026-09-27&api_key=YOUR_NASA_API_KEY
+```
+
+Changing the Farmer's stamina, position or completed scan count can change the dates sent to NASA. The actual asteroid data returned influences the event type and gameplay effects, rather than merely producing console output.
+
+**Security:** `NasaApiConfig` reads the key from the `NASA_API_KEY` environment variable using `System.getenv()`. The real API key is not stored in the source code or proposal and must not be committed to Git.
+
+### Schema
+
+`NasaAsteroidParser` expects a JSON response containing a `near_earth_objects` object, with asteroid arrays grouped by approach date.
+
+**Example expected JSON structure:**
+
+```json
+{
+  "near_earth_objects": {
+    "2026-09-26": [
+      {
+        "id": "123456",
+        "name": "Example Asteroid",
+        "is_potentially_hazardous_asteroid": false,
+        "estimated_diameter": {
+          "meters": {
+            "estimated_diameter_min": 30.0,
+            "estimated_diameter_max": 38.0
+          }
+        },
+        "close_approach_data": [
+          {
+            "close_approach_date": "2026-09-26",
+            "relative_velocity": {
+              "kilometers_per_second": "16.0"
+            },
+            "miss_distance": {
+              "kilometers": "500000.0"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The parser extracts the asteroid's ID, name, average estimated diameter, velocity, miss distance, hazardous classification and approach date into `AsteroidData`.
+
+`CelestialEvent` implementations use these measurements to calculate an `ImpactProfile`, which determines meteor impacts, terrain changes, resource generation, guardian spawning and environmental effects.
+
+The celestial events are fictional gameplay mechanics and are not NASA impact predictions.

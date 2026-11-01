@@ -652,6 +652,22 @@ The API key must not be hardcoded, committed to GitLab or included in submitted 
 
 An internet connection is required for live Observatory scans, but not for the automated unit tests.
 
+### setup for markers
+
+To test the NASA API integration without registering for a personal API key:
+
+1. Open the project in IntelliJ IDEA.
+2. Navigate to **Run → Edit Configurations → game.Application**.
+3. Add `NASA_API_KEY=DEMO_KEY` under **Environment variables**.
+4. Run `game.Application`.
+5. Activate the Observatory (`O`) from an adjacent tile.
+
+NASA provides `DEMO_KEY` for testing, subject to lower request limits. For more reliable access, a personal API key can be obtained from https://api.nasa.gov/.
+
+The API key is read through an environment variable and is not hardcoded into the project.
+
+Automated JUnit tests do not require an API key or internet connection because they use simulated NASA responses.
+
 ### Failure handling
 
 The Observatory handles unavailable NASA responses, invalid data, interrupted requests and empty asteroid feeds without deducting stamina.
