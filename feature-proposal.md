@@ -80,7 +80,7 @@ to the killer, applies the creature's death effect and leaves `Remains`).
 ## A3 REQ 4: Magical Farm Companions
 Author: Vanessa Liau Jia Yee (34599398)
 
-> This describes the implemented version and planned features of Magical Farm Companions.
+> This describes the implemented version of Magical Farm Companions.
 > Changes from the TA-approved proposal are documented in README.md.
 
 ### Pitch
@@ -93,8 +93,10 @@ one Farmer turn.
 
 ### Mechanics
 - **Activating:** standing next to a companion adds two actions to the Farmer's menu
-    while the companion still has charges. The companion's area effects stay fixed where 
-    they were cast, even if the companion wanders away.
+    while the companion still has charges. Each companion has three shared activation
+    charges across both abilities. Successful activations consume one charge, while failed
+    activations still use the Farmer's turn without consuming a charge. Area effects remain
+    fixed at their activation locations even if the companion wanders away.
 - **TimeRabbit** (3x3 area centred on the rabbit)
     - **Growth Magic:** every plant in the area with a next growth stage advances
         by exactly one stage, ignoring its age, interval and growth probability.
@@ -144,6 +146,13 @@ one Farmer turn.
         its next action. The restriction is cleared at the start of that creature's following turn, avoiding dependence 
         on SanctuaryDeer's position in the engine's actor order. This is a per-creature turn rule, not a global round-long
         shield.
+  
+### Relationship with REQ3
+Rainbow Storm affects hostile creatures through the `Hostile` and `Stunnable` capabilities without removing their
+existing curses or other status effects. When a hostile dies, its normal death handling remains
+responsible for curses and remains. Nature's Sanctuary affects only `Repellable` creatures, leaving allied
+undead unaffected. Living Soil transforms only ground supporting SoilConvertible, ensuring cursed ground
+and remains are preserved.
 
 ### Architecture
 | Abstraction                                                 | Concrete class  | New or retrofitted | Complex effect |
@@ -161,10 +170,11 @@ Magical Harvest Trail, `SanctuaryDeer` owns Living Soil, and the three
 Only the three `FarmMagic` classes implement that interface; the companion-owned abilities
 are TimedAreaEffects started by the companion.
 
-**Supporting new classes (not counted among the six):** `CompanionAction` (abstract,
-shared charge and adjacency rules), `ActivateMagicAction`, `ActivateOwnAbilityAction`,
-`TimedAreaEffect` (abstract), `TemporalFreezeEffect`, `AreaLocationHelper`, and the 
-interfaces `GrowthAcceleratable`, `Freezable`, `FreshProduce`, `Stunnable`, 
+**Supporting new classes (not counted among the six):** `CompanionAction` (abstract class
+providing shared charge and adjacency rules), `ActivateMagicAction`, `ActivateOwnAbilityAction`,
+`TimedAreaEffect` (abstract class), `TemporalFreezeEffect`, `HarvestTrailEffect`, `RainbowStormEffect`,
+`LivingSoilEffect`, `NatureSanctuaryEffect`, `AreaLocationHelper`, `MovementRestrictions`and the 
+capability interfaces `GrowthAcceleratable`, `Freezable`, `FreshProduce`, `Stunnable`, 
 `Repellable` and `SoilConvertible`.
 
 **Modified existing classes:** 
