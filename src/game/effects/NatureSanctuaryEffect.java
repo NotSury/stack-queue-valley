@@ -21,6 +21,7 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
     private static final int RADIUS = 1;
     private static final int DURATION = 1;
     private final Actor farmer;
+    private final SanctuaryProtection protection = new SanctuaryProtection();
 
     /**
      * Creates Nature's Sanctuary.
@@ -53,9 +54,20 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
      */
     @Override
     protected void applyTick(List<Location> area) {
+    }
+
+    /**
+     * Activates sanctuary protection and restores the Farmer's health and stamina when the Farmer
+     * is inside the sanctuary area.
+     *
+     * @param area locations covered by the sanctuary
+     */
+    public void activate(List<Location> area) {
+        protection.protect(area);
+
         for (Location location : area) {
             if (location.containsAnActor() &&
-            location.getActor() == farmer) {
+                    location.getActor() == farmer) {
 
                 farmer.modifyStatistic(ActorStatistics.HEALTH,
                         StatisticOperations.INCREASE, 2);

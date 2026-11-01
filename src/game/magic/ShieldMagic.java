@@ -2,8 +2,10 @@ package game.magic;
 
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 import game.companions.MagicalCompanion;
 import game.effects.NatureSanctuaryEffect;
+import game.support.AreaLocationHelper;
 
 /**
  * Provides Nature's Sanctuary magic to SanctuaryDeer.
@@ -37,8 +39,12 @@ public class ShieldMagic implements FarmMagic {
             return false;
         }
 
+        Location centre =  map.locationOf(companion);
+
         NatureSanctuaryEffect effect = new NatureSanctuaryEffect(map,
                 map.locationOf(companion), farmer);
+
+        effect.activate(AreaLocationHelper.square(map, centre, 1));
 
         companion.addMagicEffect(effect);
         return true;
