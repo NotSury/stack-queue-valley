@@ -687,7 +687,7 @@ public class ObservatoryIntegrationTest {
                         != fixture.observatory) {
 
                     fixture.map.at(x, y).setGround(
-                            new ImpactCrater()
+                            new Rock()
                     );
                 }
             }
@@ -867,5 +867,59 @@ public class ObservatoryIntegrationTest {
             // Prevent interference with subsequent JUnit tests.
             Thread.interrupted();
         }
+    }
+
+/**
+ * Verifies that repeated scans can reuse existing impact
+ * craters instead of exhausting nearby impactable terrain.
+ *
+ * @throws Exception if the test environment cannot initialize
+ */
+
+ @Test
+    void repeatedScansKeepFindingTargets() throws Exception {
+
+        Fixture fixture = new Fixture(
+                asteroid(400, 10, false)
+        );
+
+        for (int scan = 0; scan < 5; scan++) {
+
+            fixture.farmer.modifyStatistic(
+                    ActorStatistics.STAMINA,
+                    StatisticOperations.INCREASE,
+                    20
+            );
+
+            String result = fixture.manager.scan(
+                    fixture.farmer,
+                    fixture.observatory
+            );
+
+            assertTrue(
+                    result.contains("triggered"),
+                    "Scan " + (scan + 1)
+                            + " failed: " + result
+            );
+
+            int ticks = 0;
+
+            while (!fixture.manager.canScan()
+                    && ticks < 20) {
+
+                fixture.map.tick();
+                ticks++;
+            }
+
+            assertTrue(
+                    fixture.manager.canScan(),
+                    "Environmental field did not expire"
+            );
+        }
+
+        assertEquals(
+                5,
+                fixture.manager.getCompletedScans()
+        );
     }
 }

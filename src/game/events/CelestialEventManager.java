@@ -337,8 +337,10 @@ public final class CelestialEventManager
                     Location candidate = map.at(x, y);
 
                     if (candidate.getGround() != null
-                            && candidate.getGround().hasAbility(
-                            GroundAbility.METEOR_IMPACTABLE)) {
+                            && (candidate.getGround().hasAbility(
+                            GroundAbility.METEOR_IMPACTABLE)
+                            || candidate.getGround().hasAbility(
+                            GroundAbility.METEOR_IMPACT_SITE))) {
 
                         result.add(candidate);
                     }
