@@ -3,13 +3,10 @@ package game.effects;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.actors.ActorStatistics;
-import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.interfaces.Repellable;
 import game.support.AreaLocationHelper;
 
 import java.util.Optional;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,21 +20,28 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
     public static final String NAME = "Nature's Sanctuary";
 
     private static final int RADIUS = 1;
-    private static final int DURATION = 2;
-    private final Actor farmer;
-    private List<Location> protectedArea;
+    private static final int REACH = 2;
+    private static final int DURATION = 1;
+    private static final int MAX_RETREAT = 5;
 
     /**
-     * Creates Nature's Sanctuary.
-     *
-     * @param map the current game map
-     * @param centre the sanctuary's centre
-     * @param farmer the Farmer activating the ability
+     * Direction priority for displacement: up, right, down, left.
      */
-    public NatureSanctuaryEffect(GameMap map, Location centre, Actor farmer)
-    {
+    private static final int[][] DIRECTIONS = {
+            {0, -1},
+            {1, 0},
+            {0, 1},
+            {-1, 0}
+    };
+
+    /**
+     * Creates Nature's Sanctuary centred on the Farmer.
+     *
+     * @param map    the current game map
+     * @param centre the sanctuary's centre
+     */
+    public NatureSanctuaryEffect(GameMap map, Location centre) {
         super(map, centre, RADIUS, DURATION);
-        this.farmer = farmer;
     }
 
     /**
@@ -47,9 +51,9 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
      * @param area the sanctuary's protected locations
      */
     private void repelHostiles(List<Location> area) {
-        GameMap map = area.get(0).map();
 
-        for (Location location : area) {
+        for (Location location : AreaLocationHelper.square(getMap(), getCentre(), REACH)) {
+
             if (!location.containsAnActor()) {
                 continue;
             }
@@ -62,29 +66,62 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
                 continue;
             }
 
-            boolean moved = false;
+            if (area.contains(location)) {
+                Optional<Location> retreat =
+                        findRetreat(actor, location, area);
 
-            for (int distance = 1; distance <= 5 && !moved; distance++) {
-                for (Location candidate : AreaLocationHelper.square(map, location, distance)) {
-                    if (area.contains(candidate) || !candidate.canActorEnter(actor)) {
-                        continue;
-                    }
-
-                    int dx = Math.abs(candidate.x() - location.x());
-                    int dy = Math.abs(candidate.y() - location.y());
-
-                    if (Math.max(dx, dy) != distance) {
-                        continue;
-                    }
-
-                    map.moveActor(actor, candidate);
-                    moved = true;
-                    break;
+                if (retreat.isPresent()) {
+                    getMap().moveActor(actor, retreat.get());
                 }
             }
-            repellable.get().forbid(area);
+
+            restrictCreature(repellable.get(), area);
         }
     }
+
+    /**
+     * Prevents a creature from entering the sanctuary.
+     *
+     * @param creature the affected creature
+     * @param area the protected locations
+     */
+    private void restrictCreature(Repellable creature, List<Location> area) {
+        creature.forbid(area);
+    }
+
+    /**
+     * Finds an available retreat location outside the sanctuary.
+     * Searches along the horizontal and vertical axes using a fixed
+     * direction priority of up, right, down and left.
+     *
+     * @param actor the hostile creature being displaced
+     * @param from the creature's current location
+     * @param shield the locations protected by Nature's Sanctuary
+     * @return an available retreat location, or an empty Optional if non exists
+     */
+    private Optional<Location> findRetreat(Actor actor, Location from, List<Location> shield) {
+
+        for (int distance = 1; distance <= MAX_RETREAT; distance++) {
+           for (int[] direction : DIRECTIONS) {
+
+                int x = from.x() + direction[0] * distance;
+                int y = from.y() + direction[1] * distance;
+
+                if (!AreaLocationHelper.inBounds(getMap(), x, y)) {
+                    continue;
+                }
+
+                Location candidate = getMap().at(x, y);
+
+                if (!shield.contains(candidate)
+                        && candidate.canActorEnter(actor)
+                        && !candidate.containsAnActor()) {
+                    return Optional.of(candidate);
+            }
+        }
+    }
+    return Optional.empty();
+}
 
     /**
      * Returns the name of Nature's Sanctuary.
@@ -97,37 +134,13 @@ public class NatureSanctuaryEffect extends TimedAreaEffect {
     }
 
     /**
-     * Restores the Farmer's health and stamina when the Farmer
-     * is inside the sanctuary area.
+     * Applies sanctuary protection by repelling nearby hostile creatures
+     * and preventing them from entering the protected area.
      *
-     * @param area locations affected by the effect
+     * @param area the sanctuary's protected locations
      */
     @Override
     protected void applyTick(List<Location> area) {
-    }
-
-    /**
-     * Activates sanctuary protection and restores the Farmer's health and stamina when the Farmer
-     * is inside the sanctuary area.
-     *
-     * @param area locations covered by the sanctuary
-     */
-    public void activate(List<Location> area) {
-        protectedArea = new ArrayList<>(area);
         repelHostiles(area);
-
-        for (Location location : area) {
-            if (location.containsAnActor() &&
-                    location.getActor() == farmer) {
-
-                farmer.modifyStatistic(ActorStatistics.HEALTH,
-                        StatisticOperations.INCREASE, 2);
-
-                farmer.modifyStatistic(ActorStatistics.STAMINA,
-                        StatisticOperations.INCREASE, 2);
-
-                return;
-            }
-        }
     }
 }

@@ -13,10 +13,14 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Transform nearby Dirt tiles into Soil.
+ * Restores nearby Dirt tiles to Soil over three effect ticks.
+ * Newly restored tiles after the first tick have 50% change
+ * of regenerating a random plant.
+ *
+ * Existing crops and Soil remain unchanged.
  *
  * @author Vanessa Liau Jia Yee 34599398
- * @version 1.0.0
+ * @version 1.1.0
  */
 public class LivingSoilEffect extends TimedAreaEffect {
 
@@ -58,6 +62,7 @@ public class LivingSoilEffect extends TimedAreaEffect {
      *
      * @param area the affected locations
      */
+    @Override
     protected void applyTick(List<Location> area)
     {
         for (Location location : area)
@@ -65,12 +70,15 @@ public class LivingSoilEffect extends TimedAreaEffect {
             Optional<SoilConvertible> convertible =
                     location.getGround().asCapability(SoilConvertible.class);
 
-            if (convertible.isPresent()){
-                location.setGround(convertible.get().convertToSoil());
+            if (convertible.isEmpty()){
+                continue;
             }
-                if (!firstTick) {
+
+            location.setGround(convertible.get().convertToSoil());
+
+            if (!firstTick) {
                     regenerate(location);
-                }
+            }
         }
         firstTick = false;
     }

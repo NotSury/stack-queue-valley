@@ -37,6 +37,8 @@ public abstract class StatefulCreature extends Actor implements Stunnable, Repel
 
     private final Set<Location> forbiddenLocations = new HashSet<>();
 
+    private boolean restrictionTurnUsed = false;
+
     /**
      * Creates a creature with an initial state identifier.
      * States must be registered before initial activation.
@@ -97,13 +99,14 @@ public abstract class StatefulCreature extends Actor implements Stunnable, Repel
     }
 
     /**
-     * Prevents this creature from entering the specified locations.
+     * Temporarily prevents this creature from entering the specified locations.
      *
      * @param area locations forbidden by Nature's Sanctuary
      */
     @Override
     public void forbid(Collection<Location> area) {
         forbiddenLocations.addAll(area);
+        restrictionTurnUsed = false;
     }
 
     /**
@@ -123,6 +126,24 @@ public abstract class StatefulCreature extends Actor implements Stunnable, Repel
     @Override
     public void clearForbidden() {
         forbiddenLocations.clear();
+        restrictionTurnUsed = false;
+    }
+
+    /**
+     * Keeps restrictions active for the creature's next turn
+     * and clears them at the beginning of its following turn.
+     */
+    private void updateRestrictionTurn() {
+        if (forbiddenLocations.isEmpty()) {
+            return;
+        }
+
+        if (restrictionTurnUsed) {
+            clearForbidden();
+        }
+        else {
+            restrictionTurnUsed = true;
+        }
     }
 
     /**
@@ -139,6 +160,7 @@ public abstract class StatefulCreature extends Actor implements Stunnable, Repel
      */
     @Override
     public final Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
+        updateRestrictionTurn();
         if (!isConscious()) {
             display.println(unconscious(map));
             return new DoNothingAction();

@@ -21,6 +21,24 @@ public abstract class TimedAreaEffect
     private int remainingTurns;
 
     /**
+     * Returns the game map containing this effect.
+     *
+     * @return the game map
+     */
+    protected GameMap getMap() {
+        return map;
+    }
+
+    /**
+     * Returns the fixed centre of this effect.
+     *
+     * @return the centre location
+     */
+    protected Location getCentre() {
+        return centre;
+    }
+
+    /**
      * Creates a timed area effect.
      *
      * @param map the game map

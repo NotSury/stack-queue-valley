@@ -1,19 +1,25 @@
 package game.magic;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.companions.MagicalCompanion;
 import game.effects.NatureSanctuaryEffect;
-import game.support.AreaLocationHelper;
 
 /**
  * Provides Nature's Sanctuary magic to SanctuaryDeer.
  *
  * @author Vanessa Liau Jia Yee 34599398
- * @version 1.0.0
+ * @version 1.1.0
  */
 public class ShieldMagic implements FarmMagic {
+
+    /**
+     * Health and stamina restored on activation.
+     */
+    private static final int RESTORE = 2;
 
     /**
      * Returns the name of this magical ability.
@@ -26,7 +32,8 @@ public class ShieldMagic implements FarmMagic {
     }
 
     /**
-     * Activates Nature's Sanctuary if it is not already active.
+     * Activates Nature's Sanctuary, restoring the Farmer's
+     * health and stamina and repelling nearby hostile creatures.
      *
      * @param farmer the Farmer activating the magic
      * @param companion the magical companion
@@ -35,18 +42,20 @@ public class ShieldMagic implements FarmMagic {
      */
     @Override
     public boolean cast(Actor farmer, MagicalCompanion companion, GameMap map) {
-        if (companion.isEffectActive(NatureSanctuaryEffect.NAME)) {
-            return false;
-        }
+        farmer.modifyStatistic(ActorStatistics.HEALTH,
+                StatisticOperations.INCREASE,
+                RESTORE);
+
+        farmer.modifyStatistic(ActorStatistics.STAMINA,
+                StatisticOperations.INCREASE,
+                RESTORE);
 
         Location centre =  map.locationOf(farmer);
 
-        NatureSanctuaryEffect effect = new NatureSanctuaryEffect(map,
-                map.locationOf(companion), farmer);
+        NatureSanctuaryEffect effect = new NatureSanctuaryEffect(map, centre);
 
-        effect.activate(AreaLocationHelper.square(map, centre, 1));
+        effect.tick();
 
-        companion.addMagicEffect(effect);
         return true;
     }
 }

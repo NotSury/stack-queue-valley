@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.support.MovementRestrictions;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -125,7 +126,8 @@ public class MapJumpPlanner implements JumpPlanner{
             return false;
         }
 
-        return landing.canActorEnter(creature) && isSafe(landing);
+        return landing.canActorEnter(creature) && isSafe(landing)
+                && !MovementRestrictions.isForbidden(creature, landing);
     }
 
     /**
@@ -215,7 +217,7 @@ public class MapJumpPlanner implements JumpPlanner{
             enterable = location.canActorEnter(creature);
         }
 
-        return enterable && isSafe(location);
+        return enterable && isSafe(location) && !MovementRestrictions.isForbidden(creature, location);
     }
 
     private boolean isSafe(Location location){
