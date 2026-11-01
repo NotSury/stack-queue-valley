@@ -114,8 +114,9 @@ public class MagicalCompanionsTest {
      * Tests the Nature's Sanctuary prevents hostile movement
      * into the shield for one creature turn, then expires.
      *
-     * @throws Exception
+     * @throws Exception if the hostile creature cannot be placed on the map
      */
+    @Test
     void sanctuaryRestrictionExpiresAfterOneTurn() throws  Exception {
         Slime hostile = new Slime();
         map.addActor(hostile, map.at(4, 2));
