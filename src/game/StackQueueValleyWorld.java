@@ -134,6 +134,11 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.at(7, 3).setGround(new CauliflowerCrop());
         inheritedFarmMap.at(5, 1).setGround(new MelonCrop());
 
+        inheritedFarmMap.at(10, 1).setGround(new StrawberrySeedling());
+        inheritedFarmMap.at(11, 1).setGround(new StrawberrySprout());
+        inheritedFarmMap.at(12, 1).setGround(new CauliflowerSprout());
+        inheritedFarmMap.at(13, 1).setGround(new MelonSprout());
+
         minesMap.at(4,1).addActor(new Bat());
         minesMap.at(2,4).addActor(new Slime());
         minesMap.at(8,3).addActor(new CaveGhost());
