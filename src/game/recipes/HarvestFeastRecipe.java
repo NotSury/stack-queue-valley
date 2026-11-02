@@ -17,6 +17,9 @@ import java.util.Optional;
  *
  * <p>Cooking places an extra Harvest Feast on a random adjacent
  * tile and produces another for the cook's inventory.</p>
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class HarvestFeastRecipe extends FixedAmountRecipe {
 

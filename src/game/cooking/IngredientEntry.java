@@ -12,6 +12,9 @@ import java.util.Optional;
  * <p>Both references represent the same object. The Ingredient reference
  * provides cooking behavior, while the Item reference allows inventory
  * removal without downcasting.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public final class IngredientEntry {
 

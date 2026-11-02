@@ -15,6 +15,9 @@ import java.util.random.RandomGenerator;
  *
  * <p>All adjacent-location selection is centred on the cooking station.
  *  The random source is supplied by the caller to support deterministic tests.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public final class CookingContext {
 

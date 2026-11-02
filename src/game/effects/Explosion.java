@@ -14,7 +14,8 @@ import edu.monash.fit2099.engine.positions.Location;
  *
  * @author <Chin Kai Xuan> <35730374>
  * @author <Lee Le Si> <34599223>
- * @version 1.1.0
+ * @author <Surya Muni Peragas> <35651628>
+ * @version 1.2.0
  */
 public class Explosion {
 
@@ -78,6 +79,11 @@ public class Explosion {
 
         Actor actor = location.getActor();
         actor.hurt(damage);
+
+        if (!actor.isConscious()) {
+            actor.unconscious(location.map());
+        }
+
         return 1;
     }
 }

@@ -30,6 +30,9 @@ import org.mockito.ArgumentCaptor;
 
 /**
  * Tests Harvest Feast cooking at its ingredient quantity boundary.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 class HarvestFeastRecipeTest {
 

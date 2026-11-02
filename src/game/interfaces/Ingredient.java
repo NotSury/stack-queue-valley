@@ -8,6 +8,9 @@ import game.cooking.CookingContext;
  *
  * <p>Ingredients provide their category and their effect when cooked.
  * Cooking effects are separate from raw consumption effects.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public interface Ingredient {
 

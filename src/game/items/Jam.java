@@ -9,6 +9,9 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
  *
  * <p>Each Jam stores the number of fruits used in its own cooking attempt.
  * Stamina restoration is capped by the actor's existing statistic.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class Jam extends ConsumableItem {
 

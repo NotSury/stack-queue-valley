@@ -2,13 +2,20 @@ package game.cooking;
 
 import game.capabilities.IngredientCategory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * A recipe that requires an exact quantity from each specified category.
  *
  * <p>Subclasses configure the requirements and provide their cooking effects
  * and dishes. Ingredient selection is shared by all fixed-amount recipes.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public abstract class FixedAmountRecipe extends Recipe {
 
@@ -18,8 +25,8 @@ public abstract class FixedAmountRecipe extends Recipe {
      * Creates a fixed-amount recipe.
      *
      * @param name the recipe name
-     * @param requirements a non-empty map containing positive quantities
-     *     for the required categories
+     * @param requirements a non-empty map containing positive quantities for the required categories
+     *
      */
     protected FixedAmountRecipe(String name, Map<IngredientCategory, Integer> requirements) {
         super(name);

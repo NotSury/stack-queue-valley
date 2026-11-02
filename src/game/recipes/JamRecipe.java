@@ -1,6 +1,5 @@
 package game.recipes;
 
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.capabilities.GroundAbility;
 import game.capabilities.IngredientCategory;
@@ -10,6 +9,7 @@ import game.cooking.CookingContext;
 import game.interfaces.Tillable;
 import game.items.ConsumableItem;
 import game.items.Jam;
+import game.utils.AdjacentLocations;
 
 /**
  * Cooks Jam using every Fruit ingredient carried by the cook.
@@ -32,22 +32,25 @@ public class JamRecipe extends AllIngredientRecipe {
      * @param context the context for the cooking attempt
      * @param batch the ingredients used to cook the Jam
      * @return an enrichment description, or an empty string if nothing changed
+     *
+     * @author Surya Muni Peragas 35651628
+     * @version 1.0.0
      */
     @Override
     protected String applyCookingEffect(CookingContext context, CookingBatch batch) {
 
         int enrichedTiles = 0;
 
-        for (Exit exit : context.getStationLocation().getExits()) {
-            Location destination = exit.getDestination();
+        for (Location destination : AdjacentLocations.matchingAround(
+                context.getStationLocation(),
+                location -> location.getGround()
+                        .hasAbility(GroundAbility.BARE_DIRT))) {
 
-            if (destination.getGround().hasAbility(GroundAbility.BARE_DIRT)) {
-                Tillable tillable = destination.getGroundAs(Tillable.class);
+            Tillable tillable = destination.getGroundAs(Tillable.class);
 
-                if (tillable != null) {
-                    tillable.till(destination);
-                    enrichedTiles++;
-                }
+            if (tillable != null) {
+                tillable.till(destination);
+                enrichedTiles++;
             }
         }
 
@@ -60,13 +63,13 @@ public class JamRecipe extends AllIngredientRecipe {
     }
 
     /**
-     * Creates a fresh Jam using the batch's Fruit count.
+     * Creates a fresh Jam using the number of selected ingredients.
      *
-     * @param batch the ingredients used to cook the Jam
+     * @param batch the validated Fruit ingredients used for this Jam
      * @return a new Jam with its own fruit count
      */
     @Override
     protected ConsumableItem createDish(CookingBatch batch) {
-        return new Jam(batch.count(IngredientCategory.FRUIT));
+        return new Jam(batch.size());
     }
 }

@@ -11,6 +11,9 @@ import java.util.Optional;
  *
  * <p>At least one matching ingredient is required. Subclasses configure
  * the category and provide their cooking effects and dishes.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public abstract class AllIngredientRecipe extends Recipe {
 

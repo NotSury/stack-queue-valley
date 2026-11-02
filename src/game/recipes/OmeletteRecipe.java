@@ -17,6 +17,9 @@ import java.util.Optional;
  *
  * <p>Cooking has a chance to place Fire on a random adjacent tile.
  * Successful cooking produces a fresh Omelette.</p>
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class OmeletteRecipe extends FixedAmountRecipe {
 

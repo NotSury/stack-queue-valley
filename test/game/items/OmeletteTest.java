@@ -16,6 +16,9 @@ import java.util.List;
 
 /**
  * Tests Omelette consumption with different combinations of statuses.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 class OmeletteTest {
 
