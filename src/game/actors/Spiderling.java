@@ -7,11 +7,15 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 import game.actions.SpiderlingTurnAction;
 import game.capabilities.WebAbility;
 import game.interfaces.Hostile;
+import game.interfaces.Repellable;
 import game.interfaces.Stunnable;
 import game.support.CreatureRestrictionState;
+
+import java.util.Collection;
 
 /**
  * A small, independent Spiderling that wanders without attacking.
@@ -22,7 +26,7 @@ import game.support.CreatureRestrictionState;
  * @author Vanessa Liau Jia Yee 34599398
  * @version 1.1.0
  */
-public class Spiderling extends Actor implements Hostile, Stunnable {
+public class Spiderling extends Actor implements Hostile, Stunnable, Repellable {
 
     private static final int STARTING_HEALTH = 10;
     private static final int LIFETIME_TURNS = 8;
@@ -103,6 +107,35 @@ public class Spiderling extends Actor implements Hostile, Stunnable {
         if (map.contains(this)) {
             map.removeActor(this);
         }
+    }
+
+    /**
+     * Prevents the Spiderling from entering protected locations.
+     *
+     * @param area locations forbidden to this actor
+     */
+    @Override
+    public void forbid(Collection<Location> area) {
+        restrictions.forbid(area);
+    }
+
+    /**
+     * Checks if a location is forbidden.
+     *
+     * @param location the destination being checked
+     * @return true if the location is forbidden
+     */
+    @Override
+    public boolean isForbidden(Location location) {
+        return restrictions.isForbidden(location);
+    }
+
+    /**
+     * Clears the Spiderling's movement restrictions.
+     */
+    @Override
+    public void clearForbidden() {
+        restrictions.clearForbidden();
     }
 
     /**
