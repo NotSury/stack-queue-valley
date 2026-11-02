@@ -9,8 +9,6 @@ import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
-import edu.monash.fit2099.engine.actors.ActorStatistics;
-import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actors.*;
 import game.behaviours.AmbushBehaviour;
 import game.behaviours.AttackBehaviour;
@@ -51,14 +49,12 @@ import game.reactions.GuardianReaction;
 import game.companions.TimeRabbit;
 import game.companions.PrismFox;
 import game.companions.SanctuaryDeer;
-import game.items.Strawberry;
 
 import java.time.Clock;
 import java.util.Random;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 /**
  * StackQueueValleyWorld represents the game world for Stack-Queue Valley.
