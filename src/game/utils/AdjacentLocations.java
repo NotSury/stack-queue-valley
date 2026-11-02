@@ -10,9 +10,8 @@ import java.util.function.Predicate;
 import java.util.random.RandomGenerator;
 
 /**
- * Finds adjacent locations that satisfy a supplied condition, and picks a
- * random one of them, so that "a random adjacent tile that ..." is written
- * once instead of in every class that needs it (DRY).
+ * Finds adjacent locations that satisfy a supplied condition and
+ * optionally selects one at random.
  *
  * @author Surya Muni Peragas 35651628
  * @author Lee Le Si 34599223

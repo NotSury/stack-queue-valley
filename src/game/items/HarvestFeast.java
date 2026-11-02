@@ -7,6 +7,9 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 /**
  * A cooked dish that increases maximum health and stamina,
  * then fully restores both statistics.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class HarvestFeast extends ConsumableItem {
 
@@ -42,6 +45,6 @@ public class HarvestFeast extends ConsumableItem {
 
         return actor + " consumes a Harvest Feast, increasing maximum "
                 + "health and stamina by " + MAXIMUM_INCREASE
-                + " and full restoring both.";
+                + " and fully restoring both.";
     }
 }

@@ -24,7 +24,8 @@ import game.interfaces.Ingredient;
  *
  * @author <Chin Kai Xuan> <35730374>
  * @author <Lee Le Si> <34599223>
- * @version 1.1.0
+ * @author Surya Muni Peragas 35651628
+ * @version 1.2.0
  */
 public class Melon extends ConsumableItem implements CoatingSource, Ingredient {
 
@@ -116,6 +117,6 @@ public class Melon extends ConsumableItem implements CoatingSource, Ingredient {
         Explosion explosion = new Explosion(COOKING_BURST_DAMAGE);
         explosion.explodeAround(context.getStationLocation());
 
-        return "Melon brusts, dealing " + COOKING_BURST_DAMAGE + " damage to each actor adjacent to the cooking station.";
+        return "Melon bursts, dealing " + COOKING_BURST_DAMAGE + " damage to each actor adjacent to the cooking station.";
     }
 }

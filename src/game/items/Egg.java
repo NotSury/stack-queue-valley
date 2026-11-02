@@ -28,7 +28,8 @@ import java.util.List;
  *
  * @author Lee Le Si <34599223>
  * @author Vanessa Liau Jia Yee <34599398>
- * @version 1.2.0
+ * @author Surya Muni Peragas 35651628
+ * @version 1.3.0
  */
 public class Egg extends Item implements Sellable, Ingredient
 {

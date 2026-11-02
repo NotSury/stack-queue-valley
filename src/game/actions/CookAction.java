@@ -15,6 +15,9 @@ import java.util.random.RandomGenerator;
  *
  * <p>The recipe handles ingredient validation, cooking effects
  * and adding the resulting dish to the inventory.</p>
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class CookAction extends Action {
 
