@@ -86,7 +86,7 @@ public class GrowBehaviour implements PlantBehaviour, GrowthAcceleratable {
         location.setGround(nextStage);
 
         System.out.println(currentPlant + " at (" + location.x() + ", " +
-                location.y() + ") grows into " + nextStage + ".");
+                location.y() + ") on " + location.map() + " grows into a " + nextStage + ".");
 
         return true;
     }
