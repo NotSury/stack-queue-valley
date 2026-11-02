@@ -1,10 +1,10 @@
 package game.reactions;
 
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.events.ImpactProfile;
 import game.interfaces.CelestialReaction;
+import game.support.AreaLocationHelper;
 
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -36,11 +36,11 @@ public final class ImpactDamageReaction
     }
 
     /**
-     * Applies impact damage to actors that have not already
-     * been hit during the current event.
+     * Applies direct impact damage to actors at most once
+     * per celestial event.
      *
      * @param profile calculated celestial impact properties
-     * @param location impact centre
+     * @param location centre of the meteor impact
      */
     @Override
     public void apply(ImpactProfile profile, Location location) {
@@ -54,32 +54,19 @@ public final class ImpactDamageReaction
             return;
         }
 
-        GameMap map = location.map();
-        long radius = profile.getRadius();
+        for (Location affected : AreaLocationHelper.circle(
+                location, profile.getRadius())) {
 
-        for (int x : map.getXRange()) {
-            for (int y : map.getYRange()) {
+            if (!affected.containsAnActor()) {
+                continue;
+            }
 
-                long dx = (long) x - location.x();
-                long dy = (long) y - location.y();
+            Actor actor = affected.getActor();
 
-                if (dx * dx + dy * dy > radius * radius) {
-                    continue;
-                }
+            if (actor.isConscious()
+                    && damagedActors.add(actor)) {
 
-                Location affected = map.at(x, y);
-
-                if (!affected.containsAnActor()) {
-                    continue;
-                }
-
-                Actor actor = affected.getActor();
-
-                if (actor.isConscious()
-                        && damagedActors.add(actor)) {
-
-                    actor.hurt(damage);
-                }
+                actor.hurt(damage);
             }
         }
     }

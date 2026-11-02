@@ -19,10 +19,10 @@ public final class StarliteOre extends Item implements Sellable {
     private static final int SELL_PRICE = 250;
 
     /**
-     * Creates a portable piece of Starlit Ore.
+     * Creates a portable piece of Starlite Ore.
      */
     public StarliteOre() {
-        super("Starlit Ore", '+');
+        super("Starlite Ore", '+');
         makePortable();
     }
 
@@ -52,12 +52,12 @@ public final class StarliteOre extends Item implements Sellable {
 
         if (!seller.hasStatistic(FarmerStatistic.COINS)) {
             return seller
-                    + " cannot sell Starlit Ore without a wallet.";
+                    + " cannot sell Starlite Ore without a wallet.";
         }
 
         if (!seller.getInventory().getItems().contains(this)) {
             return seller
-                    + " does not own this Starlit Ore.";
+                    + " does not own this Starlite Ore.";
         }
 
         seller.getInventory().remove(this);
@@ -68,7 +68,7 @@ public final class StarliteOre extends Item implements Sellable {
                 SELL_PRICE
         );
 
-        return seller + " sells Starlit Ore for "
+        return seller + " sells Starlite Ore for "
                 + SELL_PRICE + " coins.";
     }
 }

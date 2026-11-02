@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.behaviours.ProduceBehaviour;
 import game.items.Strawberry;
+import game.interfaces.CosmicMutable;
 
 import java.util.List;
 import java.util.Random;
@@ -27,7 +28,8 @@ import java.util.Random;
  * @author Khoo Lynn 34598901
  * @version 1.1.0
  */
-public class StrawberryCrop extends WaterableCrop {
+public class StrawberryCrop extends WaterableCrop
+        implements CosmicMutable {
 
     /**
      * Stamina required to harvest this crop.
@@ -176,5 +178,15 @@ public class StrawberryCrop extends WaterableCrop {
                 exits.get(randomIndex).getDestination();
 
         adjacentLocation.addItem(createRandomStrawberry());
+    }
+
+    /**
+     * Returns the cosmic mutation variety for Strawberry.
+     *
+     * @return Cosmic Strawberry variety
+     */
+    @Override
+    public CosmicCrop.Variety getCosmicVariety() {
+        return CosmicCrop.Variety.STRAWBERRY;
     }
 }

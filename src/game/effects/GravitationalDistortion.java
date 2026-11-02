@@ -9,6 +9,7 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.capabilities.GroundAbility;
 import game.interfaces.GravitationalFuel;
 import game.navigation.MovementSafety;
+import game.support.AreaLocationHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ public final class GravitationalDistortion
 
         super(
                 "Gravitational Distortion",
-                'G',
+                'Q',
                 radius,
                 durationTurns
         );
@@ -158,7 +159,7 @@ public final class GravitationalDistortion
             Location centre) {
 
         long originalDistance =
-                distanceSquared(source, centre);
+                AreaLocationHelper.distanceSquared(source, centre);
 
         Location best = null;
         long bestDistance = originalDistance;
@@ -179,7 +180,7 @@ public final class GravitationalDistortion
             }
 
             long distance =
-                    distanceSquared(next, centre);
+                    AreaLocationHelper.distanceSquared(next, centre);
 
             if (distance >= bestDistance) {
                 continue;
@@ -200,22 +201,5 @@ public final class GravitationalDistortion
         }
 
         return best;
-    }
-
-    /**
-     * Calculates the squared distance between two locations.
-     *
-     * @param first first location
-     * @param second second location
-     * @return squared Euclidean distance
-     */
-    private long distanceSquared(
-            Location first,
-            Location second) {
-
-        long dx = (long) first.x() - second.x();
-        long dy = (long) first.y() - second.y();
-
-        return dx * dx + dy * dy;
     }
 }

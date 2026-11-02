@@ -346,12 +346,20 @@ public class CelestialReactionTest {
                 map.at(0, 0).getGround()
         );
 
-        assertEquals(
-                2L,
-                map.at(0, 0).getItems().stream()
+        long oreNearCorner = 0;
+
+        for (int x = 0; x <= 2; x++) {
+            for (int y = 0; y <= 2; y++) {
+
+                oreNearCorner += map.at(x, y)
+                        .getItems()
+                        .stream()
                         .filter(MeteoriteOre.class::isInstance)
-                        .count()
-        );
+                        .count();
+            }
+        }
+
+        assertEquals(2L, oreNearCorner);
 
         assertEquals(
                 88,

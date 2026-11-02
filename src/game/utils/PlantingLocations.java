@@ -14,8 +14,14 @@ import java.util.List;
  */
 public class PlantingLocations
 {
+    /**
+     * Prevents instantiation of this utility class.
+     */
     private PlantingLocations()
     {
+        throw new UnsupportedOperationException(
+                "PlantingLocations is a utility class and cannot be instantiated."
+        );
     }
 
     /**

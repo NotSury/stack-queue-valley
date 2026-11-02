@@ -30,7 +30,7 @@ public final class AstralBlessing extends EnvironmentalField {
      * @param durationTurns duration taken from the impact profile
      */
     public AstralBlessing(int radius, int durationTurns) {
-        super("Astral Blessing", 'B', radius, durationTurns);
+        super("Astral Blessing", '!', radius, durationTurns);
     }
 
     /**

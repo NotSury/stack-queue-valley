@@ -9,6 +9,8 @@ import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
+import edu.monash.fit2099.engine.actors.ActorStatistics;
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actors.*;
 import game.behaviours.AmbushBehaviour;
 import game.behaviours.AttackBehaviour;
@@ -48,6 +50,7 @@ import game.reactions.ResourceReaction;
 import game.reactions.GuardianReaction;
 import game.companions.TimeRabbit;
 import game.companions.PrismFox;
+import game.companions.SanctuaryDeer;
 import game.items.Strawberry;
 
 import java.time.Clock;
@@ -133,6 +136,11 @@ public class StackQueueValleyWorld extends World {
         inheritedFarmMap.at(2, 3).setGround(new StrawberryCrop());
         inheritedFarmMap.at(7, 3).setGround(new CauliflowerCrop());
         inheritedFarmMap.at(5, 1).setGround(new MelonCrop());
+
+        inheritedFarmMap.at(10, 1).setGround(new StrawberrySeedling());
+        inheritedFarmMap.at(11, 1).setGround(new StrawberrySprout());
+        inheritedFarmMap.at(12, 1).setGround(new CauliflowerSprout());
+        inheritedFarmMap.at(13, 1).setGround(new MelonSprout());
 
         minesMap.at(4,1).addActor(new Bat());
         minesMap.at(2,4).addActor(new Slime());
@@ -221,12 +229,15 @@ public class StackQueueValleyWorld extends World {
                 new Observatory(celestialManager)
         );
 
+        // REQ4: Magical farm companions
         TimeRabbit timeRabbit = new TimeRabbit();
-        inheritedFarmMap.at(1,3).addActor(timeRabbit);
+        inheritedFarmMap.at(3,5).addActor(timeRabbit);
 
-        // REQ 4 TESTING
         PrismFox prismFox = new PrismFox();
         inheritedFarmMap.at(1, 4). addActor(prismFox);
+
+        SanctuaryDeer sanctuaryDeer = new SanctuaryDeer();
+        inheritedFarmMap.at(1, 2).addActor(sanctuaryDeer);
 
         Cow cow = new Cow();
         Chicken chicken = new Chicken();
