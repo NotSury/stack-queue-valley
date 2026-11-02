@@ -21,7 +21,7 @@ public class TimeRabbit extends MagicalCompanion
      */
     public TimeRabbit()
     {
-        super("TimeRabbit", 'R', 20);
+        super("TimeRabbit", 'r', 20);
     }
 
     /**
