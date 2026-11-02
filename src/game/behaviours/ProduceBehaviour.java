@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.interfaces.PlantBehaviour;
 import game.interfaces.ProduceFactory;
+import game.utils.PlantMessages;
 
 import java.util.List;
 import java.util.Objects;
@@ -68,9 +69,8 @@ public class ProduceBehaviour implements PlantBehaviour {
         Item produce = Objects.requireNonNull(produceFactory.create());
         destination.addItem(produce);
 
-        System.out.println(location.getGround() + " at (" + location.x() + ", " + location.y() +
-                ") on " + location.map() + " drops a " + produce + " at (" + destination.x() +
-                ", " + destination.y() + ") on " + destination.map() + ".");
+        System.out.println(location.getGround() + " at " + PlantMessages.formatLocation(location)
+                + " drops a " + produce + " at " + PlantMessages.formatLocation(destination) + ".");
 
         return true;
     }

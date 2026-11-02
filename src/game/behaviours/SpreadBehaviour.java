@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.grounds.Plant;
 import game.interfaces.PlantBehaviour;
 import game.interfaces.PlantFactory;
+import game.utils.PlantMessages;
 import game.utils.PlantingLocations;
 
 import java.util.List;
@@ -87,9 +88,9 @@ public class SpreadBehaviour implements PlantBehaviour {
         Plant newPlant = Objects.requireNonNull(newPlantFactory.create());
         destination.setGround(newPlant);
 
-        System.out.println(location.getGround() + " at (" + location.x() + ", " + location.y() +
-                ") on " + location.map() + " spreads, and " + newPlant + " takes root at (" +
-                destination.x() + ", " + destination.y() + ") on " + destination.map() + ".");
+        System.out.println(location.getGround() + " at " + PlantMessages.formatLocation(location)
+                + " spreads, and " + newPlant + " takes root at " +
+                PlantMessages.formatLocation(destination) + ".");
 
         return true;
     }

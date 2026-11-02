@@ -6,6 +6,7 @@ import game.grounds.Plant;
 import game.interfaces.PlantBehaviour;
 import game.interfaces.PlantFactory;
 import game.interfaces.GrowthAcceleratable;
+import game.utils.PlantMessages;
 
 import java.util.Objects;
 import java.util.Random;
@@ -85,8 +86,8 @@ public class GrowBehaviour implements PlantBehaviour, GrowthAcceleratable {
         Plant nextStage = Objects.requireNonNull(nextStageFactory.create());
         location.setGround(nextStage);
 
-        System.out.println(currentPlant + " at (" + location.x() + ", " +
-                location.y() + ") on " + location.map() + " grows into a " + nextStage + ".");
+        System.out.println(currentPlant + " at " + PlantMessages.formatLocation(location)
+                + " grows into a " + nextStage + ".");
 
         return true;
     }
