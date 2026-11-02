@@ -11,6 +11,7 @@ import game.actors.Farmer;
 import game.actors.Slime;
 import game.effects.RainbowStormEffect;
 import game.support.TestMaps;
+import game.support.CreatureRestrictionState;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,5 +91,23 @@ public class RainbowStormTest {
 
         assertEquals(healthBefore, hostile.getStatistic(ActorStatistics.HEALTH),
                 "Hostiles outside the storm area must not take damage");
+    }
+
+    /**
+     * Verify that the creature remains stunned for three turns
+     * before being allowed to act again.
+     */
+    @Test
+    void testShorterStunDoesNotOverrideLongerStun(){
+        CreatureRestrictionState restrictions =
+                new CreatureRestrictionState();
+
+        restrictions.stun(3);
+        restrictions.stun(1);
+
+        assertTrue(restrictions.consumeStunnedTurn());
+        assertTrue(restrictions.consumeStunnedTurn());
+        assertTrue(restrictions.consumeStunnedTurn());
+        assertFalse(restrictions.consumeStunnedTurn());
     }
 }

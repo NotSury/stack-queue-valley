@@ -15,15 +15,20 @@ import game.grounds.StrawberryCrop;
 import game.grounds.CauliflowerSprout;
 import game.interfaces.PlantFactory;
 import game.items.Strawberry;
+import game.support.CreatureRestrictionState;
 import game.support.TestMaps;
+import game.companions.TimeRabbit;
+import game.effects.TimedAreaEffect;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests the magical companion abilities introduced in REQ4.
@@ -140,5 +145,98 @@ public class MagicalCompanionsTest {
         assertFalse(hostile.isForbidden(protectedTile),
                 "Restriction should expire on the following turn");
     }
+
+    /**
+     * Tests that forbidden locations remain restricted for
+     * one creature turn and are cleared on the following turn.
+     *
+     * Verifies the movement restriction expiry used by
+     * Nature's Sanctuary.
+     */
+    @Test
+    void testSanctuaryRestrictionExpires() {
+        CreatureRestrictionState restrictions =
+                new CreatureRestrictionState();
+
+        Location location = mock(Location.class);
+
+        restrictions.forbid(List.of(location));
+
+        assertTrue(restrictions.isForbidden(location));
+
+        restrictions.updateRestrictionTurn();
+        assertTrue(restrictions.isForbidden(location));
+
+        restrictions.updateRestrictionTurn();
+        assertFalse(restrictions.isForbidden(location));
+    }
+
+    /**
+     * Tests that clearing movement restrictions removes all forbidden
+     * locations immediately.
+     */
+    @Test
+    void testClearForbiddenLocations() {
+        CreatureRestrictionState restrictions =
+                new CreatureRestrictionState();
+
+        Location location1 = mock(Location.class);
+        Location location2 = mock(Location.class);
+
+        restrictions.forbid(List.of(location1, location2));
+
+        assertTrue(restrictions.isForbidden(location1));
+        assertTrue(restrictions.isForbidden(location2));
+
+        restrictions.clearForbidden();
+
+        assertFalse(restrictions.isForbidden(location1));
+        assertFalse(restrictions.isForbidden(location2));
+    }
+
+    /**
+     * Verifies that a magical companion cleans up its active effects
+     * when it dies before their normal expiry.
+     */
+    @Test
+    void testCompanionDeathCleansUpActiveEffects() {
+        TimeRabbit rabbit = new TimeRabbit();
+        GameMap map = mock(GameMap.class);
+
+        AtomicInteger cleanupCount = new AtomicInteger(0);
+
+        TimedAreaEffect effect = new TimedAreaEffect(
+                map, null, 1, 3) {
+
+            @Override
+            public String getAbilityName() {
+                return "Test Freeze";
+            }
+
+            protected void applyTick(List<Location> area) {
+
+            }
+
+            @Override
+            protected void onExpire() {
+                cleanupCount.incrementAndGet();
+            }
+        };
+
+        rabbit.addMagicEffect(effect);
+
+        assertFalse(effect.isExpired());
+
+        rabbit.unconscious(map);
+
+        assertEquals(1, cleanupCount.get());
+        assertTrue(effect.isExpired());
+        assertFalse(rabbit.isEffectActive("Test Freeze"));
+
+        effect.finish();
+        assertEquals(1, cleanupCount.get());
+    }
+
+
 
 }
