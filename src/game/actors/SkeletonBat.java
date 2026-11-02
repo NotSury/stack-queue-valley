@@ -13,7 +13,7 @@ import game.weapons.CreatureWeapon;
  * of enemies.
  *
  * @author Lee Le Si 34599223
- * @version 1.0.0
+ * @version 1.1.0
  */
 public class SkeletonBat extends Undead {
 
@@ -50,12 +50,8 @@ public class SkeletonBat extends Undead {
      */
     @Override
     protected String useAbility(Location here) {
-        int infected = 0;
-        for (Actor hostile : NearbyActors.within(here, AURA_RADIUS, NearbyActors.HOSTILE)) {
-            if (CurseApplier.apply(hostile, new Contagion())) {
-                infected++;
-            }
-        }
+        int infected = CurseApplier.applyToAll(
+                NearbyActors.within(here, AURA_RADIUS, NearbyActors.HOSTILE), Contagion::new);
         return infected == 0 ? "" : this + "'s plague aura infects " + infected + " hostile(s) with Contagion.";
     }
 }
