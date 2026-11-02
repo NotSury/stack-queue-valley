@@ -30,7 +30,8 @@ import java.util.Optional;
  *
  * @author Lee Le Si 34599223
  * @author Vanessa Liau Jia Yee <34599398>
- * @version 1.1.0
+ * @author Surya Muni Peragas 35651628
+ * @version 1.2.0
  */
 public class Parsnip extends ProcessableItem implements FeedItem, Ingredient, FreshProduce {
     /**

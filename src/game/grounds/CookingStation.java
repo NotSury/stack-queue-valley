@@ -16,6 +16,9 @@ import java.util.random.RandomGenerator;
  *
  * <p>Every recipe is offered regardless of the actor's inventory.
  * Ingredient availability is checked when cooking is attempted.</p>
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class CookingStation extends Ground {
 

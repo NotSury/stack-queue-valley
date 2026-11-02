@@ -1,7 +1,5 @@
 package game.cooking;
 
-import game.capabilities.IngredientCategory;
-
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -10,6 +8,9 @@ import java.util.StringJoiner;
  *
  * <p>The recipe must check that the selection satisfies its requirements
  * and contains each original item at most once before creating the batch.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public final class CookingBatch {
 
@@ -25,21 +26,12 @@ public final class CookingBatch {
     }
 
     /**
-     * Counts the selected ingredients belonging to a category.
+     * Returns the number of ingredients selected for this batch.
      *
-     * @param category the category to count
-     * @return the number of matching ingredients
+     * @return the number of selected ingredients
      */
-    public int count(IngredientCategory category) {
-        int total = 0;
-
-        for (IngredientEntry entry : entries) {
-            if (entry.getCategory() == category) {
-                total ++;
-            }
-        }
-
-        return total;
+    public int size() {
+        return entries.size();
     }
 
     /**

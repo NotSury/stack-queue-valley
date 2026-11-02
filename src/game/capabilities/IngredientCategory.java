@@ -5,6 +5,9 @@ package game.capabilities;
  *
  * <p>Recipes depend on categories rather than particular produce classes,
  * allowing new ingredients to work with existing recipes.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public enum IngredientCategory {
 

@@ -19,7 +19,8 @@ import java.util.Random;
  * This represents a Stone item
  *
  * @author Vanessa Liau Jia Yee <34599398>
- * @version 1.0.0
+ * @author Surya Muni Peragas 35651628
+ * @version 1.1.0
  */
 public class Stone extends Item implements Sellable
 {

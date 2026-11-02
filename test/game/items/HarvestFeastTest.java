@@ -12,6 +12,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * Tests Harvest Feast consumption and permanent statistic increases.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 class HarvestFeastTest {
 
