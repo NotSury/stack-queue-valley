@@ -8,4 +8,10 @@ package game.interfaces;
  */
 public interface PlantableGround
 {
+    /**
+     * Checks if a crop can be planted on this ground.
+     *
+     * @return true if planting is allowed, false otherwise
+     */
+    boolean canPlant();
 }
