@@ -801,9 +801,6 @@ class PlantTest {
 
     /**
      * Provides fixed random values for deterministic unit tests.
-     *
-     * @author Khoo Lynn
-     * @version 1.0.0
      */
     private static class FixedRandom extends Random {
 
@@ -846,8 +843,6 @@ class PlantTest {
     /**
      * Provides a sequence of random doubles for testing repeated attempts.
      *
-     * @author Khoo Lynn
-     * @version 1.0.0
      */
     private static class SequenceRandom extends Random {
 
