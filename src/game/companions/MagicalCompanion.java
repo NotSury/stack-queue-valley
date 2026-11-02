@@ -146,6 +146,43 @@ public abstract class MagicalCompanion extends Actor
     }
 
     /**
+     * Finishes and removes all active magical effects when the companion dies.
+     */
+    private void finishActiveEffects() {
+        for (TimedAreaEffect effect : activeEffects) {
+            effect.finish();
+        }
+        activeEffects.clear();
+    }
+
+    /**
+     * Handles companion death without an attacker.
+     * Cleans up active magical effects before removing the companion.
+     *
+     * @param map where the actor fell unconscious
+     * @return a description of the companion's death
+     */
+    @Override
+    public String unconscious(GameMap map) {
+        finishActiveEffects();
+        return super.unconscious(map);
+    }
+
+    /**
+     * Handles companion death caused by another actor.
+     * Cleans up active magical effects before removing the companion.
+     *
+     * @param attacker the perpetrator
+     * @param map where the actor fell unconscious
+     * @return a description of the companion's death
+     */
+    @Override
+    public String unconscious(Actor attacker, GameMap map) {
+        finishActiveEffects();
+        return super.unconscious(attacker, map);
+    }
+
+    /**
      * Check if a magical effect is currently active.
      *
      * @param abilityName the name of the effect
@@ -180,7 +217,12 @@ public abstract class MagicalCompanion extends Actor
     {
         if (!isConscious())
         {
-            map.removeActor(this);
+            finishActiveEffects();
+
+            if (map.contains(this))
+            {
+                map.removeActor(this);
+            }
             return new DoNothingAction();
         }
 

@@ -19,6 +19,7 @@ public abstract class TimedAreaEffect
     private final Location centre;
     private final int radius;
     private int remainingTurns;
+    private boolean finished = false;
 
     /**
      * Returns the game map containing this effect.
@@ -80,7 +81,7 @@ public abstract class TimedAreaEffect
      */
     public void tick()
     {
-        if (remainingTurns > 0)
+        if (!finished && remainingTurns > 0)
         {
             List<Location> area =
                     AreaLocationHelper.square(map, centre, radius);
@@ -105,12 +106,16 @@ public abstract class TimedAreaEffect
     }
 
     /**
-     * Performs cleanup after the effect has expired.
+     * Finishes the effect and performs cleanup only once.
+     * Can be called after normal expiry or when the
+     * companion dies before the effect expires.
      */
     public void finish()
     {
-        if (isExpired())
+        if (!finished)
         {
+            finished = true;
+            remainingTurns = 0;
             onExpire();
         }
     }

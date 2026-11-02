@@ -79,6 +79,7 @@ public abstract class Plant extends Ground implements
      * @param location the Location containing the plant
      * @return true if the plant successfully advances
      */
+    @Override
     public boolean advanceGrowth(Location location)
     {
         if (frozenTicks > 0 || freezeHolds > 0 ||growthBehaviour == null)
@@ -91,6 +92,7 @@ public abstract class Plant extends Ground implements
     /**
      * Temporarily freezes the plant's automatic lifecycle.
      */
+    @Override
     public void freeze()
     {
         frozenTicks = 1;
@@ -100,6 +102,7 @@ public abstract class Plant extends Ground implements
      * Keeps the plant protected from magical growth while
      * a freeze effect is active.
      */
+    @Override
     public void holdFreeze()
     {
         freezeHolds++;
@@ -108,6 +111,7 @@ public abstract class Plant extends Ground implements
     /**
      * Releases one active freeze hold.
      */
+    @Override
     public void releaseFreeze()
     {
         if (freezeHolds > 0)

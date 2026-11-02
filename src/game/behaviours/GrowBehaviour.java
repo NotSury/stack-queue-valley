@@ -5,7 +5,6 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.grounds.Plant;
 import game.interfaces.PlantBehaviour;
 import game.interfaces.PlantFactory;
-import game.interfaces.GrowthAcceleratable;
 import game.utils.PlantMessages;
 
 import java.util.Objects;
@@ -20,7 +19,7 @@ import java.util.Random;
  * @author Vanessa Liau Jia Yee 34599398
  * @version 1.1.0
  */
-public class GrowBehaviour implements PlantBehaviour, GrowthAcceleratable {
+public class GrowBehaviour implements PlantBehaviour {
     private final int interval;
     private final double probability;
     private final PlantFactory nextStageFactory;
