@@ -13,6 +13,7 @@ import java.util.Random;
  * Represents the purchasing behaviour for a Sword from the Merchant
  *
  * @author <Vanessa Liau Jia Yee> <34599398>
+ * @author Khoo Lynn 34598901
  * @version 1.0.0
  */
 public class BuySword implements Buyable
@@ -41,11 +42,6 @@ public class BuySword implements Buyable
     @Override
     public String buy(Actor buyer, Actor merchant, GameMap map)
     {
-        if (buyer.getStatistic(FarmerStatistic.COINS) < PRICE)
-        {
-            return buyer + " does not have enough coins to buy a Sword.";
-        }
-
         buyer.modifyStatistic(FarmerStatistic.COINS, StatisticOperations.DECREASE, PRICE);
 
         Random random = new Random();
