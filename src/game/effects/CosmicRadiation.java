@@ -62,7 +62,7 @@ public final class CosmicRadiation extends EnvironmentalField {
 
         super(
                 "Cosmic Radiation",
-                'X',
+                'i',
                 radius,
                 durationTurns
         );
