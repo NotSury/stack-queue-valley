@@ -178,6 +178,12 @@ public abstract class MagicalCompanion extends Actor
     public Action playTurn(ActionList actions, Action lastAction,
                            GameMap map, Display display)
     {
+        if (!isConscious())
+        {
+            map.removeActor(this);
+            return new DoNothingAction();
+        }
+
         for (int i = activeEffects.size() - 1; i >= 0; i--)
         {
             TimedAreaEffect effect = activeEffects.get(i);
