@@ -8,6 +8,9 @@ import java.util.function.Predicate;
 
 /**
  * Finds adjacent locations that satisfy a supplied condition.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public final class AdjacentLocations {
 

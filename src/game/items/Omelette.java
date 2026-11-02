@@ -8,6 +8,9 @@ import java.util.List;
 /**
  * A cooked dish that removes all statuses from the consuming actor,
  * including beneficial statuses.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public class Omelette extends ConsumableItem {
 

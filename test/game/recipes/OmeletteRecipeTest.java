@@ -25,6 +25,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * Tests ingredient validation and cooking behaviour for Omelette recipes.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 class OmeletteRecipeTest {
 

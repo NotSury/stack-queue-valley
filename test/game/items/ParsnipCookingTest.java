@@ -25,6 +25,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * Tests Parsnip's cooking effect using real ground and locations.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 class ParsnipCookingTest {
 

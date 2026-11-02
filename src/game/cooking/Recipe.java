@@ -18,6 +18,9 @@ import java.util.StringJoiner;
  * <p>Subclasses provide ingredient selection, recipe cooking effects
  * and dish creation. The final cooking operation ensures these steps
  * run in the required order.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public abstract class Recipe {
 

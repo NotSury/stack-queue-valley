@@ -32,6 +32,9 @@ public class JamRecipe extends AllIngredientRecipe {
      * @param context the context for the cooking attempt
      * @param batch the ingredients used to cook the Jam
      * @return an enrichment description, or an empty string if nothing changed
+     *
+     * @author Surya Muni Peragas 35651628
+     * @version 1.0.0
      */
     @Override
     protected String applyCookingEffect(CookingContext context, CookingBatch batch) {

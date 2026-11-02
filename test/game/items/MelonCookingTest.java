@@ -23,6 +23,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * Tests Melon cooking damage, lethal damage and the chance boundary.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 class MelonCookingTest {
 

@@ -9,7 +9,8 @@ import java.util.List;
  * This is a utility class for finding adjacent plantable Locations.
  *
  * @author Vanessa Liau Jia Yee <34599398>
- * @version 1.0.0
+ * @author Surya Muni Peragas 35651628
+ * @version 1.1.0
  */
 public class PlantingLocations
 {

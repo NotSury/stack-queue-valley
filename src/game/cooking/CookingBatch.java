@@ -8,6 +8,9 @@ import java.util.StringJoiner;
  *
  * <p>The recipe must check that the selection satisfies its requirements
  * and contains each original item at most once before creating the batch.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 public final class CookingBatch {
 

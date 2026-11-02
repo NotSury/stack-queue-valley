@@ -12,6 +12,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * Tests Jam consumption using normal and boundary stamina values.
+ *
+ * @author Surya Muni Peragas 35651628
+ * @version 1.0.0
  */
 class JamTest {
 

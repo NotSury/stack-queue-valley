@@ -24,7 +24,8 @@ import game.interfaces.Ingredient;
  *
  * @author <Chin Kai Xuan> <35730374>
  * @author <Lee Le Si> <34599223>
- * @version 1.1.0
+ * @author Surya Muni Peragas 35651628
+ * @version 1.2.0
  */
 public class Melon extends ConsumableItem implements CoatingSource, Ingredient {
 
