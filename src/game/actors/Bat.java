@@ -1,7 +1,6 @@
 package game.actors;
 
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.afflictions.Affliction;
@@ -11,10 +10,11 @@ import game.grounds.Blight;
 import game.grounds.TemporaryGround;
 import game.interfaces.Cursed;
 import game.items.Strawberry;
+import game.utils.AdjacentLocations;
 import game.utils.NearbyActors;
 import game.weapons.CreatureWeapon;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 /**
  * A bat: 50 HP, bites for 35 damage with a 90% chance to hit.
@@ -69,15 +69,14 @@ public class Bat extends HostileCreature implements Cursed {
      */
     @Override
     public String respondToAttack(Actor attacker, GameMap map){
-        List<Exit> exits = map.locationOf(this).getExits();
-        if(exits.isEmpty()){
+        // items can share a tile with actors, so any adjacent tile works
+        Optional<Location> dropSpot =
+                AdjacentLocations.randomMatching(map.locationOf(this), location -> true, random);
+        if (dropSpot.isEmpty()) {
             return "";
         }
 
-        // items can share a tile with actors, so any adjacent tile works
-        Location dropSpot = exits.get(random.nextInt(exits.size())).getDestination();
-
-        dropSpot.addItem(new Strawberry(false)); // false = not rotten
+        dropSpot.get().addItem(new Strawberry(false)); // false = not rotten
         return this + " drops a strawberry.";
     }
 
