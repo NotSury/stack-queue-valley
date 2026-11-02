@@ -26,7 +26,7 @@ import java.util.Random;
  * Skeleton Bat.</p>
  *
  * @author <Lee Le Si> <34599223>
- * @version 1.2.0
+ * @version 1.3.0
  */
 public class Bat extends HostileCreature implements Cursed {
     /**
@@ -100,12 +100,8 @@ public class Bat extends HostileCreature implements Cursed {
      */
     @Override
     public String onDeath(Location remains) {
-        int infected = 0;
-        for (Actor hostile : NearbyActors.within(remains, BONE_BURST_RADIUS, NearbyActors.HOSTILE)) {
-            if (CurseApplier.apply(hostile, new Contagion())) {
-                infected++;
-            }
-        }
+        int infected = CurseApplier.applyToAll(
+                NearbyActors.within(remains, BONE_BURST_RADIUS, NearbyActors.HOSTILE), Contagion::new);
         TemporaryGround.placeAround(remains, Blight::new, false);
         return this + "'s bones burst, infecting " + infected + " hostile(s) with Contagion and blighting the ground.";
     }
