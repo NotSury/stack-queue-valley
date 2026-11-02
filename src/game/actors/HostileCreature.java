@@ -18,10 +18,9 @@ import game.interfaces.Hostile;
 import game.weapons.CreatureWeapon;
 import game.interfaces.Stunnable;
 import game.interfaces.Repellable;
+import game.support.CreatureRestrictionState;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -60,20 +59,9 @@ public abstract class HostileCreature extends Actor implements
 
     private final Map<Integer, Behaviour<Actor, Action>>  behaviours = new TreeMap<>();
 
-    /**
-     * Locations temporarily forbidden by Nature's Sanctuary.
-     */
-    private final Set<Location> forbiddenLocations = new HashSet<>();
+    private final CreatureRestrictionState restrictions =
+            new CreatureRestrictionState();
 
-    /**
-     * Tracks if the creature has already taken its restricted turn.
-     */
-    private boolean restrictionTurnUsed = false;
-
-    /**
-     * Number of remaining turns during which this creature cannot act.
-     */
-    private int stunTurns = 0;
     /**
      * Constructor for HostileCreature.
      *
@@ -97,7 +85,7 @@ public abstract class HostileCreature extends Actor implements
      */
     @Override
     public void stun(int turns) {
-        stunTurns = Math.max(stunTurns, turns);
+        restrictions.stun(turns);
     }
 
     /**
@@ -107,8 +95,7 @@ public abstract class HostileCreature extends Actor implements
      */
     @Override
     public void forbid(Collection<Location> area) {
-        forbiddenLocations.addAll(area);
-        restrictionTurnUsed = false;
+        restrictions.forbid(area);
     }
 
     /**
@@ -119,7 +106,7 @@ public abstract class HostileCreature extends Actor implements
      */
     @Override
     public boolean isForbidden(Location location) {
-        return forbiddenLocations.contains(location);
+        return restrictions.isForbidden(location);
     }
 
     /**
@@ -127,27 +114,7 @@ public abstract class HostileCreature extends Actor implements
      */
     @Override
     public void clearForbidden() {
-        forbiddenLocations.clear();
-        restrictionTurnUsed = false;
-    }
-
-    /**
-     * Maintains movement restrictions for one complete creature turn.
-     *
-     * The restriction remains active during the first turn after
-     * activation and is cleared at the start of the following turn.
-     */
-    private void updateRestrictionTurn() {
-        if (forbiddenLocations.isEmpty()) {
-            return;
-        }
-
-        if (restrictionTurnUsed) {
-            clearForbidden();
-        }
-        else {
-            restrictionTurnUsed = true;
-        }
+        restrictions.clearForbidden();
     }
 
     /**
@@ -165,16 +132,15 @@ public abstract class HostileCreature extends Actor implements
      */
     @Override
     public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
-        updateRestrictionTurn();
+        restrictions.updateRestrictionTurn();
 
         if (!isConscious()) {
             display.println(unconscious(map));
             return new DoNothingAction();
         }
 
-        if (stunTurns > 0)
+        if (restrictions.consumeStunnedTurn())
         {
-            stunTurns--;
             display.println(this + " is stunned and cannot act.");
             return new DoNothingAction();
         }
