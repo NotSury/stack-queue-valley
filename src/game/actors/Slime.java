@@ -2,7 +2,6 @@ package game.actors;
 
 import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.afflictions.Affliction;
@@ -10,10 +9,10 @@ import game.afflictions.Mire;
 import game.grounds.MireGround;
 import game.grounds.TemporaryGround;
 import game.interfaces.Cursed;
+import game.utils.AdjacentLocations;
 import game.weapons.CreatureWeapon;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -24,7 +23,7 @@ import java.util.Random;
  * into a swamp around its remains when it dies.</p>
  *
  * @author <Lee Le Si> <34599223>
- * @version 1.2.0
+ * @version 1.3.0
  */
 public class Slime extends HostileCreature implements Cursed {
     /**
@@ -81,20 +80,16 @@ public class Slime extends HostileCreature implements Cursed {
             return "";
         }
 
-        // collect adjacent tiles the new slime is allowed to stand on
+        // pick a random adjacent tile the new slime is allowed to stand on
         Slime newSlime = new Slime();
-        List<Location> freeSpots = new ArrayList<>();
-        for (Exit exit : map.locationOf(this).getExits()){
-            if (exit.getDestination().canActorEnter(newSlime)){
-                freeSpots.add(exit.getDestination());
-            }
-        }
-        if (freeSpots.isEmpty()){
+        Optional<Location> freeSpot = AdjacentLocations.randomMatching(
+                map.locationOf(this), location -> location.canActorEnter(newSlime), random);
+        if (freeSpot.isEmpty()){
             return "";
         }
 
         try{
-            freeSpots.get(random.nextInt(freeSpots.size())).addActor(newSlime);
+            freeSpot.get().addActor(newSlime);
         }catch (GameEngineException e){
             return ""; // spot was taken; no split this time
         }
