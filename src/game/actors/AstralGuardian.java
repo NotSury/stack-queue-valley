@@ -27,7 +27,7 @@ public final class AstralGuardian extends HostileCreature {
     public AstralGuardian() {
         super(
                 "Astral Guardian",
-                'A',
+                'a',
                 HEALTH,
                 new CreatureWeapon(
                         ATTACK_DAMAGE,

@@ -28,8 +28,9 @@ import java.util.List;
  *
  * The Merchant is represented by the '$' character.
  *
- * @author Vanessa Liau Jia Yee <34599398>
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @author Khoo Lynn 34598901
+ * @version 1.1.0
  */
 public class Merchant extends Actor
 {
@@ -63,6 +64,12 @@ public class Merchant extends Actor
     public Action playTurn(ActionList actions, Action lastAction,
                            GameMap map, Display display)
     {
+        if (!isConscious())
+        {
+            display.println(unconscious(map));
+            return new DoNothingAction();
+        }
+
         Action action = behaviour.operate(this, map.locationOf(this));
 
         if (action != null)
@@ -105,5 +112,7 @@ public class Merchant extends Actor
 
         return actions;
     }
+
+
 
 }

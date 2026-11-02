@@ -22,7 +22,7 @@ public class PrismFox extends MagicalCompanion {
      */
     public PrismFox()
     {
-        super("PrismFox", 'X', 20);
+        super("PrismFox", 'x', 20);
     }
 
     /**

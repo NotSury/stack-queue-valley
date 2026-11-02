@@ -11,6 +11,7 @@ import game.actions.SpiderlingTurnAction;
 import game.capabilities.WebAbility;
 import game.interfaces.Hostile;
 import game.interfaces.Stunnable;
+import game.support.CreatureRestrictionState;
 
 /**
  * A small, independent Spiderling that wanders without attacking.
@@ -30,8 +31,8 @@ public class Spiderling extends Actor implements Hostile, Stunnable {
 
     private int remainingTurns = LIFETIME_TURNS;
 
-    private int stunTurns = 0;
-
+    private final CreatureRestrictionState restrictions =
+            new CreatureRestrictionState();
     /**
      * Creates an unplaced Spiderling with ordinary NPC movement.
      *
@@ -65,9 +66,8 @@ public class Spiderling extends Actor implements Hostile, Stunnable {
             return new DoNothingAction();
         }
 
-        if (stunTurns > 0)
+        if (restrictions.consumeStunnedTurn())
         {
-            stunTurns--;
             display.println(this + " is stunned and cannot act.");
             return new DoNothingAction();
         }
@@ -112,7 +112,7 @@ public class Spiderling extends Actor implements Hostile, Stunnable {
      */
     @Override
     public void stun(int turns) {
-        stunTurns = Math.max(stunTurns, turns);
+        restrictions.stun(turns);
     }
 
     /**

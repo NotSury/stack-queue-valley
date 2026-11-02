@@ -7,17 +7,36 @@ import game.capabilities.FarmerStatistic;
 import game.interfaces.Buyable;
 import game.items.Sword;
 
+import java.util.Objects;
 import java.util.Random;
 
 /**
  * Represents the purchasing behaviour for a Sword from the Merchant
  *
  * @author <Vanessa Liau Jia Yee> <34599398>
+ * @author Khoo Lynn 34598901
  * @version 1.0.0
  */
 public class BuySword implements Buyable
 {
     private static final int PRICE = 3000;
+    private final Random random;
+
+    /**
+     * Constructor for BuySword.
+     */
+    public BuySword(){
+        this(new Random());
+    }
+
+    /**
+     * Constructor with a random number generator.
+     *
+     * @param random random number generator.
+     */
+    public BuySword(Random random){
+        this.random = Objects.requireNonNull(random);
+    }
 
     /**
      * Returns the purchase price of a Sword.
@@ -31,7 +50,7 @@ public class BuySword implements Buyable
     }
 
     /**
-     * Attempts to purchase and plant a Sword.
+     * Attempts to purchase a Sword.
      *
      * @param buyer the actor purchasing the Sword
      * @param merchant the Merchant selling the Sword
@@ -41,14 +60,7 @@ public class BuySword implements Buyable
     @Override
     public String buy(Actor buyer, Actor merchant, GameMap map)
     {
-        if (buyer.getStatistic(FarmerStatistic.COINS) < PRICE)
-        {
-            return buyer + " does not have enough coins to buy a Sword.";
-        }
-
         buyer.modifyStatistic(FarmerStatistic.COINS, StatisticOperations.DECREASE, PRICE);
-
-        Random random = new Random();
 
         if (random.nextBoolean())
         {

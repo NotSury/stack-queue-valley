@@ -11,6 +11,7 @@ import game.interfaces.Repellable;
 import game.states.CreatureState;
 import game.states.CreatureStateType;
 import game.interfaces.Stunnable;
+import game.support.CreatureRestrictionState;
 
 import java.util.*;
 
@@ -33,11 +34,8 @@ public abstract class StatefulCreature extends Actor implements Stunnable, Repel
 
     private String pendingEntryMessage = "";
 
-    private int stunTurns = 0;
-
-    private final Set<Location> forbiddenLocations = new HashSet<>();
-
-    private boolean restrictionTurnUsed = false;
+    private final CreatureRestrictionState restrictions =
+            new CreatureRestrictionState();
 
     /**
      * Creates a creature with an initial state identifier.
@@ -95,7 +93,7 @@ public abstract class StatefulCreature extends Actor implements Stunnable, Repel
      */
     @Override
     public void stun(int turns) {
-        stunTurns = Math.max(stunTurns, turns);
+        restrictions.stun(turns);
     }
 
     /**
@@ -105,8 +103,7 @@ public abstract class StatefulCreature extends Actor implements Stunnable, Repel
      */
     @Override
     public void forbid(Collection<Location> area) {
-        forbiddenLocations.addAll(area);
-        restrictionTurnUsed = false;
+        restrictions.forbid(area);
     }
 
     /**
@@ -117,7 +114,7 @@ public abstract class StatefulCreature extends Actor implements Stunnable, Repel
      */
     @Override
     public boolean isForbidden(Location location) {
-        return forbiddenLocations.contains(location);
+        return restrictions.isForbidden(location);
     }
 
     /**
@@ -125,25 +122,7 @@ public abstract class StatefulCreature extends Actor implements Stunnable, Repel
      */
     @Override
     public void clearForbidden() {
-        forbiddenLocations.clear();
-        restrictionTurnUsed = false;
-    }
-
-    /**
-     * Keeps restrictions active for the creature's next turn
-     * and clears them at the beginning of its following turn.
-     */
-    private void updateRestrictionTurn() {
-        if (forbiddenLocations.isEmpty()) {
-            return;
-        }
-
-        if (restrictionTurnUsed) {
-            clearForbidden();
-        }
-        else {
-            restrictionTurnUsed = true;
-        }
+        restrictions.clearForbidden();
     }
 
     /**
@@ -160,15 +139,14 @@ public abstract class StatefulCreature extends Actor implements Stunnable, Repel
      */
     @Override
     public final Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
-        updateRestrictionTurn();
+        restrictions.updateRestrictionTurn();
         if (!isConscious()) {
             display.println(unconscious(map));
             return new DoNothingAction();
         }
 
-        if (stunTurns > 0)
+        if (restrictions.consumeStunnedTurn())
         {
-            stunTurns--;
             display.println(this + " is stunned and cannot act.");
             return new DoNothingAction();
         }

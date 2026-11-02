@@ -1,13 +1,14 @@
 package game.behaviours;
 
 import edu.monash.fit2099.engine.items.Item;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.interfaces.PlantBehaviour;
 import game.interfaces.ProduceFactory;
+import game.utils.AdjacentLocations;
+import game.utils.PlantMessages;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -58,19 +59,20 @@ public class ProduceBehaviour implements PlantBehaviour {
      */
     @Override
     public boolean perform(Location location){
-        List<Exit> exits = location.getExits();
+        Optional<Location> destination = AdjacentLocations.randomMatching(
+                location, adjacentLocation -> true, random
+        );
 
-        if (exits.isEmpty()){
+        if (destination.isEmpty()){
             return false;
         }
 
-        Location destination = exits.get(random.nextInt(exits.size())).getDestination();
+        Location dropLocation = destination.get();
         Item produce = Objects.requireNonNull(produceFactory.create());
-        destination.addItem(produce);
+        dropLocation.addItem(produce);
 
-        System.out.println(location.getGround() + " at (" + location.x() + ", " + location.y() +
-                ") on " + location.map() + " drops a " + produce + " at (" + destination.x() +
-                ", " + destination.y() + ") on " + destination.map() + ".");
+        System.out.println(location.getGround() + " at " + PlantMessages.formatLocation(location)
+                + " drops a " + produce + " at " + PlantMessages.formatLocation(dropLocation) + ".");
 
         return true;
     }

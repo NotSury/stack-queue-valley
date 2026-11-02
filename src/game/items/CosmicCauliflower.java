@@ -15,7 +15,7 @@ public final class CosmicCauliflower extends ConsumableItem {
      * Creates a portable Cosmic Cauliflower.
      */
     public CosmicCauliflower() {
-        super("Cosmic Cauliflower", 'f');
+        super("Cosmic Cauliflower", 'u');
     }
 
     /**
