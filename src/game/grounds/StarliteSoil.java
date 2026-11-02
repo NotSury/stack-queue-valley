@@ -10,7 +10,8 @@ import game.interfaces.PlantableGround;
  * to later meteor impacts.
  *
  * @author Chin Kai Xuan 35730374
- * @version 1.0.0
+ * @author Vanessa Liau Jia Yee 34599398
+ * @version 1.1.0
  */
 public final class StarliteSoil extends Ground
         implements PlantableGround {
@@ -22,5 +23,15 @@ public final class StarliteSoil extends Ground
         super('_', "Starlite Soil");
 
         enableAbility(GroundAbility.OPEN_GROUND);
+    }
+
+    /**
+     * Checks if a crop can be placed on Starlite Soil.
+     *
+     * @return true becasue Starlite Soil supports planting
+     */
+    @Override
+    public boolean canPlant() {
+        return true;
     }
 }

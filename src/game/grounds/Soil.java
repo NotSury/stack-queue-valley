@@ -21,4 +21,14 @@ public class Soil extends Ground implements PlantableGround {
         this.enableAbility(GroundAbility.OPEN_GROUND);
         this.enableAbility(GroundAbility.METEOR_IMPACTABLE);
     }
+
+    /**
+     * Checks if a crop can be placed on this soil.
+     *
+     * @return true if planting is allowed
+     */
+    @Override
+    public boolean canPlant() {
+        return true;
+    }
 }
