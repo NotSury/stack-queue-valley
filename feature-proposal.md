@@ -173,7 +173,7 @@ are TimedAreaEffects started by the companion.
 **Supporting new classes (not counted among the six):** `CompanionAction` (abstract class
 providing shared charge and adjacency rules), `ActivateMagicAction`, `ActivateOwnAbilityAction`,
 `TimedAreaEffect` (abstract class), `TemporalFreezeEffect`, `HarvestTrailEffect`, `RainbowStormEffect`,
-`LivingSoilEffect`, `NatureSanctuaryEffect`, `AreaLocationHelper`, `MovementRestrictions`and the 
+`LivingSoilEffect`, `NatureSanctuaryEffect`, `AreaLocationHelper`, `MovementRestrictions`, `CreatureRestrictionState` and the 
 capability interfaces `GrowthAcceleratable`, `Freezable`, `FreshProduce`, `Stunnable`, 
 `Repellable` and `SoilConvertible`.
 
@@ -184,8 +184,9 @@ capability interfaces `GrowthAcceleratable`, `Freezable`, `FreshProduce`, `Stunn
   (register growth through `addGrowBehaviour`), `Dirt` (implements `SoilConvertible`).
 - Items: `Strawberry`, `Tomato`, `Parsnip` (implement `FreshProduce`).
 - REQ 3 / REQ 5: `HostileCreature` and `StatefulCreature` (implement `Stunnable`
-  and `Repellable`), `WanderBehaviour`, `MapMovementPlanner`, `MapJumpPlanner`
-  (consult `MovementRestrictions`).
+  and `Repellable`), while Spiderling implements `Stunnable`. All three use `CreatureRestrictionState`
+for shared stun handling, while the first two also use it for movement restrictions. `WanderBehaviour`, 
+`MapMovementPlanner`, `MapJumpPlanner` (consult `MovementRestrictions`).
 - No engine classes are modified.
 
 **Higher-level classes that depend only on the abstractions (DIP):**
