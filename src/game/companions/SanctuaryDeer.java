@@ -35,7 +35,7 @@ public class SanctuaryDeer extends MagicalCompanion {
      */
     public SanctuaryDeer()
     {
-        super("SanctuaryDeer", 'D', 20);
+        super("SanctuaryDeer", 'd', 20);
     }
 
     /**
