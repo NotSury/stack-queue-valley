@@ -2,6 +2,7 @@ package game.afflictions;
 
 import edu.monash.fit2099.engine.actors.Actor;
 import game.capabilities.NecromancyCapability;
+
 import java.util.List;
 import java.util.function.Supplier;
 
