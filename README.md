@@ -29,8 +29,26 @@
   \==\  _ / \==\ _.\=\.-'/==/ - , ,/==/ - , ,/==/ ,     /  /==/._/        
    `--`--'   `--`        `--`-----'`--`-----'`--`-----``   `--`-`         
 ```
-## Contribution Log
-[Contribution Log Link](https://docs.google.com/spreadsheets/d/1VfutnfXfJ8pkZfCXGZGbKtAEHKDqI-Xkg6gcwM73iw8/edit?usp=sharing)
+
+Stack Queue Valley is a turn-based farming and adventure game that runs in the terminal. You play as a farmer who has inherited a run-down farm: tilling soil, planting and watering crops, raising animals, trading with a merchant and cooking meals. Below the farm lie the Mines, where hostile creatures react to what the farmer does instead of simply chasing them.
+
+The game was built in Java by a team of five for FIT2099 (Object-Oriented Design and Implementation) at Monash University in Semester 2, 2026. It extends a turn-based game engine provided by the unit's teaching team. Each assignment added new requirements on top of the existing design, so the codebase grew over three assignments.
+
+## Contributions
+
+This was a group project, and every requirement below has a named owner. Individual classes are credited in their `@author` tags.
+
+**Surya Muni Peragas**
+- **A2 REQ5: state-based creature behaviour for the Cave Mimic and Nest Spider (main contribution).** Each creature runs on a four-state machine: the Cave Mimic moves through Disguised, Ambush, Looting and Escape, and the Nest Spider through Nesting, Weaving, Hunting and Pouncing. Gameplay conditions decide each transition, and every state has an entry effect that runs once when the creature enters it. I designed the shared state framework, built the Cave Mimic, and built the Nest Spider's actor, states, nest and Spiderlings. Lee Le Si contributed the Spider's web network, alert-driven pouncing and hazard-aware movement, and Khoo Lynn contributed tactical jumping and work on the Hunting and Pouncing states.
+- **A3 REQ2: the Cooking Station (secondary contribution).** A cooking station on the farm turns harvested ingredients into Jam, Omelette and Harvest Feast through a shared recipe workflow, with unit tests for each recipe.
+
+**Team members**
+- **Khoo Lynn:** A2 REQ2 and A3 REQ1 (plant growth and the initial farm setup).
+- **Lee Le Si:** A2 REQ4 and A3 REQ3 (The Necromancer's Curse).
+- **Vanessa Liau Jia Yee:** A2 REQ3 (the Merchant) and A3 REQ4 (Magical Farm Companions).
+- **Chin Kai Xuan:** A2 REQ1 and A3 REQ5 (Starfall: Celestial Forge).
+
+The engine in `src/edu/monash/fit2099` and the original base code were provided by the FIT2099 teaching team.
 
 ## Assignment 2 REQ5 — Cave Mimic
 
