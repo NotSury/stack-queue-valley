@@ -30,7 +30,9 @@
    `--`--'   `--`        `--`-----'`--`-----'`--`-----``   `--`-`         
 ```
 
-Stack Queue Valley is a turn-based farming and adventure game that runs in the terminal. You play as a farmer who has inherited a run-down farm: tilling soil, planting and watering crops, raising animals, trading with a merchant and cooking meals. Below the farm lie the Mines, where hostile creatures react to what the farmer does instead of simply chasing them.
+![Stack Queue Valley desktop GUI on the Inherited Farm](docs/screenshots/gui-farm.png)
+
+Stack Queue Valley is a turn-based farming and adventure game. It was written to run in the terminal, and it can now also be played in a pixel-art desktop window. You play as a farmer who has inherited a run-down farm: tilling soil, planting and watering crops, raising animals, trading with a merchant and cooking meals. Below the farm lie the Mines, where hostile creatures react to what the farmer does instead of simply chasing them.
 
 The game was built in Java by a team of five for FIT2099 (Object-Oriented Design and Implementation) at Monash University in Semester 2, 2026. It extends a turn-based game engine provided by the unit's teaching team. Each assignment added new requirements on top of the existing design, so the codebase grew over three assignments.
 
@@ -49,6 +51,35 @@ This was a group project, and every requirement below has a named owner. Individ
 - **Chin Kai Xuan:** A2 REQ1 and A3 REQ5 (Starfall: Celestial Forge).
 
 The engine in `src/edu/monash/fit2099` and the original base code were provided by the FIT2099 teaching team.
+
+## Desktop GUI (later addition)
+
+The Swing desktop GUI was added after the group project was submitted and was not part of the assessed work. The graded version is tagged `assignment-3-submission`.
+
+The GUI is a separate front end in `src/game/gui`. It runs the same game code as the console version and does not change the engine or any gameplay class. An adapter supplies the engine's input and output, and the window draws the map, status bar and inventory from live game state. Hidden information stays hidden: a disguised Cave Mimic is drawn as the Geode it imitates, and concealed Spider Webs are not drawn. All artwork is generated in code, so the project includes no third-party assets.
+
+![The Mines in the desktop GUI, with the Nest Spider, its webs and a disguised Cave Mimic](docs/screenshots/gui-mines.png)
+
+### Run the desktop GUI
+
+Requirements: JDK 17 or later.
+
+1. Open the project in IntelliJ IDEA as a Maven project.
+2. Open `src/game/gui/GuiApplication.java`.
+3. Click the green run arrow next to `main` and choose **Run 'GuiApplication.main()'**.
+
+The console version is still available from `game.Application`.
+
+### Controls
+
+| Input | Action |
+|---|---|
+| Arrow keys, numpad or number keys 1–9 | Move (the numpad layout gives the eight directions) |
+| Space or 5 | Wait one turn |
+| Letter keys | Choose the action shown next to that letter |
+| `>` / `<` (or `.` / `,`) | Next or previous page of a long action list |
+| Mouse | Click an action, a direction button or a highlighted tile next to the farmer |
+| Mouse wheel, Page Up / Page Down | Scroll the event log |
 
 ## Assignment 2 REQ5 — Cave Mimic
 
@@ -506,7 +537,7 @@ The Observatory is displayed as `O` and is located beside the Farmer's starting 
 | External API | NASA Near-Earth Object Web Service (NeoWs) |
 | API endpoint | `https://api.nasa.gov/neo/rest/v1/feed` |
 | Observatory symbol | `O` |
-| Observatory location | Inherited Farm, (1, 3) |
+| Observatory location | Inherited Farm, (17, 1) |
 | Observatory accessibility | Impassable; activated from an adjacent tile |
 | Scan stamina cost | 3 stamina |
 | Scan requirement | Farmer must be adjacent to the Observatory |
