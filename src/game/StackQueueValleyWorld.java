@@ -124,24 +124,26 @@ public class StackQueueValleyWorld extends World {
         GameMap minesMap = new GameMap("Mines", groundCreator, mines);
         this.addGameMap(minesMap);
 
-        inheritedFarmMap.at(4, 3).setGround(new ParsnipCrop());
-        inheritedFarmMap.at(6, 3).setGround(new TomatoCrop());
-        inheritedFarmMap.at(3,2).setGround(new ParsnipCrop());
-        inheritedFarmMap.at(8, 2).setGround(new TomatoCrop());
+        // Farm layout: row 3 is kept clear as a path across the whole farm.
+        // Mature crops form one plot south of the path, east of the start.
+        inheritedFarmMap.at(6, 4).setGround(new ParsnipCrop());
+        inheritedFarmMap.at(7, 4).setGround(new TomatoCrop());
+        inheritedFarmMap.at(8, 4).setGround(new CauliflowerCrop());
+        inheritedFarmMap.at(9, 4).setGround(new StrawberryCrop());
+        inheritedFarmMap.at(6, 5).setGround(new ParsnipCrop());
+        inheritedFarmMap.at(7, 5).setGround(new TomatoCrop());
+        inheritedFarmMap.at(8, 5).setGround(new MelonCrop());
 
-        inheritedFarmMap.at(2, 3).setGround(new StrawberryCrop());
-        inheritedFarmMap.at(7, 3).setGround(new CauliflowerCrop());
-        inheritedFarmMap.at(5, 1).setGround(new MelonCrop());
-
-        inheritedFarmMap.at(10, 1).setGround(new StrawberrySeedling());
-        inheritedFarmMap.at(11, 1).setGround(new StrawberrySprout());
-        inheritedFarmMap.at(12, 1).setGround(new CauliflowerSprout());
-        inheritedFarmMap.at(13, 1).setGround(new MelonSprout());
+        // Young crops form a second patch on the east side of the farm.
+        inheritedFarmMap.at(14, 5).setGround(new StrawberrySeedling());
+        inheritedFarmMap.at(15, 5).setGround(new StrawberrySprout());
+        inheritedFarmMap.at(16, 5).setGround(new CauliflowerSprout());
+        inheritedFarmMap.at(17, 5).setGround(new MelonSprout());
 
         minesMap.at(4,1).addActor(new Bat());
         minesMap.at(2,4).addActor(new Slime());
         minesMap.at(8,3).addActor(new CaveGhost());
-        inheritedFarmMap.at(5,4).addItem(new Melon());
+        inheritedFarmMap.at(9, 5).addItem(new Melon());
 
         minesMap.at(2,1).setGround(new Rock());
         minesMap.at(7,2).setGround(new Rock());
@@ -155,33 +157,33 @@ public class StackQueueValleyWorld extends World {
 
         TeleportDestination farmDestination = new TeleportDestination("Inherited Farm Ladder", inheritedFarmMap.at(0,0));
         TeleportDestination minesDestination = new TeleportDestination("Mines Ladder", minesMap.at(0,0));
-        TeleportDestination farmDestination2 = new TeleportDestination("Inherited Farm Ladder 2", inheritedFarmMap.at(9,4));
+        TeleportDestination farmDestination2 = new TeleportDestination("Inherited Farm Ladder 2", inheritedFarmMap.at(12, 5));
         TeleportDestination minesDestination2 = new TeleportDestination("Mines Ladder 2", minesMap.at(9,0));
 
         inheritedFarmMap.at(0,0).setGround(new Ladder(minesDestination));
         minesMap.at(0,0).setGround(new Ladder(farmDestination));
-        inheritedFarmMap.at(9,4).setGround(new Ladder(minesDestination2));
+        inheritedFarmMap.at(12, 5).setGround(new Ladder(minesDestination2));
         minesMap.at(9,0).setGround(new Ladder(farmDestination2));
 
         TeleportDestination farmCircleDestination = new TeleportDestination("Inherited Farm Circle", inheritedFarmMap.at(1,6));
         TeleportDestination minesCircleDestination = new TeleportDestination("Mines Circle", minesMap.at(8,6));
-        TeleportDestination farmCircleDestination2 = new TeleportDestination("Inherited Farm Circle 2", inheritedFarmMap.at(8,6));
+        TeleportDestination farmCircleDestination2 = new TeleportDestination("Inherited Farm Circle 2", inheritedFarmMap.at(19, 6));
         TeleportDestination minesCircleDestination2 = new TeleportDestination("Mines Circle 2", minesMap.at(1,6));
 
         inheritedFarmMap.at(1,6).setGround(new TeleportationCircle(minesCircleDestination));
         minesMap.at(8,6).setGround(new TeleportationCircle(farmCircleDestination));
-        inheritedFarmMap.at(8,6).setGround(new TeleportationCircle(minesCircleDestination2));
+        inheritedFarmMap.at(19, 6).setGround(new TeleportationCircle(minesCircleDestination2));
         minesMap.at(1,6).setGround(new TeleportationCircle(farmCircleDestination2));
 
-        TeleportDestination farmDeviceDestination = new TeleportDestination("Farm Clearing", inheritedFarmMap.at(8,5));
+        TeleportDestination farmDeviceDestination = new TeleportDestination("Farm Clearing", inheritedFarmMap.at(13, 3));
         TeleportDestination minesDeviceDestination = new TeleportDestination("Mines Clearing", minesMap.at(4,3));
 
         AlienDevice alienDevice = new AlienDevice(Arrays.asList(farmDeviceDestination, minesDeviceDestination));
 
-        inheritedFarmMap.at(2,6).addItem(alienDevice);
+        inheritedFarmMap.at(3, 6).addItem(alienDevice);
 
         Farmer farmer = new Farmer("Bob");
-        this.addPlayer(farmer, inheritedFarmMap.at(0, 3));
+        this.addPlayer(farmer, inheritedFarmMap.at(2, 3));
 
 // NASA data source: HTTP and JSON are kept outside gameplay logic.
         AsteroidFeed asteroidFeed = new NasaAsteroidFeed(
@@ -220,32 +222,33 @@ public class StackQueueValleyWorld extends World {
                         new Random()
                 );
 
-// Place the Observatory near the Farmer's starting location.
-        inheritedFarmMap.at(1, 3).setGround(
+// Place the Observatory in open ground on the east side of the farm.
+        inheritedFarmMap.at(17, 1).setGround(
                 new Observatory(celestialManager)
         );
 
         // REQ4: Magical farm companions
         TimeRabbit timeRabbit = new TimeRabbit();
-        inheritedFarmMap.at(3,5).addActor(timeRabbit);
+        inheritedFarmMap.at(5, 5).addActor(timeRabbit);
 
         PrismFox prismFox = new PrismFox();
-        inheritedFarmMap.at(1, 4). addActor(prismFox);
+        inheritedFarmMap.at(15, 4).addActor(prismFox);
 
         SanctuaryDeer sanctuaryDeer = new SanctuaryDeer();
-        inheritedFarmMap.at(1, 2).addActor(sanctuaryDeer);
+        inheritedFarmMap.at(15, 1).addActor(sanctuaryDeer);
 
         Cow cow = new Cow();
         Chicken chicken = new Chicken();
 
         Merchant merchant = new Merchant();
-        inheritedFarmMap.at(6, 2).addActor(merchant);
+        inheritedFarmMap.at(11, 2).addActor(merchant);
 
-        inheritedFarmMap.at(1,1).addActor(cow);
-        inheritedFarmMap.at(4,5).addActor(chicken);
+        inheritedFarmMap.at(8, 1).addActor(cow);
+        inheritedFarmMap.at(9, 2).addActor(chicken);
 
-        inheritedFarmMap.at(6,5).setGround(new PreservesJar());
-        inheritedFarmMap.at(5,6).setGround(new DryingRack());
+        // Processing facilities sit beside the Cooking Station, north of the path.
+        inheritedFarmMap.at(5, 1).setGround(new PreservesJar());
+        inheritedFarmMap.at(6, 1).setGround(new DryingRack());
 
         List<Recipe> cookingRecipes = List.of(
                 new JamRecipe(),
@@ -253,7 +256,7 @@ public class StackQueueValleyWorld extends World {
                 new HarvestFeastRecipe()
         );
 
-        inheritedFarmMap.at(2, 4).setGround(
+        inheritedFarmMap.at(4, 1).setGround(
                 new CookingStation(cookingRecipes, new Random())
         );
 
