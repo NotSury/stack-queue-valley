@@ -537,7 +537,7 @@ The Observatory is displayed as `O` and is located beside the Farmer's starting 
 | External API | NASA Near-Earth Object Web Service (NeoWs) |
 | API endpoint | `https://api.nasa.gov/neo/rest/v1/feed` |
 | Observatory symbol | `O` |
-| Observatory location | Inherited Farm, (1, 3) |
+| Observatory location | Inherited Farm, (17, 1) |
 | Observatory accessibility | Impassable; activated from an adjacent tile |
 | Scan stamina cost | 3 stamina |
 | Scan requirement | Farmer must be adjacent to the Observatory |
